@@ -14,22 +14,22 @@ export function CameraRig({ mode }: CameraRigProps) {
   const { camera, size } = useThree();
 
   // Target positions & look-ats for each camera mode
-  const targetCamPos = useRef(new THREE.Vector3(0, 1.82, 5.5));
-  const targetLookAt = useRef(new THREE.Vector3(0, 0.85, -1.0));
+  const targetCamPos = useRef(new THREE.Vector3(0, 1.78, 5.2));
+  const targetLookAt = useRef(new THREE.Vector3(0, 0.95, -1.0));
 
   useEffect(() => {
     const isPortrait = size.width < size.height;
 
-    // Room boundaries: X in [-6.5, 6.5], Y in [0.5, 3.8] (ceiling at 4.2), Z in [-8.5, 5.7] (front wall at 6.0)
+    // Room boundaries: X in [-6.5, 6.5], Y in [0.5, 3.8] (ceiling at 4.2), Z in [-8.5, 5.4] (front wall at 6.0, chalkboard at 5.92)
     if (mode === 'teacher_pov') {
       if (isPortrait) {
         // Teacher POV in portrait mode: At teacher desk, looking down over the classroom
-        targetCamPos.current.set(0, 1.85, 5.35);
+        targetCamPos.current.set(0, 1.85, 5.25);
         targetLookAt.current.set(0, 0.85, -0.8);
       } else {
         // Desktop landscape POV
-        targetCamPos.current.set(0, 1.75, 5.5);
-        targetLookAt.current.set(0, 0.9, -1.0);
+        targetCamPos.current.set(0, 1.78, 5.2);
+        targetLookAt.current.set(0, 0.95, -1.0);
       }
     } else if (mode === 'overview') {
       if (isPortrait) {
@@ -60,6 +60,8 @@ export function CameraRig({ mode }: CameraRigProps) {
   useFrame((_, delta) => {
     // Smooth cinematic interpolation when switching modes
     camera.position.lerp(targetCamPos.current, delta * 3.5);
+    // Boundary safety: never allow camera to pierce back into front wall/chalkboard (Z <= 5.45)
+    camera.position.z = Math.min(camera.position.z, 5.45);
 
     if (controlsRef.current) {
       controlsRef.current.target.lerp(targetLookAt.current, delta * 3.5);
@@ -70,6 +72,7 @@ export function CameraRig({ mode }: CameraRigProps) {
   return (
     <OrbitControls
       ref={controlsRef}
+      target={[0, 0.95, -1.0]}
       makeDefault
       enableDamping
       dampingFactor={0.06}
