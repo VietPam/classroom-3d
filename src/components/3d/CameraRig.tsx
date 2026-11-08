@@ -14,39 +14,39 @@ export function CameraRig({ mode }: CameraRigProps) {
   const { camera, size } = useThree();
 
   // Target positions & look-ats for each camera mode
-  const targetCamPos = useRef(new THREE.Vector3(0, 1.72, 5.85));
-  const targetLookAt = useRef(new THREE.Vector3(0, 0.95, -1.0));
+  const targetCamPos = useRef(new THREE.Vector3(0, 1.82, 5.5));
+  const targetLookAt = useRef(new THREE.Vector3(0, 0.85, -1.0));
 
   useEffect(() => {
     const isPortrait = size.width < size.height;
-    const aspect = size.width / Math.max(1, size.height);
 
+    // Room boundaries: X in [-6.5, 6.5], Y in [0.5, 3.8] (ceiling at 4.2), Z in [-8.5, 5.7] (front wall at 6.0)
     if (mode === 'teacher_pov') {
       if (isPortrait) {
-        // In portrait mode, pull camera further back and slightly higher so both sides of classroom and teacher desk are visible
-        const zOffset = (1 - Math.min(1, aspect)) * 2.2;
-        targetCamPos.current.set(0, 1.92, 5.85 + zOffset);
-        targetLookAt.current.set(0, 0.85, -0.6);
+        // Teacher POV in portrait mode: At teacher desk, looking down over the classroom
+        targetCamPos.current.set(0, 2.05, 5.45);
+        targetLookAt.current.set(0, 0.8, -1.2);
       } else {
-        // Behind teacher desk looking forward over the students
-        targetCamPos.current.set(0, 1.72, 5.85);
-        targetLookAt.current.set(0, 0.95, -1.0);
+        // Desktop landscape POV
+        targetCamPos.current.set(0, 1.75, 5.5);
+        targetLookAt.current.set(0, 0.9, -1.0);
       }
     } else if (mode === 'overview') {
       if (isPortrait) {
-        targetCamPos.current.set(6.2, 5.8, 5.2);
-        targetLookAt.current.set(0, 0.6, -1.0);
+        // Overview in portrait mode: high angle corner, safely below ceiling (Y < 4.0) and inside walls
+        targetCamPos.current.set(4.5, 3.5, 4.5);
+        targetLookAt.current.set(0, 0.6, -1.2);
       } else {
-        // High bird's eye orbit perspective showing the entire classroom
-        targetCamPos.current.set(5.5, 4.8, 4.0);
-        targetLookAt.current.set(0, 0.8, -1.2);
+        // Desktop landscape overview
+        targetCamPos.current.set(4.8, 3.6, 4.2);
+        targetLookAt.current.set(0, 0.7, -1.2);
       }
     }
 
-    // Adapt camera FOV dynamically to avoid narrow horizontal FOV in portrait mode
+    // Adapt camera FOV dynamically to ensure all 4 columns of desks fit comfortably on portrait screens
     if ('isPerspectiveCamera' in camera && (camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
       const persCamera = camera as THREE.PerspectiveCamera;
-      const targetFov = isPortrait ? Math.min(68, Math.max(52, Math.round(52 / (aspect * 1.25)))) : 52;
+      const targetFov = isPortrait ? 66 : 50;
       if (Math.abs(persCamera.fov - targetFov) > 0.5) {
         persCamera.fov = targetFov;
         persCamera.updateProjectionMatrix();
@@ -75,7 +75,7 @@ export function CameraRig({ mode }: CameraRigProps) {
       minAzimuthAngle={mode === 'teacher_pov' ? -Math.PI / 4 : -Infinity}
       maxAzimuthAngle={mode === 'teacher_pov' ? Math.PI / 4 : Infinity}
       minDistance={1.2}
-      maxDistance={mode === 'teacher_pov' ? 10 : 22}
+      maxDistance={mode === 'teacher_pov' ? 8 : 16}
       enablePan={mode === 'overview'}
     />
   );
