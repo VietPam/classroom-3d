@@ -43,7 +43,6 @@ export function CameraRig({ mode }: CameraRigProps) {
       }
     }
 
-    // Adapt camera FOV dynamically to ensure all 4 columns of desks fit comfortably on portrait screens
     if ('isPerspectiveCamera' in camera && (camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
       const persCamera = camera as THREE.PerspectiveCamera;
       const targetFov = isPortrait ? 66 : 50;
@@ -51,6 +50,10 @@ export function CameraRig({ mode }: CameraRigProps) {
         persCamera.fov = targetFov;
         persCamera.updateProjectionMatrix();
       }
+    }
+
+    if (controlsRef.current) {
+      controlsRef.current.target.copy(targetLookAt.current);
     }
   }, [mode, size.width, size.height, camera]);
 
@@ -70,13 +73,12 @@ export function CameraRig({ mode }: CameraRigProps) {
       makeDefault
       enableDamping
       dampingFactor={0.06}
-      maxPolarAngle={mode === 'teacher_pov' ? Math.PI / 2.05 : Math.PI / 2.1}
-      minPolarAngle={mode === 'teacher_pov' ? Math.PI / 3.2 : Math.PI / 6}
-      minAzimuthAngle={mode === 'teacher_pov' ? -Math.PI / 4 : -Infinity}
-      maxAzimuthAngle={mode === 'teacher_pov' ? Math.PI / 4 : Infinity}
+      maxPolarAngle={Math.PI / 2.05}
+      minPolarAngle={Math.PI / 6}
       minDistance={1.2}
       maxDistance={mode === 'teacher_pov' ? 8 : 16}
       enablePan={mode === 'overview'}
     />
   );
 }
+
