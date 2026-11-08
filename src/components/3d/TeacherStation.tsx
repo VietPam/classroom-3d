@@ -174,26 +174,26 @@ export function TeacherStation({ onBellClick, hasSubmittedPaper, submittedStuden
         </group>
       )}
 
-      {/* ================= TEACHER CHAIR ================= */}
-      <group position={[0, 0, 0.8]}>
+      {/* ================= TEACHER CHAIR (Tucked neatly under desk) ================= */}
+      <group position={[0, 0, 0.18]}>
         {/* Base star */}
-        <mesh position={[0, 0.1, 0]}>
-          <cylinderGeometry args={[0.28, 0.28, 0.04, 5]} />
+        <mesh position={[0, 0.08, 0]}>
+          <cylinderGeometry args={[0.26, 0.26, 0.03, 5]} />
           <meshStandardMaterial color="#0f172a" metalness={0.6} />
         </mesh>
         {/* Center column */}
-        <mesh position={[0, 0.28, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 0.32]} />
+        <mesh position={[0, 0.22, 0]}>
+          <cylinderGeometry args={[0.028, 0.028, 0.26]} />
           <meshStandardMaterial color="#334155" metalness={0.8} />
         </mesh>
         {/* Seat cushion */}
-        <mesh position={[0, 0.46, 0]} castShadow>
-          <boxGeometry args={[0.5, 0.08, 0.48]} />
+        <mesh position={[0, 0.40, 0]} castShadow>
+          <boxGeometry args={[0.48, 0.07, 0.44]} />
           <meshStandardMaterial color="#1e293b" roughness={0.7} />
         </mesh>
-        {/* Backrest */}
-        <mesh position={[0, 0.78, 0.22]} rotation={[-0.05, 0, 0]} castShadow>
-          <boxGeometry args={[0.46, 0.58, 0.06]} />
+        {/* Low backrest tucked below desk height */}
+        <mesh position={[0, 0.56, 0.16]} rotation={[-0.05, 0, 0]} castShadow>
+          <boxGeometry args={[0.44, 0.25, 0.05]} />
           <meshStandardMaterial color="#1e293b" roughness={0.7} />
         </mesh>
       </group>
