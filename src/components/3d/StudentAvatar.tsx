@@ -92,10 +92,10 @@ export function StudentAvatar({
         torsoRef.current.rotation.z = 0;
       }
 
-      // Head thinking, looking down at paper and nodding peacefully
+      // Head thinking, looking down at paper and nodding peacefully (facing teacher comfortably)
       if (headRef.current) {
-        headRef.current.rotation.x = 0.28 + Math.cos(time * 1.1 + studentSeed) * 0.04;
-        headRef.current.rotation.y = Math.sin(time * 0.6 + studentSeed) * 0.12;
+        headRef.current.rotation.x = 0.08 + Math.cos(time * 1.1 + studentSeed) * 0.03;
+        headRef.current.rotation.y = Math.sin(time * 0.6 + studentSeed) * 0.08;
       }
 
       // Left paw resting comfortably holding paper flat on desk
@@ -135,10 +135,10 @@ export function StudentAvatar({
         rightKneeRef.current.rotation.x = kneeAngle;
       }
 
-      // Torso shifts forward then rises up to standing height (0.84)
+      // Torso shifts and rises to standing height (0.46)
       if (torsoRef.current) {
-        torsoRef.current.position.y = 0.44 + t * 0.4;
-        torsoRef.current.rotation.x = Math.sin(t * Math.PI) * 0.25;
+        torsoRef.current.position.y = 0.44 + t * 0.02;
+        torsoRef.current.rotation.x = Math.sin(t * Math.PI) * 0.15;
       }
 
       // Student steps back slightly as they stand
@@ -177,7 +177,7 @@ export function StudentAvatar({
         rightLegRef.current.rotation.x = -Math.sin(gait) * 0.45;
       }
       if (torsoRef.current) {
-        torsoRef.current.position.y = 0.84 + Math.abs(Math.sin(gait)) * 0.04;
+        torsoRef.current.position.y = 0.46 + Math.abs(Math.sin(gait)) * 0.025;
       }
 
       if (t >= 1) {
@@ -215,7 +215,7 @@ export function StudentAvatar({
         rightArmRef.current.rotation.set(-0.35, 0, 0.15); // holds test paper high
       }
       if (torsoRef.current) {
-        torsoRef.current.position.y = 0.84 + Math.abs(Math.sin(gait)) * 0.05;
+        torsoRef.current.position.y = 0.46 + Math.abs(Math.sin(gait)) * 0.025;
         torsoRef.current.rotation.z = Math.sin(gait) * 0.06;
       }
       if (headRef.current) {
@@ -243,7 +243,7 @@ export function StudentAvatar({
       }
       if (torsoRef.current) {
         torsoRef.current.rotation.x = reachProgress * 0.22;
-        torsoRef.current.position.y = 0.84;
+        torsoRef.current.position.y = 0.46;
       }
       if (headRef.current) {
         headRef.current.rotation.x = reachProgress * 0.28;
@@ -305,7 +305,7 @@ export function StudentAvatar({
         rightArmRef.current.rotation.x = Math.sin(gait) * 0.35;
       }
       if (torsoRef.current) {
-        torsoRef.current.position.y = 0.84 + Math.abs(Math.sin(gait)) * 0.04;
+        torsoRef.current.position.y = 0.46 + Math.abs(Math.sin(gait)) * 0.025;
         torsoRef.current.rotation.z = -Math.sin(gait) * 0.05;
       }
       if (headRef.current) {
@@ -344,9 +344,9 @@ export function StudentAvatar({
         rightKneeRef.current.rotation.x = kneeAngle;
       }
 
-      // Torso lowers from 0.84 to 0.44
+      // Torso lowers smoothly to seated height (0.44)
       if (torsoRef.current) {
-        torsoRef.current.position.y = 0.84 - t * 0.4;
+        torsoRef.current.position.y = 0.46 - t * 0.02;
       }
 
       if (t >= 1) {
@@ -563,52 +563,109 @@ export function StudentAvatar({
               <meshBasicMaterial color="#2d1606" />
             </mesh>
 
-            {/* Signature Chill Eyes with Anime Catchlights (Lively & Cute!) */}
+            {/* ================= PROMINENT SPARKLING ANIME CAPYBARA EYES ================= */}
+            {/* Positioned clearly on the front of the face, above snout, facing camera */}
             {/* Left Eye */}
-            <group position={[-0.142, 0.048, 0.12]} rotation={[0, -0.55, 0]}>
-              <mesh scale={[0.65, 1.05, 1.05]}>
-                <sphereGeometry args={[0.032, 20, 20]} />
-                <meshStandardMaterial color="#0a0f1d" roughness={0.08} metalness={0.2} />
+            <group position={[-0.088, 0.076, 0.242]} rotation={[-0.08, -0.22, 0.06]}>
+              {/* Eye Socket Contour Ring */}
+              <mesh position={[0, 0, -0.006]} scale={[1.15, 1.18, 0.5]}>
+                <sphereGeometry args={[0.038, 24, 24]} />
+                <meshStandardMaterial color={snoutColor} roughness={0.8} />
               </mesh>
-              {/* Primary Sparkling Catchlight */}
-              <mesh position={[0.012, 0.012, 0.026]}>
-                <sphereGeometry args={[0.010, 12, 12]} />
+              {/* Glossy Obsidian Eyeball */}
+              <mesh scale={[1.0, 1.08, 0.9]} castShadow>
+                <sphereGeometry args={[0.036, 28, 28]} />
+                <meshStandardMaterial color="#070a12" roughness={0.04} metalness={0.25} />
+              </mesh>
+              {/* Relaxed / Calm Zen Eyelid across top */}
+              <mesh position={[0, 0.022, 0.016]} rotation={[-0.18, 0, -0.12]}>
+                <boxGeometry args={[0.056, 0.018, 0.022]} />
+                <meshStandardMaterial color={furColor} roughness={0.75} />
+              </mesh>
+              {/* Eyelid crease line */}
+              <mesh position={[0, 0.031, 0.022]} rotation={[0, 0, -0.1]}>
+                <boxGeometry args={[0.046, 0.003, 0.006]} />
+                <meshBasicMaterial color="#3b1d08" />
+              </mesh>
+              {/* Primary Sparkling Diamond Catchlight */}
+              <mesh position={[0.012, 0.012, 0.030]}>
+                <sphereGeometry args={[0.012, 14, 14]} />
                 <meshBasicMaterial color="#ffffff" />
               </mesh>
-              {/* Secondary Subtle Catchlight */}
-              <mesh position={[-0.008, -0.008, 0.024]}>
-                <sphereGeometry args={[0.005, 8, 8]} />
-                <meshBasicMaterial color="#ffffff" transparent opacity={0.7} />
+              {/* Secondary Soft Anime Catchlight */}
+              <mesh position={[-0.010, -0.010, 0.028]}>
+                <sphereGeometry args={[0.007, 10, 10]} />
+                <meshBasicMaterial color="#ffffff" transparent opacity={0.85} />
+              </mesh>
+              {/* Tertiary Tiny Sparkle */}
+              <mesh position={[0.014, -0.006, 0.029]}>
+                <sphereGeometry args={[0.0035, 8, 8]} />
+                <meshBasicMaterial color="#ffffff" />
               </mesh>
             </group>
 
             {/* Right Eye */}
-            <group position={[0.142, 0.048, 0.12]} rotation={[0, 0.55, 0]}>
-              <mesh scale={[0.65, 1.05, 1.05]}>
-                <sphereGeometry args={[0.032, 20, 20]} />
-                <meshStandardMaterial color="#0a0f1d" roughness={0.08} metalness={0.2} />
+            <group position={[0.088, 0.076, 0.242]} rotation={[-0.08, 0.22, -0.06]}>
+              {/* Eye Socket Contour Ring */}
+              <mesh position={[0, 0, -0.006]} scale={[1.15, 1.18, 0.5]}>
+                <sphereGeometry args={[0.038, 24, 24]} />
+                <meshStandardMaterial color={snoutColor} roughness={0.8} />
               </mesh>
-              {/* Primary Sparkling Catchlight */}
-              <mesh position={[-0.012, 0.012, 0.026]}>
-                <sphereGeometry args={[0.010, 12, 12]} />
+              {/* Glossy Obsidian Eyeball */}
+              <mesh scale={[1.0, 1.08, 0.9]} castShadow>
+                <sphereGeometry args={[0.036, 28, 28]} />
+                <meshStandardMaterial color="#070a12" roughness={0.04} metalness={0.25} />
+              </mesh>
+              {/* Relaxed / Calm Zen Eyelid across top */}
+              <mesh position={[0, 0.022, 0.016]} rotation={[-0.18, 0, 0.12]}>
+                <boxGeometry args={[0.056, 0.018, 0.022]} />
+                <meshStandardMaterial color={furColor} roughness={0.75} />
+              </mesh>
+              {/* Eyelid crease line */}
+              <mesh position={[0, 0.031, 0.022]} rotation={[0, 0, 0.1]}>
+                <boxGeometry args={[0.046, 0.003, 0.006]} />
+                <meshBasicMaterial color="#3b1d08" />
+              </mesh>
+              {/* Primary Sparkling Diamond Catchlight */}
+              <mesh position={[-0.012, 0.012, 0.030]}>
+                <sphereGeometry args={[0.012, 14, 14]} />
                 <meshBasicMaterial color="#ffffff" />
               </mesh>
-              {/* Secondary Subtle Catchlight */}
-              <mesh position={[0.008, -0.008, 0.024]}>
-                <sphereGeometry args={[0.005, 8, 8]} />
-                <meshBasicMaterial color="#ffffff" transparent opacity={0.7} />
+              {/* Secondary Soft Anime Catchlight */}
+              <mesh position={[0.010, -0.010, 0.028]}>
+                <sphereGeometry args={[0.007, 10, 10]} />
+                <meshBasicMaterial color="#ffffff" transparent opacity={0.85} />
+              </mesh>
+              {/* Tertiary Tiny Sparkle */}
+              <mesh position={[-0.014, -0.006, 0.029]}>
+                <sphereGeometry args={[0.0035, 8, 8]} />
+                <meshBasicMaterial color="#ffffff" />
               </mesh>
             </group>
 
-            {/* Cute Rosy Cheeks (Blush) */}
-            <mesh position={[-0.165, -0.032, 0.12]} rotation={[0, -Math.PI / 2 + 0.35, 0]}>
+            {/* Cute Rosy Cheeks (Soft Anime Blush) */}
+            <mesh position={[-0.145, -0.012, 0.215]} rotation={[0, -0.52, 0]}>
               <circleGeometry args={[0.038, 24]} />
-              <meshBasicMaterial color="#fb7185" transparent opacity={0.55} />
+              <meshBasicMaterial color="#fb7185" transparent opacity={0.65} />
             </mesh>
-            <mesh position={[0.165, -0.032, 0.12]} rotation={[0, Math.PI / 2 - 0.35, 0]}>
+            <mesh position={[0.145, -0.012, 0.215]} rotation={[0, 0.52, 0]}>
               <circleGeometry args={[0.038, 24]} />
-              <meshBasicMaterial color="#fb7185" transparent opacity={0.55} />
+              <meshBasicMaterial color="#fb7185" transparent opacity={0.65} />
             </mesh>
+
+            {/* Cute Whisker Muzzle Freckles */}
+            {[-0.018, 0, 0.018].map((offsetY, i) => (
+              <group key={`whisker-dot-${i}`}>
+                <mesh position={[-0.078, -0.02 + offsetY * 0.7, 0.292]}>
+                  <sphereGeometry args={[0.003, 8, 8]} />
+                  <meshBasicMaterial color="#3b1d08" />
+                </mesh>
+                <mesh position={[0.078, -0.02 + offsetY * 0.7, 0.292]}>
+                  <sphereGeometry args={[0.003, 8, 8]} />
+                  <meshBasicMaterial color="#3b1d08" />
+                </mesh>
+              </group>
+            ))}
 
             {/* Cute Rounded Cupped Ears */}
             {/* Left Ear */}
