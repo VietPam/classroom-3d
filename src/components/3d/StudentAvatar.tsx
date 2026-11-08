@@ -45,7 +45,7 @@ export function StudentAvatar({
   const aislePos: [number, number, number] = [0, 0, dz - 0.38];
   const teacherDeskPos: [number, number, number] = [0, 0, 3.15];
 
-  // Capybara Color Palette
+  // Warm Stylized Capybara Color Palette
   const furColor = data.capybaraTone || data.skinTone || '#9d633b';
   const snoutColor = '#6d3c19';
   const nosePadColor = '#1f130b';
@@ -186,45 +186,40 @@ export function StudentAvatar({
       }
     }
 
-    // ================= STATE 4: WALKING TO TEACHER DESK =================
+    // ================= STATE 4: WALKING TO TEACHER =================
     else if (state === 'WALKING_TO_TEACHER') {
-      progressRef.current += delta * 0.55; // walk speed
+      progressRef.current += delta * 0.35;
       const t = Math.min(1, progressRef.current);
 
-      // Walk along aisle (X = 0) from aislePos[2] to teacherDeskPos[2]
-      const curZ = THREE.MathUtils.lerp(aislePos[2], teacherDeskPos[2], t);
+      // Walk up center aisle (X = 0, Z from aislePos to teacher desk)
+      const startZ = seatPos[2] - 0.15;
+      const targetZ = teacherDeskPos[2];
+      const curZ = THREE.MathUtils.lerp(startZ, targetZ, t);
       rootGroupRef.current.position.set(0, 0, curZ);
 
-      // Face teacher desk (+Z direction = 0 radians)
-      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(
-        rootGroupRef.current.rotation.y,
-        0,
-        delta * 8
-      );
+      // Face forward toward teacher (+Z is front)
+      rootGroupRef.current.rotation.y = 0;
 
-      // Cute Capybara Waddle Gait (leg swing + arm counter-swing + pelvis sway)
+      // Cute energetic Capybara waddle walk cycle
       const gait = time * 8;
       checkFootstep(gait);
 
       if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = Math.sin(gait) * 0.6;
-        rightLegRef.current.rotation.x = -Math.sin(gait) * 0.6;
-      }
-      if (leftKneeRef.current && rightKneeRef.current) {
-        leftKneeRef.current.rotation.x = Math.max(0, -Math.sin(gait) * 0.7);
-        rightKneeRef.current.rotation.x = Math.max(0, Math.sin(gait) * 0.7);
+        leftLegRef.current.rotation.x = Math.sin(gait) * 0.55;
+        rightLegRef.current.rotation.x = -Math.sin(gait) * 0.55;
       }
       if (leftArmRef.current) {
-        leftArmRef.current.rotation.x = -Math.sin(gait) * 0.5;
+        leftArmRef.current.rotation.x = -Math.sin(gait) * 0.4;
       }
-      // Right arm holds test paper in front of chest
       if (rightArmRef.current) {
-        rightArmRef.current.rotation.set(-0.45 + Math.sin(gait) * 0.1, 0, 0.2);
+        rightArmRef.current.rotation.set(-0.35, 0, 0.15); // holds test paper high
       }
       if (torsoRef.current) {
-        torsoRef.current.position.y = 0.84 + Math.abs(Math.sin(gait)) * 0.04;
-        torsoRef.current.rotation.y = -Math.sin(gait) * 0.08;
-        torsoRef.current.rotation.z = Math.sin(gait) * 0.05;
+        torsoRef.current.position.y = 0.84 + Math.abs(Math.sin(gait)) * 0.05;
+        torsoRef.current.rotation.z = Math.sin(gait) * 0.06;
+      }
+      if (headRef.current) {
+        headRef.current.rotation.x = Math.sin(gait * 2) * 0.05;
       }
 
       if (t >= 1) {
@@ -233,48 +228,45 @@ export function StudentAvatar({
       }
     }
 
-    // ================= STATE 5: HANDING PAPER AT TEACHER DESK =================
+    // ================= STATE 5: HANDING PAPER =================
     else if (state === 'HANDING_PAPER') {
+      progressRef.current += delta * 0.9;
+      const t = Math.min(1, progressRef.current);
+
       rootGroupRef.current.position.set(0, 0, teacherDeskPos[2]);
-      rootGroupRef.current.rotation.y = 0;
+      rootGroupRef.current.rotation.set(0, 0, 0);
 
-      // Legs standing still
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.set(0, 0, 0);
-        rightLegRef.current.rotation.set(0, 0, 0);
+      // Cute polite bow and extend paper to teacher
+      const reachProgress = Math.sin(t * Math.PI);
+      if (rightArmRef.current) {
+        rightArmRef.current.rotation.set(-0.85 * reachProgress, 0, 0.05);
       }
-      if (leftKneeRef.current && rightKneeRef.current) {
-        leftKneeRef.current.rotation.set(0, 0, 0);
-        rightKneeRef.current.rotation.set(0, 0, 0);
-      }
-
-      // Torso & paw extend forward to place paper onto teacher desk
       if (torsoRef.current) {
+        torsoRef.current.rotation.x = reachProgress * 0.22;
         torsoRef.current.position.y = 0.84;
-        torsoRef.current.rotation.set(0.1, 0, 0);
-      }
-      if (rightArmRef.current && rightForearmRef.current) {
-        rightArmRef.current.rotation.set(-1.1, 0, 0.1);
-        rightForearmRef.current.rotation.set(-0.2, 0, 0);
       }
       if (headRef.current) {
-        // Polite respectful Capybara nod to teacher
-        headRef.current.rotation.set(0.2, 0, 0);
+        headRef.current.rotation.x = reachProgress * 0.28;
+      }
+
+      if (t >= 1) {
+        progressRef.current = 0;
+        onStateAdvance('TURNING_AROUND');
       }
     }
 
     // ================= STATE 6: TURNING AROUND =================
     else if (state === 'TURNING_AROUND') {
-      progressRef.current += delta * 2.2;
+      progressRef.current += delta * 1.5;
       const t = Math.min(1, progressRef.current);
 
-      // Rotate 180 degrees from 0 to Math.PI
       rootGroupRef.current.position.set(0, 0, teacherDeskPos[2]);
-      rootGroupRef.current.rotation.y = t * Math.PI;
+      // Smoothly rotate 180 degrees to face back toward desks (-Z)
+      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI, t);
 
-      // Paws reset to side
+      // Reset arm posture
       if (rightArmRef.current) {
-        rightArmRef.current.rotation.set(0, 0, 0.1);
+        rightArmRef.current.rotation.set(0, 0, 0);
       }
       if (torsoRef.current) {
         torsoRef.current.rotation.set(0, 0, 0);
@@ -286,34 +278,38 @@ export function StudentAvatar({
       }
     }
 
-    // ================= STATE 7: WALKING BACK TO SEAT AISLE =================
+    // ================= STATE 7: WALKING TO SEAT =================
     else if (state === 'WALKING_TO_SEAT') {
-      progressRef.current += delta * 0.55;
+      progressRef.current += delta * 0.35;
       const t = Math.min(1, progressRef.current);
 
-      // Walk along aisle back to student's row
-      const curZ = THREE.MathUtils.lerp(teacherDeskPos[2], aislePos[2], t);
+      // Walk back down aisle toward student row
+      const startZ = teacherDeskPos[2];
+      const targetZ = seatPos[2] - 0.15;
+      const curZ = THREE.MathUtils.lerp(startZ, targetZ, t);
       rootGroupRef.current.position.set(0, 0, curZ);
-      rootGroupRef.current.rotation.y = Math.PI; // facing -Z (back of classroom)
 
-      const gait = time * 8;
+      // Face back toward desk (-Z)
+      rootGroupRef.current.rotation.y = Math.PI;
+
+      // Relaxed, relieved happy walk waddle
+      const gait = time * 7.5;
       checkFootstep(gait);
 
       if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = Math.sin(gait) * 0.6;
-        rightLegRef.current.rotation.x = -Math.sin(gait) * 0.6;
-      }
-      if (leftKneeRef.current && rightKneeRef.current) {
-        leftKneeRef.current.rotation.x = Math.max(0, -Math.sin(gait) * 0.7);
-        rightKneeRef.current.rotation.x = Math.max(0, Math.sin(gait) * 0.7);
+        leftLegRef.current.rotation.x = Math.sin(gait) * 0.45;
+        rightLegRef.current.rotation.x = -Math.sin(gait) * 0.45;
       }
       if (leftArmRef.current && rightArmRef.current) {
-        leftArmRef.current.rotation.x = -Math.sin(gait) * 0.5;
-        rightArmRef.current.rotation.x = Math.sin(gait) * 0.5;
+        leftArmRef.current.rotation.x = -Math.sin(gait) * 0.35;
+        rightArmRef.current.rotation.x = Math.sin(gait) * 0.35;
       }
       if (torsoRef.current) {
         torsoRef.current.position.y = 0.84 + Math.abs(Math.sin(gait)) * 0.04;
-        torsoRef.current.rotation.z = Math.sin(gait) * 0.05;
+        torsoRef.current.rotation.z = -Math.sin(gait) * 0.05;
+      }
+      if (headRef.current) {
+        headRef.current.rotation.x = Math.sin(gait * 2) * 0.04;
       }
 
       if (t >= 1) {
@@ -414,25 +410,25 @@ export function StudentAvatar({
     >
       {/* Selection / Hover Glow ring on ground */}
       {(isHovered || isActive) && (
-        <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.3, 0.44, 24]} />
+        <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.32, 0.48, 32]} />
           <meshBasicMaterial
             color={isActive ? '#38bdf8' : '#facc15'}
             transparent
-            opacity={0.8}
+            opacity={0.85}
           />
         </mesh>
       )}
 
       {/* Floating Name Badge when hovered or active */}
       {(isHovered || isActive) && (
-        <group position={[0, 1.85, 0]}>
+        <group position={[0, 1.88, 0]}>
           <mesh>
-            <boxGeometry args={[0.76, 0.20, 0.02]} />
-            <meshBasicMaterial color="#0f172a" />
+            <boxGeometry args={[0.82, 0.22, 0.02]} />
+            <meshStandardMaterial color="#0f172a" roughness={0.4} />
           </mesh>
           <mesh position={[0, 0, 0.015]}>
-            <planeGeometry args={[0.72, 0.16]} />
+            <planeGeometry args={[0.78, 0.18]} />
             <meshBasicMaterial color={isActive ? '#0284c7' : '#1e293b'} />
           </mesh>
         </group>
@@ -441,173 +437,246 @@ export function StudentAvatar({
       {/* ================= TORSO & CAPYBARA BODY ================= */}
       <group ref={torsoRef} position={[0, 0.44, 0]}>
         {/* Chubby Pear-shaped Pelvis / Lower Body */}
-        <mesh castShadow>
-          <boxGeometry args={[0.38, 0.22, 0.36]} />
-          <meshStandardMaterial color={furColor} roughness={0.85} />
+        <mesh castShadow scale={[1.15, 0.95, 1.15]}>
+          <sphereGeometry args={[0.22, 28, 28]} />
+          <meshStandardMaterial color={furColor} roughness={0.75} />
         </mesh>
 
         {/* Cute stubby Capybara tail at back */}
-        <mesh position={[0, -0.04, -0.19]} castShadow>
-          <sphereGeometry args={[0.045, 8, 8]} />
-          <meshStandardMaterial color={snoutColor} roughness={0.9} />
+        <mesh position={[0, -0.06, -0.22]} castShadow>
+          <sphereGeometry args={[0.045, 16, 16]} />
+          <meshStandardMaterial color={snoutColor} roughness={0.8} />
         </mesh>
 
-        {/* Chest with Colorful Student Sweater / Robe */}
-        <group position={[0, 0.24, 0]}>
-          <mesh castShadow>
-            <boxGeometry args={[0.40, 0.34, 0.36]} />
+        {/* Chest with Cozy Student Sweater / Robe */}
+        <group position={[0, 0.22, 0]}>
+          <mesh castShadow scale={[1.16, 1.0, 1.08]}>
+            <capsuleGeometry args={[0.17, 0.16, 16, 28]} />
             <meshStandardMaterial
               color={isHovered ? '#fbbf24' : data.shirtColor}
-              roughness={0.7}
+              roughness={0.65}
             />
           </mesh>
 
-          {/* Student Collar detail */}
-          <mesh position={[0, 0.16, 0.185]}>
-            <boxGeometry args={[0.18, 0.05, 0.03]} />
-            <meshStandardMaterial color="#fef08a" roughness={0.6} />
+          {/* Soft rounded sweater collar */}
+          <mesh position={[0, 0.21, 0.03]} rotation={[Math.PI / 2 + 0.15, 0, 0]}>
+            <torusGeometry args={[0.12, 0.028, 16, 32]} />
+            <meshStandardMaterial color="#fef08a" roughness={0.5} />
+          </mesh>
+
+          {/* Cozy tummy patch under sweater */}
+          <mesh position={[0, 0.02, 0.14]} scale={[0.85, 1.1, 0.35]}>
+            <sphereGeometry args={[0.13, 20, 20]} />
+            <meshStandardMaterial color={bellyColor} roughness={0.8} />
           </mesh>
 
           {/* Accessory: Red Ribbon Bow */}
           {data.accessory === 'red_bow' && (
-            <group position={[0, 0.14, 0.20]}>
-              <mesh rotation={[0, 0, 0.25]}>
-                <boxGeometry args={[0.07, 0.04, 0.02]} />
-                <meshStandardMaterial color="#e11d48" />
+            <group position={[0, 0.16, 0.21]}>
+              {/* Left loop */}
+              <mesh position={[-0.04, 0.01, 0]} rotation={[0, 0, 0.4]}>
+                <torusGeometry args={[0.035, 0.014, 12, 24]} />
+                <meshStandardMaterial color="#e11d48" roughness={0.4} />
               </mesh>
-              <mesh rotation={[0, 0, -0.25]}>
-                <boxGeometry args={[0.07, 0.04, 0.02]} />
-                <meshStandardMaterial color="#e11d48" />
+              {/* Right loop */}
+              <mesh position={[0.04, 0.01, 0]} rotation={[0, 0, -0.4]}>
+                <torusGeometry args={[0.035, 0.014, 12, 24]} />
+                <meshStandardMaterial color="#e11d48" roughness={0.4} />
               </mesh>
+              {/* Center knot */}
               <mesh>
-                <sphereGeometry args={[0.022, 8, 8]} />
-                <meshStandardMaterial color="#be123c" />
+                <sphereGeometry args={[0.022, 12, 12]} />
+                <meshStandardMaterial color="#be123c" roughness={0.3} />
+              </mesh>
+              {/* Ribbon tails */}
+              <mesh position={[-0.025, -0.04, -0.005]} rotation={[0, 0, 0.3]}>
+                <capsuleGeometry args={[0.01, 0.05, 8, 12]} />
+                <meshStandardMaterial color="#e11d48" />
+              </mesh>
+              <mesh position={[0.025, -0.04, -0.005]} rotation={[0, 0, -0.3]}>
+                <capsuleGeometry args={[0.01, 0.05, 8, 12]} />
+                <meshStandardMaterial color="#e11d48" />
               </mesh>
             </group>
           )}
 
-          {/* ================= ICONIC CAPYBARA HEAD ================= */}
-          <group ref={headRef} position={[0, 0.34, 0.04]}>
+          {/* ================= ICONIC ORGANIC CAPYBARA HEAD ================= */}
+          <group ref={headRef} position={[0, 0.35, 0.06]}>
             {/* Neck */}
-            <mesh position={[0, -0.08, 0]}>
-              <cylinderGeometry args={[0.10, 0.12, 0.10]} />
-              <meshStandardMaterial color={furColor} roughness={0.85} />
+            <mesh position={[0, -0.10, -0.02]}>
+              <cylinderGeometry args={[0.10, 0.13, 0.12, 24]} />
+              <meshStandardMaterial color={furColor} roughness={0.8} />
             </mesh>
 
-            {/* Main Capybara Head (Blocky, sturdy, loaf-shaped) */}
-            <mesh castShadow>
-              <boxGeometry args={[0.28, 0.26, 0.38]} />
-              <meshStandardMaterial color={furColor} roughness={0.85} />
+            {/* Main Capybara Organic Pear-shaped Head */}
+            <mesh position={[0, 0.02, 0.02]} scale={[1.04, 1.16, 1.35]} castShadow>
+              <sphereGeometry args={[0.20, 32, 32]} />
+              <meshStandardMaterial color={furColor} roughness={0.75} />
             </mesh>
 
-            {/* Lower Chin / Belly tone */}
-            <mesh position={[0, -0.09, 0.10]} castShadow>
-              <boxGeometry args={[0.24, 0.08, 0.22]} />
-              <meshStandardMaterial color={bellyColor} roughness={0.85} />
+            {/* Chubby Cute Cheeks (Left & Right) */}
+            <mesh position={[-0.11, -0.04, 0.08]} scale={[1.05, 0.95, 1.05]} castShadow>
+              <sphereGeometry args={[0.11, 24, 24]} />
+              <meshStandardMaterial color={furColor} roughness={0.75} />
+            </mesh>
+            <mesh position={[0.11, -0.04, 0.08]} scale={[1.05, 0.95, 1.05]} castShadow>
+              <sphereGeometry args={[0.11, 24, 24]} />
+              <meshStandardMaterial color={furColor} roughness={0.75} />
             </mesh>
 
-            {/* Flat Muzzle / Snout in front */}
-            <mesh position={[0, -0.02, 0.21]} castShadow>
-              <boxGeometry args={[0.23, 0.18, 0.12]} />
-              <meshStandardMaterial color={snoutColor} roughness={0.85} />
+            {/* Lower Chin / Throat warm tone */}
+            <mesh position={[0, -0.10, 0.10]} scale={[1.1, 0.7, 1.2]} castShadow>
+              <sphereGeometry args={[0.12, 20, 20]} />
+              <meshStandardMaterial color={bellyColor} roughness={0.8} />
             </mesh>
 
-            {/* Black Nose Pad */}
-            <mesh position={[0, 0.045, 0.272]}>
-              <boxGeometry args={[0.10, 0.045, 0.02]} />
-              <meshStandardMaterial color={nosePadColor} roughness={0.5} />
+            {/* Smooth Rounded Snout */}
+            <mesh
+              position={[0, -0.02, 0.22]}
+              rotation={[Math.PI / 2, 0, 0]}
+              scale={[1.12, 1.0, 0.95]}
+              castShadow
+            >
+              <capsuleGeometry args={[0.09, 0.09, 16, 28]} />
+              <meshStandardMaterial color={snoutColor} roughness={0.75} />
+            </mesh>
+
+            {/* Cute Rounded Black Button Nose Pad */}
+            <mesh position={[0, 0.036, 0.315]} scale={[1.3, 0.85, 0.9]} castShadow>
+              <sphereGeometry args={[0.034, 20, 20]} />
+              <meshStandardMaterial color={nosePadColor} roughness={0.35} metalness={0.1} />
             </mesh>
 
             {/* Nostrils */}
-            <mesh position={[-0.025, 0.042, 0.283]}>
-              <boxGeometry args={[0.015, 0.012, 0.005]} />
+            <mesh position={[-0.022, 0.032, 0.336]}>
+              <sphereGeometry args={[0.007, 8, 8]} />
               <meshBasicMaterial color="#000000" />
             </mesh>
-            <mesh position={[0.025, 0.042, 0.283]}>
-              <boxGeometry args={[0.015, 0.012, 0.005]} />
+            <mesh position={[0.022, 0.032, 0.336]}>
+              <sphereGeometry args={[0.007, 8, 8]} />
               <meshBasicMaterial color="#000000" />
             </mesh>
 
-            {/* Signature Chill Half-Closed Eyes */}
-            <mesh position={[-0.142, 0.048, 0.10]} rotation={[0, -Math.PI / 2, 0]}>
-              <boxGeometry args={[0.045, 0.015, 0.008]} />
-              <meshBasicMaterial color="#1a110a" />
-            </mesh>
-            <mesh position={[0.142, 0.048, 0.10]} rotation={[0, Math.PI / 2, 0]}>
-              <boxGeometry args={[0.045, 0.015, 0.008]} />
-              <meshBasicMaterial color="#1a110a" />
+            {/* Sweet chill mouth line */}
+            <mesh position={[0, -0.025, 0.306]} rotation={[Math.PI, 0, 0]}>
+              <torusGeometry args={[0.026, 0.004, 8, 16, Math.PI]} />
+              <meshBasicMaterial color="#2d1606" />
             </mesh>
 
-            {/* Cute Rosy Cheek Blushes */}
-            <mesh position={[-0.142, -0.02, 0.10]} rotation={[0, -Math.PI / 2, 0]}>
-              <planeGeometry args={[0.04, 0.025]} />
-              <meshBasicMaterial color="#f472b6" transparent opacity={0.7} />
-            </mesh>
-            <mesh position={[0.142, -0.02, 0.10]} rotation={[0, Math.PI / 2, 0]}>
-              <planeGeometry args={[0.04, 0.025]} />
-              <meshBasicMaterial color="#f472b6" transparent opacity={0.7} />
-            </mesh>
-
-            {/* Small Rounded Ears */}
-            <group position={[-0.13, 0.135, -0.05]} rotation={[0.2, -0.2, -0.35]}>
-              <mesh castShadow>
-                <sphereGeometry args={[0.045, 8, 8]} />
-                <meshStandardMaterial color={snoutColor} roughness={0.9} />
+            {/* Signature Chill Eyes with Anime Catchlights (Lively & Cute!) */}
+            {/* Left Eye */}
+            <group position={[-0.142, 0.048, 0.12]} rotation={[0, -0.55, 0]}>
+              <mesh scale={[0.65, 1.05, 1.05]}>
+                <sphereGeometry args={[0.032, 20, 20]} />
+                <meshStandardMaterial color="#0a0f1d" roughness={0.08} metalness={0.2} />
               </mesh>
-              <mesh position={[0, 0, 0.01]}>
-                <sphereGeometry args={[0.025, 8, 8]} />
-                <meshStandardMaterial color={innerEarColor} roughness={0.8} />
+              {/* Primary Sparkling Catchlight */}
+              <mesh position={[0.012, 0.012, 0.026]}>
+                <sphereGeometry args={[0.010, 12, 12]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+              {/* Secondary Subtle Catchlight */}
+              <mesh position={[-0.008, -0.008, 0.024]}>
+                <sphereGeometry args={[0.005, 8, 8]} />
+                <meshBasicMaterial color="#ffffff" transparent opacity={0.7} />
               </mesh>
             </group>
-            <group position={[0.13, 0.135, -0.05]} rotation={[0.2, 0.2, 0.35]}>
-              <mesh castShadow>
-                <sphereGeometry args={[0.045, 8, 8]} />
-                <meshStandardMaterial color={snoutColor} roughness={0.9} />
+
+            {/* Right Eye */}
+            <group position={[0.142, 0.048, 0.12]} rotation={[0, 0.55, 0]}>
+              <mesh scale={[0.65, 1.05, 1.05]}>
+                <sphereGeometry args={[0.032, 20, 20]} />
+                <meshStandardMaterial color="#0a0f1d" roughness={0.08} metalness={0.2} />
               </mesh>
-              <mesh position={[0, 0, 0.01]}>
-                <sphereGeometry args={[0.025, 8, 8]} />
-                <meshStandardMaterial color={innerEarColor} roughness={0.8} />
+              {/* Primary Sparkling Catchlight */}
+              <mesh position={[-0.012, 0.012, 0.026]}>
+                <sphereGeometry args={[0.010, 12, 12]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+              {/* Secondary Subtle Catchlight */}
+              <mesh position={[0.008, -0.008, 0.024]}>
+                <sphereGeometry args={[0.005, 8, 8]} />
+                <meshBasicMaterial color="#ffffff" transparent opacity={0.7} />
+              </mesh>
+            </group>
+
+            {/* Cute Rosy Cheeks (Blush) */}
+            <mesh position={[-0.165, -0.032, 0.12]} rotation={[0, -Math.PI / 2 + 0.35, 0]}>
+              <circleGeometry args={[0.038, 24]} />
+              <meshBasicMaterial color="#fb7185" transparent opacity={0.55} />
+            </mesh>
+            <mesh position={[0.165, -0.032, 0.12]} rotation={[0, Math.PI / 2 - 0.35, 0]}>
+              <circleGeometry args={[0.038, 24]} />
+              <meshBasicMaterial color="#fb7185" transparent opacity={0.55} />
+            </mesh>
+
+            {/* Cute Rounded Cupped Ears */}
+            {/* Left Ear */}
+            <group position={[-0.14, 0.14, -0.04]} rotation={[0.2, -0.3, -0.35]}>
+              <mesh castShadow scale={[1.0, 1.25, 0.6]}>
+                <capsuleGeometry args={[0.032, 0.03, 14, 20]} />
+                <meshStandardMaterial color={snoutColor} roughness={0.8} />
+              </mesh>
+              <mesh position={[0, 0, 0.012]} scale={[0.85, 0.95, 0.5]}>
+                <sphereGeometry args={[0.026, 16, 16]} />
+                <meshStandardMaterial color={innerEarColor} roughness={0.7} />
+              </mesh>
+            </group>
+            {/* Right Ear */}
+            <group position={[0.14, 0.14, -0.04]} rotation={[0.2, 0.3, 0.35]}>
+              <mesh castShadow scale={[1.0, 1.25, 0.6]}>
+                <capsuleGeometry args={[0.032, 0.03, 14, 20]} />
+                <meshStandardMaterial color={snoutColor} roughness={0.8} />
+              </mesh>
+              <mesh position={[0, 0, 0.012]} scale={[0.85, 0.95, 0.5]}>
+                <sphereGeometry args={[0.026, 16, 16]} />
+                <meshStandardMaterial color={innerEarColor} roughness={0.7} />
               </mesh>
             </group>
 
             {/* ================= MEME ACCESSORIES ================= */}
             {/* 1. Iconic Yuzu Orange on Head */}
             {data.accessory === 'orange' && (
-              <group position={[0, 0.19, 0.04]}>
+              <group position={[0, 0.22, 0.04]}>
                 <mesh castShadow>
-                  <sphereGeometry args={[0.075, 12, 12]} />
-                  <meshStandardMaterial color="#ea580c" roughness={0.5} />
+                  <sphereGeometry args={[0.08, 24, 24]} />
+                  <meshStandardMaterial color="#ea580c" roughness={0.35} />
                 </mesh>
                 {/* Stem */}
-                <mesh position={[0, 0.075, 0]}>
-                  <cylinderGeometry args={[0.008, 0.008, 0.03]} />
+                <mesh position={[0, 0.08, 0]}>
+                  <cylinderGeometry args={[0.008, 0.008, 0.03, 12]} />
                   <meshStandardMaterial color="#15803d" />
                 </mesh>
-                {/* Leaf */}
-                <mesh position={[0.025, 0.08, 0]} rotation={[0.3, 0, 0.6]}>
-                  <boxGeometry args={[0.04, 0.01, 0.06]} />
-                  <meshStandardMaterial color="#22c55e" />
+                {/* Cute curved green leaf */}
+                <mesh
+                  position={[0.03, 0.085, 0]}
+                  rotation={[0.3, 0, 0.6]}
+                  scale={[1, 0.25, 1.8]}
+                >
+                  <sphereGeometry args={[0.032, 14, 14]} />
+                  <meshStandardMaterial color="#22c55e" roughness={0.4} />
                 </mesh>
               </group>
             )}
 
             {/* 2. Pink Lotus Flower on Head */}
             {data.accessory === 'lotus' && (
-              <group position={[0, 0.16, 0.04]}>
-                {/* Golden center */}
+              <group position={[0, 0.19, 0.04]}>
+                {/* Golden pistil center */}
                 <mesh>
-                  <sphereGeometry args={[0.035, 10, 10]} />
+                  <sphereGeometry args={[0.035, 16, 16]} />
                   <meshStandardMaterial color="#facc15" roughness={0.3} />
                 </mesh>
-                {/* Petals */}
-                {[0, 60, 120, 180, 240, 300].map((deg) => (
+                {/* Delicate curved petals */}
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
                   <mesh
                     key={deg}
-                    rotation={[0.35, (deg * Math.PI) / 180, 0]}
+                    rotation={[0.4, (deg * Math.PI) / 180, 0]}
                     position={[0, 0.015, 0]}
+                    scale={[0.8, 0.3, 1.4]}
                   >
-                    <boxGeometry args={[0.035, 0.012, 0.08]} />
-                    <meshStandardMaterial color="#f472b6" roughness={0.5} />
+                    <sphereGeometry args={[0.035, 12, 12]} />
+                    <meshStandardMaterial color="#f472b6" roughness={0.4} />
                   </mesh>
                 ))}
               </group>
@@ -615,46 +684,46 @@ export function StudentAvatar({
 
             {/* 3. Round Scholar Wire Glasses */}
             {data.accessory === 'glasses' && (
-              <group position={[0, 0.048, 0.20]}>
+              <group position={[0, 0.048, 0.22]}>
                 {/* Left Lens ring */}
                 <mesh position={[-0.09, 0, 0]}>
-                  <torusGeometry args={[0.045, 0.008, 8, 16]} />
-                  <meshStandardMaterial color="#1e1b4b" metalness={0.6} />
+                  <torusGeometry args={[0.046, 0.006, 16, 32]} />
+                  <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
                 </mesh>
                 {/* Right Lens ring */}
                 <mesh position={[0.09, 0, 0]}>
-                  <torusGeometry args={[0.045, 0.008, 8, 16]} />
-                  <meshStandardMaterial color="#1e1b4b" metalness={0.6} />
+                  <torusGeometry args={[0.046, 0.006, 16, 32]} />
+                  <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
                 </mesh>
                 {/* Glasses Bridge */}
-                <mesh position={[0, 0.01, 0]}>
-                  <boxGeometry args={[0.09, 0.01, 0.01]} />
-                  <meshStandardMaterial color="#1e1b4b" metalness={0.6} />
+                <mesh position={[0, 0.015, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.005, 0.005, 0.09, 8]} />
+                  <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
                 </mesh>
               </group>
             )}
 
             {/* 4. Scholar / Graduation Mortarboard Hat */}
             {data.accessory === 'scholar_hat' && (
-              <group position={[0, 0.17, 0.02]} rotation={[0.06, 0.12, -0.04]}>
+              <group position={[0, 0.21, 0.02]} rotation={[0.06, 0.12, -0.04]}>
                 {/* Cap base */}
                 <mesh position={[0, -0.02, 0]}>
-                  <cylinderGeometry args={[0.10, 0.11, 0.05, 12]} />
-                  <meshStandardMaterial color="#1e1b4b" />
+                  <cylinderGeometry args={[0.11, 0.12, 0.05, 24]} />
+                  <meshStandardMaterial color="#1e1b4b" roughness={0.5} />
                 </mesh>
                 {/* Flat square board */}
                 <mesh position={[0, 0.02, 0]} castShadow>
-                  <boxGeometry args={[0.26, 0.015, 0.26]} />
-                  <meshStandardMaterial color="#0f172a" roughness={0.6} />
+                  <boxGeometry args={[0.28, 0.015, 0.28]} />
+                  <meshStandardMaterial color="#0f172a" roughness={0.5} />
                 </mesh>
                 {/* Golden button & tassel */}
                 <mesh position={[0, 0.035, 0]}>
-                  <sphereGeometry args={[0.018, 8, 8]} />
-                  <meshStandardMaterial color="#facc15" />
+                  <sphereGeometry args={[0.018, 12, 12]} />
+                  <meshStandardMaterial color="#facc15" metalness={0.8} />
                 </mesh>
-                <mesh position={[0.09, -0.02, 0.09]} rotation={[0, 0, 0.2]}>
-                  <cylinderGeometry args={[0.006, 0.01, 0.1, 6]} />
-                  <meshStandardMaterial color="#facc15" />
+                <mesh position={[0.10, -0.02, 0.10]} rotation={[0, 0, 0.2]}>
+                  <cylinderGeometry args={[0.006, 0.012, 0.1, 10]} />
+                  <meshStandardMaterial color="#facc15" roughness={0.4} />
                 </mesh>
               </group>
             )}
@@ -664,25 +733,32 @@ export function StudentAvatar({
           <group ref={leftArmRef} position={[-0.23, 0.14, 0]}>
             {/* Shoulder */}
             <mesh castShadow>
-              <sphereGeometry args={[0.06, 12, 12]} />
-              <meshStandardMaterial color={data.shirtColor} />
+              <sphereGeometry args={[0.065, 20, 20]} />
+              <meshStandardMaterial color={data.shirtColor} roughness={0.65} />
             </mesh>
             {/* Upper arm sleeve */}
-            <mesh position={[0, -0.12, 0]} castShadow>
-              <cylinderGeometry args={[0.05, 0.045, 0.2]} />
-              <meshStandardMaterial color={data.shirtColor} />
+            <mesh position={[0, -0.11, 0]} castShadow>
+              <capsuleGeometry args={[0.048, 0.13, 14, 20]} />
+              <meshStandardMaterial color={data.shirtColor} roughness={0.65} />
             </mesh>
             {/* Forearm & Furry Paw */}
-            <group position={[0, -0.22, 0]}>
-              <mesh position={[0, -0.08, 0]} castShadow>
-                <cylinderGeometry args={[0.042, 0.04, 0.16]} />
-                <meshStandardMaterial color={furColor} />
+            <group position={[0, -0.21, 0]}>
+              <mesh position={[0, -0.07, 0]} castShadow>
+                <capsuleGeometry args={[0.042, 0.12, 14, 20]} />
+                <meshStandardMaterial color={furColor} roughness={0.75} />
               </mesh>
-              {/* Claws / Paw Pad */}
-              <mesh position={[0, -0.16, 0.02]} castShadow>
-                <boxGeometry args={[0.07, 0.03, 0.06]} />
-                <meshStandardMaterial color={snoutColor} />
+              {/* Chubby Cute Paw */}
+              <mesh position={[0, -0.15, 0.03]} scale={[1.15, 0.85, 1.25]} castShadow>
+                <sphereGeometry args={[0.048, 20, 20]} />
+                <meshStandardMaterial color={snoutColor} roughness={0.7} />
               </mesh>
+              {/* 3 Cute Paw Claws / Beans */}
+              {[-0.028, 0, 0.028].map((px) => (
+                <mesh key={`lpaw-${px}`} position={[px, -0.165, 0.07]}>
+                  <sphereGeometry args={[0.012, 10, 10]} />
+                  <meshStandardMaterial color={nosePadColor} roughness={0.5} />
+                </mesh>
+              ))}
             </group>
           </group>
 
@@ -690,37 +766,57 @@ export function StudentAvatar({
           <group ref={rightArmRef} position={[0.23, 0.14, 0]}>
             {/* Shoulder */}
             <mesh castShadow>
-              <sphereGeometry args={[0.06, 12, 12]} />
-              <meshStandardMaterial color={data.shirtColor} />
+              <sphereGeometry args={[0.065, 20, 20]} />
+              <meshStandardMaterial color={data.shirtColor} roughness={0.65} />
             </mesh>
             {/* Upper arm sleeve */}
-            <mesh position={[0, -0.12, 0]} castShadow>
-              <cylinderGeometry args={[0.05, 0.045, 0.2]} />
-              <meshStandardMaterial color={data.shirtColor} />
+            <mesh position={[0, -0.11, 0]} castShadow>
+              <capsuleGeometry args={[0.048, 0.13, 14, 20]} />
+              <meshStandardMaterial color={data.shirtColor} roughness={0.65} />
             </mesh>
             {/* Forearm & Furry Paw */}
-            <group ref={rightForearmRef} position={[0, -0.22, 0]}>
-              <mesh position={[0, -0.08, 0]} castShadow>
-                <cylinderGeometry args={[0.042, 0.04, 0.16]} />
-                <meshStandardMaterial color={furColor} />
+            <group ref={rightForearmRef} position={[0, -0.21, 0]}>
+              <mesh position={[0, -0.07, 0]} castShadow>
+                <capsuleGeometry args={[0.042, 0.12, 14, 20]} />
+                <meshStandardMaterial color={furColor} roughness={0.75} />
               </mesh>
-              {/* Claws / Paw Pad */}
-              <mesh position={[0, -0.16, 0.02]} castShadow>
-                <boxGeometry args={[0.07, 0.03, 0.06]} />
-                <meshStandardMaterial color={snoutColor} />
+              {/* Chubby Cute Paw */}
+              <mesh position={[0, -0.15, 0.03]} scale={[1.15, 0.85, 1.25]} castShadow>
+                <sphereGeometry args={[0.048, 20, 20]} />
+                <meshStandardMaterial color={snoutColor} roughness={0.7} />
               </mesh>
+              {/* 3 Cute Paw Claws / Beans */}
+              {[-0.028, 0, 0.028].map((px) => (
+                <mesh key={`rpaw-${px}`} position={[px, -0.165, 0.07]}>
+                  <sphereGeometry args={[0.012, 10, 10]} />
+                  <meshStandardMaterial color={nosePadColor} roughness={0.5} />
+                </mesh>
+              ))}
 
               {/* Exam Paper held in right paw while walking or handing in */}
               {isCarryingPaper && (
-                <group position={[0.02, -0.15, 0.12]} rotation={[0.4, 0, 0]}>
+                <group position={[0.02, -0.15, 0.14]} rotation={[0.4, 0, 0]}>
                   <mesh castShadow>
                     <boxGeometry args={[0.22, 0.005, 0.28]} />
-                    <meshStandardMaterial color="#ffffff" roughness={0.6} />
+                    <meshStandardMaterial color="#ffffff" roughness={0.5} />
                   </mesh>
                   {/* Red Exam Seal on paper */}
                   <mesh position={[0.06, 0.004, 0.08]}>
-                    <cylinderGeometry args={[0.02, 0.02, 0.005, 12]} />
+                    <cylinderGeometry args={[0.022, 0.022, 0.006, 16]} />
                     <meshBasicMaterial color="#e11d48" />
+                  </mesh>
+                  {/* Paper Header Lines */}
+                  <mesh position={[-0.02, 0.004, -0.08]}>
+                    <planeGeometry args={[0.14, 0.018]} />
+                    <meshBasicMaterial color="#1e293b" />
+                  </mesh>
+                  <mesh position={[0, 0.004, -0.03]}>
+                    <planeGeometry args={[0.18, 0.012]} />
+                    <meshBasicMaterial color="#94a3b8" />
+                  </mesh>
+                  <mesh position={[0, 0.004, 0.01]}>
+                    <planeGeometry args={[0.18, 0.012]} />
+                    <meshBasicMaterial color="#94a3b8" />
                   </mesh>
                 </group>
               )}
@@ -731,47 +827,61 @@ export function StudentAvatar({
 
       {/* ================= HIND LEGS & FEET ================= */}
       {/* Left Hind Leg */}
-      <group position={[-0.12, 0.44, 0]}>
+      <group position={[-0.13, 0.44, 0]}>
         <group ref={leftLegRef}>
-          {/* Thigh */}
-          <mesh position={[0, -0.15, 0]} castShadow>
-            <cylinderGeometry args={[0.07, 0.06, 0.3]} />
-            <meshStandardMaterial color={furColor} roughness={0.8} />
+          {/* Chubby Thigh */}
+          <mesh position={[0, -0.13, 0]} castShadow>
+            <capsuleGeometry args={[0.068, 0.18, 16, 20]} />
+            <meshStandardMaterial color={furColor} roughness={0.75} />
           </mesh>
           {/* Knee & Calf */}
-          <group ref={leftKneeRef} position={[0, -0.3, 0]}>
-            <mesh position={[0, -0.15, 0]} castShadow>
-              <cylinderGeometry args={[0.06, 0.05, 0.3]} />
-              <meshStandardMaterial color={furColor} roughness={0.8} />
+          <group ref={leftKneeRef} position={[0, -0.28, 0]}>
+            <mesh position={[0, -0.13, 0]} castShadow>
+              <capsuleGeometry args={[0.058, 0.16, 16, 20]} />
+              <meshStandardMaterial color={furColor} roughness={0.75} />
             </mesh>
-            {/* Hind Paw */}
-            <mesh position={[0, -0.32, 0.05]} castShadow>
-              <boxGeometry args={[0.10, 0.06, 0.18]} />
+            {/* Rounded Chubby Hind Paw */}
+            <mesh position={[0, -0.28, 0.06]} scale={[1.1, 0.8, 1.35]} castShadow>
+              <capsuleGeometry args={[0.052, 0.08, 14, 20]} />
               <meshStandardMaterial color={snoutColor} roughness={0.7} />
             </mesh>
+            {/* Hind Toe Beans */}
+            {[-0.03, 0, 0.03].map((px) => (
+              <mesh key={`lhfoot-${px}`} position={[px, -0.31, 0.13]}>
+                <sphereGeometry args={[0.014, 10, 10]} />
+                <meshStandardMaterial color={nosePadColor} roughness={0.5} />
+              </mesh>
+            ))}
           </group>
         </group>
       </group>
 
       {/* Right Hind Leg */}
-      <group position={[0.12, 0.44, 0]}>
+      <group position={[0.13, 0.44, 0]}>
         <group ref={rightLegRef}>
-          {/* Thigh */}
-          <mesh position={[0, -0.15, 0]} castShadow>
-            <cylinderGeometry args={[0.07, 0.06, 0.3]} />
-            <meshStandardMaterial color={furColor} roughness={0.8} />
+          {/* Chubby Thigh */}
+          <mesh position={[0, -0.13, 0]} castShadow>
+            <capsuleGeometry args={[0.068, 0.18, 16, 20]} />
+            <meshStandardMaterial color={furColor} roughness={0.75} />
           </mesh>
           {/* Knee & Calf */}
-          <group ref={rightKneeRef} position={[0, -0.3, 0]}>
-            <mesh position={[0, -0.15, 0]} castShadow>
-              <cylinderGeometry args={[0.06, 0.05, 0.3]} />
-              <meshStandardMaterial color={furColor} roughness={0.8} />
+          <group ref={rightKneeRef} position={[0, -0.28, 0]}>
+            <mesh position={[0, -0.13, 0]} castShadow>
+              <capsuleGeometry args={[0.058, 0.16, 16, 20]} />
+              <meshStandardMaterial color={furColor} roughness={0.75} />
             </mesh>
-            {/* Hind Paw */}
-            <mesh position={[0, -0.32, 0.05]} castShadow>
-              <boxGeometry args={[0.10, 0.06, 0.18]} />
+            {/* Rounded Chubby Hind Paw */}
+            <mesh position={[0, -0.28, 0.06]} scale={[1.1, 0.8, 1.35]} castShadow>
+              <capsuleGeometry args={[0.052, 0.08, 14, 20]} />
               <meshStandardMaterial color={snoutColor} roughness={0.7} />
             </mesh>
+            {/* Hind Toe Beans */}
+            {[-0.03, 0, 0.03].map((px) => (
+              <mesh key={`rhfoot-${px}`} position={[px, -0.31, 0.13]}>
+                <sphereGeometry args={[0.014, 10, 10]} />
+                <meshStandardMaterial color={nosePadColor} roughness={0.5} />
+              </mesh>
+            ))}
           </group>
         </group>
       </group>
