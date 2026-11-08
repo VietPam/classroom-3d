@@ -24,8 +24,8 @@ export function CameraRig({ mode }: CameraRigProps) {
     if (mode === 'teacher_pov') {
       if (isPortrait) {
         // Teacher POV in portrait mode: At teacher desk, looking down over the classroom
-        targetCamPos.current.set(0, 2.05, 5.45);
-        targetLookAt.current.set(0, 0.8, -1.2);
+        targetCamPos.current.set(0, 1.85, 5.35);
+        targetLookAt.current.set(0, 0.85, -0.8);
       } else {
         // Desktop landscape POV
         targetCamPos.current.set(0, 1.75, 5.5);
@@ -34,8 +34,8 @@ export function CameraRig({ mode }: CameraRigProps) {
     } else if (mode === 'overview') {
       if (isPortrait) {
         // Overview in portrait mode: high angle corner, safely below ceiling (Y < 4.0) and inside walls
-        targetCamPos.current.set(4.5, 3.5, 4.5);
-        targetLookAt.current.set(0, 0.6, -1.2);
+        targetCamPos.current.set(4.8, 3.8, 4.2);
+        targetLookAt.current.set(0, 0.7, -1.2);
       } else {
         // Desktop landscape overview
         targetCamPos.current.set(4.8, 3.6, 4.2);
