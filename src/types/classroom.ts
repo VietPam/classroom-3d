@@ -39,6 +39,8 @@ export interface StudentData {
   shirtColor: string;
   pantsColor: string;
   shoesColor: string;
+  accessory?: 'orange' | 'lotus' | 'glasses' | 'scholar_hat' | 'red_bow' | 'none';
+  capybaraTone?: string;
   // Desk grid coordinate in world space
   deskPosition: [number, number, number]; // [x, y, z]
   aisleWaypoint: [number, number, number];

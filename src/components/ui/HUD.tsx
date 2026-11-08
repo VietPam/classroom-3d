@@ -54,13 +54,13 @@ export function HUD({ store }: HUDProps) {
           <div className="min-w-0">
             <h1 className="text-xs sm:text-sm font-bold text-white tracking-wide flex items-center gap-1.5 m-0 p-0 truncate">
               <span>Math 301</span>
-              <span className="hidden sm:inline text-slate-300 font-normal">: Advanced Calculus Exam</span>
-              <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
-                Live
+              <span className="hidden sm:inline text-slate-300 font-normal">: Capybara Calculus Exam 🐾</span>
+              <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+                Capy Live
               </span>
             </h1>
             <p className="hidden md:block text-xs text-slate-400 m-0 p-0 truncate">
-              Interactive 3D Low-Poly Classroom & Student Kinematics
+              Capybara 3D Low-Poly Classroom & Kinematics
             </p>
           </div>
         </div>
