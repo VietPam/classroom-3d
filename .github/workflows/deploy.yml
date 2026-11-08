@@ -1,0 +1,28 @@
+name: Trigger Cloudflare Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Request Central Cloudflare Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger repo-deploy-cloudflare
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DEPLOY_TRIGGER_PAT }}
+          repository: VietPam/repo-deploy-cloudflare
+          event-type: deploy-cloudflare
+          client-payload: |
+            {
+              "repository": "${{ github.repository }}",
+              "ref": "${{ github.ref_name }}",
+              "service_type": "pages",
+              "project_name": "classroom-3d",
+              "output_dir": "dist",
+              "build_command": "npm run build"
+            }
