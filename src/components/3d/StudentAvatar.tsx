@@ -1,50 +1,102 @@
 import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useGraph } from '@react-three/fiber';
+import { useGLTF, useTexture } from '@react-three/drei';
+import { SkeletonUtils } from 'three-stdlib';
 import type { StudentData } from '../../types/classroom';
-import { useCapybaraGLTF } from './CapybaraGLTF';
+import type { ProtagonistGLTFResult } from './ProtagonistGLTF';
 import { CapybaraAccessories } from './CapybaraAccessories';
 
 interface StudentAvatarProps {
   data: StudentData;
 }
 
+// Map each student to a distinct protagonist skin
+const SKIN_MAP: Record<string, string> = {
+  s1: '/models/skins/skaterMaleA.png',
+  s2: '/models/skins/skaterFemaleA.png',
+  s3: '/models/skins/cyborgFemaleA.png',
+  s4: '/models/skins/criminalMaleA.png',
+  s5: '/models/skins/skaterFemaleA.png',
+  s6: '/models/skins/skaterMaleA.png',
+  s7: '/models/skins/cyborgFemaleA.png',
+  s8: '/models/skins/criminalMaleA.png',
+  s9: '/models/skins/skaterFemaleA.png',
+};
+
 export function StudentAvatar({ data }: StudentAvatarProps) {
   const rootGroupRef = useRef<THREE.Group>(null);
-  const headRef = useRef<THREE.Group>(null);
-  const { nodes, materials } = useCapybaraGLTF();
+  const headBoneRef = useRef<THREE.Bone | null>(null);
 
   const [dx, , dz] = data.deskPosition;
-  const seatPos: [number, number, number] = [dx, 0.05, dz - 0.28];
+  const seatPos: [number, number, number] = [dx, 0.42, dz - 0.26];
 
-  // Unique custom materials per student for custom fur / clothing tone
-  const furColor = data.capybaraTone || data.skinTone || '#9d633b';
-  const customFurMaterial = useMemo(() => {
-    const mat = materials.zoo_capybara.clone();
-    mat.color = new THREE.Color(furColor);
-    mat.roughness = 0.8;
-    return mat;
-  }, [furColor, materials.zoo_capybara]);
+  // Load the rigged Humanoid GLTF
+  const { scene } = useGLTF('/models/protagonist.glb');
+  const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+  const { nodes, materials } = useGraph(clone) as unknown as ProtagonistGLTFResult;
 
-  const customShirtMaterial = useMemo(() => {
-    const mat = materials.zoo_capybara.clone();
-    mat.color = new THREE.Color(data.shirtColor);
+  // Load texture skin
+  const skinPath = SKIN_MAP[data.id] || '/models/skins/skaterMaleA.png';
+  const skinTexture = useTexture(skinPath);
+  skinTexture.flipY = false;
+
+  const customMaterial = useMemo(() => {
+    const mat = materials.skin.clone();
+    mat.map = skinTexture;
     mat.roughness = 0.6;
+    mat.needsUpdate = true;
     return mat;
-  }, [data.shirtColor, materials.zoo_capybara]);
+  }, [materials.skin, skinTexture]);
+
+  // Pose bones for seated studying posture:
+  // Hips seated, thighs bent 90 deg forward, knees bent 90 deg down, hands resting on desk
+  useMemo(() => {
+    clone.traverse((child) => {
+      if ((child as THREE.Bone).isBone) {
+        const bone = child as THREE.Bone;
+        if (bone.name.toLowerCase().includes('head')) {
+          headBoneRef.current = bone;
+        }
+        // Left Thigh
+        if (bone.name === 'LeftUpLeg' || bone.name === 'thigh.L') {
+          bone.rotation.x = -Math.PI / 2.2;
+        }
+        // Right Thigh
+        if (bone.name === 'RightUpLeg' || bone.name === 'thigh.R') {
+          bone.rotation.x = -Math.PI / 2.2;
+        }
+        // Left Knee
+        if (bone.name === 'LeftLeg' || bone.name === 'shin.L') {
+          bone.rotation.x = Math.PI / 2.2;
+        }
+        // Right Knee
+        if (bone.name === 'RightLeg' || bone.name === 'shin.R') {
+          bone.rotation.x = Math.PI / 2.2;
+        }
+        // Arms resting on desk
+        if (bone.name === 'LeftArm' || bone.name === 'upper_arm.L') {
+          bone.rotation.x = -Math.PI / 5;
+        }
+        if (bone.name === 'RightArm' || bone.name === 'upper_arm.R') {
+          bone.rotation.x = -Math.PI / 4.5;
+        }
+      }
+    });
+  }, [clone]);
 
   useFrame(({ clock }) => {
     if (!rootGroupRef.current) return;
     const time = clock.getElapsedTime();
     const studentSeed = parseInt(data.id.replace('student-', '').replace('s', ''), 10) * 1.37;
 
-    // Peaceful idle breathing & head bobbing
-    if (headRef.current) {
-      headRef.current.rotation.z = Math.sin(time * 1.6 + studentSeed) * 0.04;
-      headRef.current.rotation.y = Math.cos(time * 1.2 + studentSeed) * 0.05;
+    // Peaceful idle breathing & subtle head nodding
+    if (headBoneRef.current) {
+      headBoneRef.current.rotation.x = 0.05 + Math.sin(time * 1.5 + studentSeed) * 0.04;
+      headBoneRef.current.rotation.y = Math.cos(time * 1.1 + studentSeed) * 0.05;
     }
     if (rootGroupRef.current) {
-      rootGroupRef.current.position.y = seatPos[1] + Math.sin(time * 2 + studentSeed) * 0.005;
+      rootGroupRef.current.position.y = seatPos[1] + Math.sin(time * 2 + studentSeed) * 0.003;
     }
   });
 
@@ -52,149 +104,32 @@ export function StudentAvatar({ data }: StudentAvatarProps) {
     <group
       ref={rootGroupRef}
       position={seatPos}
-      rotation={[0, Math.PI / 2, 0]}
-      scale={[0.7, 0.7, 0.7]}
+      rotation={[0, 0, 0]}
+      scale={[0.42, 0.42, 0.42]}
     >
-      {/* GLTF Model hierarchy */}
-      <group name="animal_root">
-        {/* Head with dynamic idle rotation */}
-        <group ref={headRef} position={[0.56, 0.68, 0]}>
-          <mesh
-            name="head"
-            geometry={nodes.head.geometry}
-            material={customFurMaterial}
-            castShadow
-          >
-            <mesh
-              name="capybara_cheek_-1"
-              geometry={nodes['capybara_cheek_-1'].geometry}
-              material={customFurMaterial}
-              position={[0.16, -0.03, 0.16]}
-            />
-            <mesh
-              name="capybara_cheek_1"
-              geometry={nodes.capybara_cheek_1.geometry}
-              material={customFurMaterial}
-              position={[0.16, -0.03, -0.16]}
-            />
-            <mesh
-              name="ear_-1"
-              geometry={nodes['ear_-1'].geometry}
-              material={customFurMaterial}
-              position={[0, 0.164, 0.144]}
-            />
-            <mesh
-              name="ear_1"
-              geometry={nodes.ear_1.geometry}
-              material={customFurMaterial}
-              position={[0, 0.164, -0.144]}
-            />
-            <mesh
-              name="eye_left"
-              geometry={nodes.eye_left.geometry}
-              material={materials.zoo_black}
-              position={[0.132, 0.05, 0.13]}
-            />
-            <mesh
-              name="eye_right"
-              geometry={nodes.eye_right.geometry}
-              material={materials.zoo_black}
-              position={[0.132, 0.05, -0.13]}
-            />
-            <mesh
-              name="muzzle"
-              geometry={nodes.muzzle.geometry}
-              material={customFurMaterial}
-              position={[0.197, -0.035, 0]}
-            />
-            <mesh
-              name="nose"
-              geometry={nodes.nose.geometry}
-              material={materials.zoo_black}
-              position={[0.3, -0.02, 0]}
-            />
-          </mesh>
+      {/* Humanoid Rigged Mesh */}
+      <group rotation={[-Math.PI / 2, 0, 0]} scale={100}>
+        <primitive object={nodes.RightFootCtrl} />
+        <primitive object={nodes.HipsCtrl} />
+        <primitive object={nodes.LeftFootCtrl} />
+      </group>
 
-          {/* Student Accessory on top of head */}
-          <CapybaraAccessories accessory={data.accessory} />
-        </group>
+      <skinnedMesh
+        geometry={nodes.characterMedium.geometry}
+        material={customMaterial}
+        skeleton={nodes.characterMedium.skeleton}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={100}
+        castShadow
+        receiveShadow
+      />
 
-        {/* Body wearing colorful student sweater */}
-        <mesh
-          name="body"
-          geometry={nodes.body.geometry}
-          material={customShirtMaterial}
-          position={[0, 0.68, 0]}
-          castShadow
-        />
-
-        {/* Tail */}
-        <mesh
-          name="tail"
-          geometry={nodes.tail.geometry}
-          material={customFurMaterial}
-          position={[-0.532, 0.72, 0]}
-          rotation={[0, 0, -Math.PI / 2]}
-        />
-
-        {/* Seated / Resting legs */}
-        <mesh
-          name="leg_0"
-          geometry={nodes.leg_0.geometry}
-          material={customFurMaterial}
-          position={[-0.38, 0.59, 0.22]}
-          castShadow
-        >
-          <mesh
-            name="hoof_0"
-            geometry={nodes.hoof_0.geometry}
-            material={materials.zoo_black}
-            position={[0, -0.535, -0.025]}
-          />
-        </mesh>
-        <mesh
-          name="leg_1"
-          geometry={nodes.leg_1.geometry}
-          material={customFurMaterial}
-          position={[-0.38, 0.59, -0.22]}
-          castShadow
-        >
-          <mesh
-            name="hoof_1"
-            geometry={nodes.hoof_1.geometry}
-            material={materials.zoo_black}
-            position={[0, -0.535, -0.025]}
-          />
-        </mesh>
-        <mesh
-          name="leg_2"
-          geometry={nodes.leg_2.geometry}
-          material={customFurMaterial}
-          position={[0.38, 0.59, 0.22]}
-          castShadow
-        >
-          <mesh
-            name="hoof_2"
-            geometry={nodes.hoof_2.geometry}
-            material={materials.zoo_black}
-            position={[0, -0.535, -0.025]}
-          />
-        </mesh>
-        <mesh
-          name="leg_3"
-          geometry={nodes.leg_3.geometry}
-          material={customFurMaterial}
-          position={[0.38, 0.59, -0.22]}
-          castShadow
-        >
-          <mesh
-            name="hoof_3"
-            geometry={nodes.hoof_3.geometry}
-            material={materials.zoo_black}
-            position={[0, -0.535, -0.025]}
-          />
-        </mesh>
+      {/* Student Accessories on head */}
+      <group position={[0, 1.25, 0]}>
+        <CapybaraAccessories accessory={data.accessory} />
       </group>
     </group>
   );
 }
+
+useGLTF.preload('/models/protagonist.glb');
