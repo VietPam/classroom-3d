@@ -6,10 +6,10 @@ export function CapybaraAccessories({ accessory }: CapybaraAccessoriesProps) {
   if (!accessory || accessory === 'none') return null;
 
   return (
-    <group position={[0.2, 0.22, 0]}>
+    <group position={[0, 0.58, 0]}>
       {/* 1. Iconic Yuzu Orange on Head */}
       {accessory === 'orange' && (
-        <group position={[0, 0, 0]} scale={[0.8, 0.8, 0.8]}>
+        <group position={[0, 0, 0]} scale={[0.65, 0.65, 0.65]}>
           <mesh castShadow>
             <sphereGeometry args={[0.08, 16, 16]} />
             <meshStandardMaterial color="#ea580c" roughness={0.35} />
@@ -29,7 +29,7 @@ export function CapybaraAccessories({ accessory }: CapybaraAccessoriesProps) {
 
       {/* 2. Pink Lotus Flower on Head */}
       {accessory === 'lotus' && (
-        <group position={[0, -0.02, 0]} scale={[0.8, 0.8, 0.8]}>
+        <group position={[0, -0.01, 0]} scale={[0.65, 0.65, 0.65]}>
           <mesh>
             <sphereGeometry args={[0.035, 12, 12]} />
             <meshStandardMaterial color="#facc15" roughness={0.3} />
@@ -48,9 +48,9 @@ export function CapybaraAccessories({ accessory }: CapybaraAccessoriesProps) {
         </group>
       )}
 
-      {/* 3. Round Scholar Wire Glasses */}
+      {/* 3. Round Wire Glasses on Face */}
       {accessory === 'glasses' && (
-        <group position={[0.1, -0.15, 0]} rotation={[0, Math.PI / 2, 0]} scale={[0.8, 0.8, 0.8]}>
+        <group position={[0, -0.11, 0.12]} scale={[0.55, 0.55, 0.55]}>
           <mesh position={[-0.09, 0, 0]}>
             <torusGeometry args={[0.046, 0.006, 12, 24]} />
             <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
@@ -68,7 +68,7 @@ export function CapybaraAccessories({ accessory }: CapybaraAccessoriesProps) {
 
       {/* 4. Scholar / Graduation Mortarboard Hat */}
       {accessory === 'scholar_hat' && (
-        <group position={[0, 0.02, 0]} scale={[0.75, 0.75, 0.75]}>
+        <group position={[0, 0.01, 0]} scale={[0.65, 0.65, 0.65]}>
           <mesh position={[0, -0.02, 0]}>
             <cylinderGeometry args={[0.11, 0.12, 0.05, 16]} />
             <meshStandardMaterial color="#1e1b4b" roughness={0.5} />
@@ -90,7 +90,7 @@ export function CapybaraAccessories({ accessory }: CapybaraAccessoriesProps) {
 
       {/* 5. Red Ribbon Bow */}
       {accessory === 'red_bow' && (
-        <group position={[0, -0.01, 0]} scale={[0.8, 0.8, 0.8]}>
+        <group position={[0.07, 0, 0]} scale={[0.65, 0.65, 0.65]}>
           <mesh position={[-0.04, 0.01, 0]} rotation={[0, 0, 0.4]}>
             <torusGeometry args={[0.035, 0.014, 10, 20]} />
             <meshStandardMaterial color="#e11d48" roughness={0.4} />

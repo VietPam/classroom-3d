@@ -1,3 +1,34 @@
+export type CharacterState =
+  | 'IDLE'
+  | 'WALKING'
+  | 'THINKING'
+  | 'CELEBRATING'
+  | 'SAD'
+  | 'PRESENTING';
+
+export type QuizStatus =
+  | 'IDLE'
+  | 'RUNNING'
+  | 'THINKING'
+  | 'REVEAL'
+  | 'PRESENTING';
+
+export interface QuizOption {
+  id: 'A' | 'B' | 'C' | 'D';
+  label: string;
+  code: string;
+  isCorrect?: boolean;
+}
+
+export interface QuizData {
+  title: string;
+  question: string;
+  codeSnippet: string;
+  options: QuizOption[];
+  correctOption: 'A' | 'B' | 'C' | 'D';
+  explanation: string;
+}
+
 export interface StudentData {
   id: string;
   name: string;
@@ -11,6 +42,9 @@ export interface StudentData {
   shoesColor: string;
   accessory?: 'orange' | 'lotus' | 'glasses' | 'scholar_hat' | 'red_bow' | 'none';
   capybaraTone?: string;
-  // Desk grid coordinate in world space
+  // Spawn & desk coordinate in world space
   deskPosition: [number, number, number]; // [x, y, z]
+  targetPosition?: [number, number, number];
+  currentState?: CharacterState;
+  chosenOption?: 'A' | 'B' | 'C' | 'D' | 'PODIUM';
 }

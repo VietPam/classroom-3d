@@ -1,5 +1,7 @@
 import { ClassroomStructure } from './ClassroomStructure';
-import { StudentDesk } from './StudentDesk';
+import { SpawnPod } from './SpawnPod';
+import { FloorZones } from './FloorZones';
+import { SmartboardDisplay } from './SmartboardDisplay';
 import { StudentAvatar } from './StudentAvatar';
 import { CameraRig } from './CameraRig';
 import type { ClassroomStore } from '../../hooks/useClassroomStore';
@@ -9,7 +11,7 @@ interface ClassroomSceneProps {
 }
 
 export function ClassroomScene({ store }: ClassroomSceneProps) {
-  const { students, cameraResetCount } = store;
+  const { students, quiz, quizStatus, cameraResetCount } = store;
 
   return (
     <>
@@ -41,22 +43,32 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
       <pointLight position={[0, 3.8, 0]} intensity={0.8} distance={12} color="#ffffff" />
       <pointLight position={[0, 3.8, 3.5]} intensity={0.6} distance={8} color="#fef3c7" />
 
-      {/* ================= CAMERA CONTROLS (Always OrbitControls) ================= */}
+      {/* ================= CAMERA CONTROLS ================= */}
       <CameraRig resetTrigger={cameraResetCount} />
 
       {/* ================= CLASSROOM ROOM ARCHITECTURE ================= */}
       <ClassroomStructure />
 
-      {/* ================= STUDENT STATIONS & AVATARS ================= */}
+      {/* ================= SMARTBOARD INTERACTIVE CONTENT ================= */}
+      <SmartboardDisplay quiz={quiz} status={quizStatus} />
+
+      {/* ================= 4 QUIZ FLOOR ZONES & PODIUM STAGE ================= */}
+      <FloorZones
+        quizStatus={quizStatus}
+        correctOption={quiz.correctOption}
+        activePodium={quizStatus === 'PRESENTING'}
+      />
+
+      {/* ================= STUDENT SPAWN PODS & MOVING AVATARS ================= */}
       {students.map((student) => (
         <group key={student.id}>
-          {/* 3D Desk & Chair */}
-          <StudentDesk
+          {/* Cyber Floor Spawn Pad (Replaces old bulky desk) */}
+          <SpawnPod
             position={student.deskPosition}
-            seatId={student.seatId}
+            accentColor={student.shirtColor}
           />
 
-          {/* 3D Student Avatar (peacefully writing) */}
+          {/* Dynamic Moving & Emoting Chibi Avatar */}
           <StudentAvatar data={student} />
         </group>
       ))}
