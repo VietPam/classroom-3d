@@ -111,6 +111,7 @@ export function HUD({ store }: HUDProps) {
 
           {/* B. Manual Quiz Race Trigger */}
           <button
+            data-testid="btn-start-race"
             onClick={() => {
               playSFX('click_ui');
               startQuizShowdown();
@@ -136,6 +137,7 @@ export function HUD({ store }: HUDProps) {
 
           {/* D. Celebrate All */}
           <button
+            data-testid="btn-celebrate"
             onClick={() => {
               playSFX('click_ui');
               celebrateAll();

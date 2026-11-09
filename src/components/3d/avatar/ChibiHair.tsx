@@ -5,7 +5,7 @@ interface ChibiHairProps {
 
 export function ChibiHair({ hairStyle, hairColor }: ChibiHairProps) {
   return (
-    <group position={[0, 0.46, 0]}>
+    <group position={[0, 0.06, 0]}>
       {/* 1. SHORT HAIR */}
       {hairStyle === 'short' && (
         <group>

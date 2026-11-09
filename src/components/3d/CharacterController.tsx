@@ -30,7 +30,7 @@ export function CharacterController({ data, children }: CharacterControllerProps
   // Character state
   const state = data.currentState || 'IDLE';
 
-  // Smooth Movement & Steering in useFrame
+  // Smooth Movement, Steering & Deceleration in useFrame
   useFrame((_, delta) => {
     // 1. Calculate vector to target
     const dx = targetX - currentPos.current.x;
@@ -39,17 +39,19 @@ export function CharacterController({ data, children }: CharacterControllerProps
 
     let walkingNow = false;
 
-    if (dist > 0.06) {
+    if (dist > 0.05) {
       walkingNow = true;
-      // Moving towards target: steer toward movement vector
+      // Moving towards target: steer smoothly toward movement vector
       const targetYaw = Math.atan2(dx, dz);
       let diff = targetYaw - currentYaw.current;
       while (diff < -Math.PI) diff += Math.PI * 2;
       while (diff > Math.PI) diff -= Math.PI * 2;
-      currentYaw.current += diff * Math.min(1, delta * 12);
+      currentYaw.current += diff * Math.min(1, delta * 14);
 
-      // Move along vector (speed: 2.6 m/s)
-      const step = Math.min(dist, 2.6 * delta);
+      // Smooth deceleration near destination for graceful stop
+      const baseSpeed = 2.2;
+      const speed = dist < 0.35 ? Math.max(0.8, dist * 3.8) : baseSpeed;
+      const step = Math.min(dist, speed * delta);
       currentPos.current.x += (dx / dist) * step;
       currentPos.current.z += (dz / dist) * step;
     } else {
@@ -57,10 +59,13 @@ export function CharacterController({ data, children }: CharacterControllerProps
       walkingNow = false;
 
       // Desired idle facing angle:
-      // When at Quiz Zone or Podium, face forward towards the camera (yaw = Math.PI)
-      // When back at Spawn, face the blackboard (yaw = 0)
+      // When at Quiz Zone / Front Stage (Z > 1.0) or during THINKING/CELEBRATING/SAD,
+      // face forward towards the camera (yaw = Math.PI)
+      // When back at Spawn / desks (Z <= 1.0), face the blackboard (yaw = 0)
+      const isAtFrontStage = currentPos.current.z > 1.0;
       let targetYaw = 0;
       if (
+        isAtFrontStage ||
         state === 'THINKING' ||
         state === 'CELEBRATING' ||
         state === 'SAD'
@@ -71,7 +76,7 @@ export function CharacterController({ data, children }: CharacterControllerProps
       let diff = targetYaw - currentYaw.current;
       while (diff < -Math.PI) diff += Math.PI * 2;
       while (diff > Math.PI) diff -= Math.PI * 2;
-      currentYaw.current += diff * Math.min(1, delta * 6);
+      currentYaw.current += diff * Math.min(1, delta * 8);
     }
 
     if (walkingNow !== isWalking) {

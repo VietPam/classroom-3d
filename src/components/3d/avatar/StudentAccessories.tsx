@@ -6,7 +6,7 @@ export function StudentAccessories({ accessory }: StudentAccessoriesProps) {
   if (!accessory || accessory === 'none') return null;
 
   return (
-    <group position={[0, 0.58, 0]}>
+    <group position={[0, 0.18, 0]}>
       {/* 1. Iconic Yuzu Orange on Head */}
       {accessory === 'orange' && (
         <group position={[0, 0, 0]} scale={[0.65, 0.65, 0.65]}>

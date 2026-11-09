@@ -39,7 +39,10 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
       />
 
       {/* Subtle fill light from front right */}
-      <directionalLight position={[6, 5, 5]} intensity={0.5} color="#e0f2fe" />
+      <directionalLight position={[6, 5, 5]} intensity={0.4} color="#e0f2fe" />
+
+      {/* Front Face Key/Fill Light (streaming from camera viewpoint to illuminate chibi faces brilliantly) */}
+      <directionalLight position={[0, 2.8, -5.5]} intensity={0.85} color="#ffffff" />
 
       {/* Interior ceiling panel light glow */}
       <pointLight position={[0, 3.8, 0]} intensity={0.8} distance={12} color="#ffffff" />
