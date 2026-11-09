@@ -68,7 +68,11 @@ export function CharacterController({ data, children }: CharacterControllerProps
         isAtFrontStage ||
         state === 'THINKING' ||
         state === 'CELEBRATING' ||
-        state === 'SAD'
+        state === 'SAD' ||
+        state === 'WAVE' ||
+        state === 'DANCE' ||
+        state === 'SHOCKED' ||
+        state === 'RAISE_HAND'
       ) {
         targetYaw = Math.PI;
       }

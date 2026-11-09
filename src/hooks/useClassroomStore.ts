@@ -66,6 +66,10 @@ export interface ClassroomStore {
   startQuizShowdown: () => void;
   resetAllToSpawn: () => void;
   celebrateAll: () => void;
+  triggerWaveAll: () => void;
+  triggerRaiseHandAll: () => void;
+  triggerDanceAll: () => void;
+  triggerShockedAll: () => void;
 }
 
 export function useClassroomStore(): ClassroomStore {
@@ -319,6 +323,98 @@ export function useClassroomStore(): ClassroomStore {
     );
   }, [clearTimers]);
 
+  // Cả lớp vẫy tay chào khán giả (WAVE)
+  const triggerWaveAll = useCallback(() => {
+    clearTimers();
+    audioEngine.playSFX('pop_mouth');
+
+    setStudents((prev) =>
+      prev.map((student) => ({
+        ...student,
+        currentState: 'WAVE',
+      }))
+    );
+
+    const restoreTimer = setTimeout(() => {
+      setStudents((prev) =>
+        prev.map((student) => ({
+          ...student,
+          currentState: 'IDLE',
+        }))
+      );
+    }, 3500);
+    timersRef.current.push(restoreTimer);
+  }, [clearTimers]);
+
+  // Cả lớp giơ tay xin phát biểu (RAISE_HAND)
+  const triggerRaiseHandAll = useCallback(() => {
+    clearTimers();
+    audioEngine.playSFX('click_ui');
+
+    setStudents((prev) =>
+      prev.map((student) => ({
+        ...student,
+        currentState: 'RAISE_HAND',
+      }))
+    );
+
+    const restoreTimer = setTimeout(() => {
+      setStudents((prev) =>
+        prev.map((student) => ({
+          ...student,
+          currentState: 'IDLE',
+        }))
+      );
+    }, 3200);
+    timersRef.current.push(restoreTimer);
+  }, [clearTimers]);
+
+  // Cả lớp quẩy vũ đạo Chibi vui nhộn (DANCE)
+  const triggerDanceAll = useCallback(() => {
+    clearTimers();
+    audioEngine.playSFX('rizz_sound');
+
+    setStudents((prev) =>
+      prev.map((student) => ({
+        ...student,
+        currentState: 'DANCE',
+      }))
+    );
+
+    const restoreTimer = setTimeout(() => {
+      setStudents((prev) =>
+        prev.map((student) => ({
+          ...student,
+          currentState: 'IDLE',
+        }))
+      );
+    }, 4500);
+    timersRef.current.push(restoreTimer);
+  }, [clearTimers]);
+
+  // Cả lớp giật mình ôm đầu (SHOCKED)
+  const triggerShockedAll = useCallback(() => {
+    clearTimers();
+    audioEngine.playSFX('vine_boom');
+
+    setStudents((prev) =>
+      prev.map((student) => ({
+        ...student,
+        currentState: 'SHOCKED',
+      }))
+    );
+
+    const restoreTimer = setTimeout(() => {
+      setStudents((prev) =>
+        prev.map((student) => ({
+          ...student,
+          currentState: 'IDLE',
+        }))
+      );
+    }, 3200);
+    timersRef.current.push(restoreTimer);
+  }, [clearTimers]);
+
   // Chuyển sang câu hỏi tiếp theo
   const nextQuiz = useCallback(() => {
     clearTimers();
@@ -428,5 +524,9 @@ export function useClassroomStore(): ClassroomStore {
     startQuizShowdown,
     resetAllToSpawn,
     celebrateAll,
+    triggerWaveAll,
+    triggerRaiseHandAll,
+    triggerDanceAll,
+    triggerShockedAll,
   };
 }

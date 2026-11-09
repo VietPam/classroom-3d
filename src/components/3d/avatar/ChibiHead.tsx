@@ -1,28 +1,55 @@
 import { useRef } from 'react';
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import type { CharacterState } from '../../../types/classroom';
 
 interface ChibiHeadProps {
   skinTone: string;
+  state?: CharacterState;
 }
 
-export function ChibiHead({ skinTone }: ChibiHeadProps) {
+export function ChibiHead({ skinTone, state = 'IDLE' }: ChibiHeadProps) {
   const leftEyeRef = useRef<THREE.Group>(null);
   const rightEyeRef = useRef<THREE.Group>(null);
+  const mouthRef = useRef<THREE.Group>(null);
 
-  // Natural anime periodic blink
-  useFrame(({ clock }) => {
+  // Natural anime periodic blink & dynamic facial expressions
+  useFrame(({ clock }, delta) => {
     const time = clock.getElapsedTime();
+
     // Blink cycle every 3.8 seconds for ~0.14 seconds
     const cycle = (time + 0.8) % 3.8;
-    let eyeScaleY = 1;
-    if (cycle > 3.66) {
-      const progress = (cycle - 3.66) / 0.14;
-      eyeScaleY = 0.1 + Math.abs(progress - 0.5) * 1.8;
+    let baseEyeScaleY = 1;
+    let baseEyeScaleX = 1;
+
+    if (state === 'SHOCKED') {
+      // Dilated wide shock eyes, no blinking while shocked
+      baseEyeScaleY = 1.35;
+      baseEyeScaleX = 1.35;
+    } else {
+      if (cycle > 3.66) {
+        const progress = (cycle - 3.66) / 0.14;
+        baseEyeScaleY = 0.1 + Math.abs(progress - 0.5) * 1.8;
+      }
     }
 
-    if (leftEyeRef.current) leftEyeRef.current.scale.y = eyeScaleY;
-    if (rightEyeRef.current) rightEyeRef.current.scale.y = eyeScaleY;
+    const lerpFactor = Math.min(1, delta * 15);
+    if (leftEyeRef.current) {
+      leftEyeRef.current.scale.y = THREE.MathUtils.lerp(leftEyeRef.current.scale.y, baseEyeScaleY, lerpFactor);
+      leftEyeRef.current.scale.x = THREE.MathUtils.lerp(leftEyeRef.current.scale.x, baseEyeScaleX, lerpFactor);
+    }
+    if (rightEyeRef.current) {
+      rightEyeRef.current.scale.y = THREE.MathUtils.lerp(rightEyeRef.current.scale.y, baseEyeScaleY, lerpFactor);
+      rightEyeRef.current.scale.x = THREE.MathUtils.lerp(rightEyeRef.current.scale.x, baseEyeScaleX, lerpFactor);
+    }
+
+    // Mouth expression transition
+    if (mouthRef.current) {
+      const targetMouthScale = state === 'SHOCKED' ? 1.4 : 1.0;
+      mouthRef.current.scale.setScalar(
+        THREE.MathUtils.lerp(mouthRef.current.scale.x, targetMouthScale, lerpFactor)
+      );
+    }
   });
 
   return (
@@ -88,11 +115,20 @@ export function ChibiHead({ skinTone }: ChibiHeadProps) {
         </mesh>
       </group>
 
-      {/* Cute Sweet Smile */}
-      <mesh position={[0, -0.042, 0.12]} rotation={[Math.PI, 0, 0]}>
-        <torusGeometry args={[0.014, 0.0025, 8, 16, Math.PI]} />
-        <meshBasicMaterial color="#7c2d12" />
-      </mesh>
+      {/* Mouth (Smile by default, O-shaped gasp during SHOCKED) */}
+      <group ref={mouthRef} position={[0, -0.042, 0.12]}>
+        {state === 'SHOCKED' ? (
+          <mesh scale={[1, 1.3, 0.6]}>
+            <torusGeometry args={[0.015, 0.004, 8, 16]} />
+            <meshBasicMaterial color="#451a03" />
+          </mesh>
+        ) : (
+          <mesh rotation={[Math.PI, 0, 0]}>
+            <torusGeometry args={[0.014, 0.0025, 8, 16, Math.PI]} />
+            <meshBasicMaterial color="#7c2d12" />
+          </mesh>
+        )}
+      </group>
     </group>
   );
 }

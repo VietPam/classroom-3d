@@ -125,8 +125,79 @@ export function ChibiBody({
       targetRightForearmX = -1.35;
 
       targetBounceY = Math.sin(time * 2 + studentSeed) * 0.005;
+    } else if (state === 'WAVE') {
+      // 5. WAVE EMOTE (Right arm raised high waving briskly, left hand on hip)
+      targetLeftArmX = 0.15;
+      targetLeftArmY = 0.2;
+      targetLeftArmZ = -0.22;
+      targetLeftForearmX = -0.3;
+
+      // Right arm raised high waving side to side
+      const waveCycle = Math.sin(time * 9 + studentSeed) * 0.32;
+      targetRightArmX = 0.05;
+      targetRightArmY = -0.1;
+      targetRightArmZ = -2.15 + waveCycle;
+      targetRightForearmX = -0.55;
+
+      targetRootRotZ = Math.sin(time * 4.5 + studentSeed) * 0.035;
+      targetBounceY = Math.sin(time * 4.5 + studentSeed) * 0.008;
+    } else if (state === 'RAISE_HAND') {
+      // 6. RAISE HAND EMOTE (Right arm straight up eager to answer, subtle enthusiastic pulse)
+      targetLeftArmX = 0.08;
+      targetLeftArmY = 0;
+      targetLeftArmZ = -0.12;
+      targetLeftForearmX = -0.15;
+
+      // Right arm reaches straight up high
+      const handPulse = Math.sin(time * 6 + studentSeed) * 0.06;
+      targetRightArmX = 0.1;
+      targetRightArmY = 0;
+      targetRightArmZ = -2.85 + handPulse;
+      targetRightForearmX = -0.08; // Almost straight elbow
+
+      targetBounceY = 0.015 + Math.sin(time * 3 + studentSeed) * 0.004; // Stand tall
+    } else if (state === 'DANCE') {
+      // 7. DANCE EMOTE (Energetic hip swing, rhythmic alternating disco arms & knee bounces)
+      const danceBeat = time * 7.5 + studentSeed;
+      targetRootRotZ = Math.sin(danceBeat) * 0.09;
+      targetRootRotY = -Math.cos(danceBeat) * 0.08;
+      targetBounceY = Math.abs(Math.sin(danceBeat)) * 0.045;
+
+      // Alternating disco arms
+      targetLeftArmX = Math.sin(danceBeat) * 0.75;
+      targetLeftArmZ = -0.35;
+      targetLeftForearmX = -0.85;
+
+      targetRightArmX = -Math.sin(danceBeat) * 0.75;
+      targetRightArmZ = 0.35;
+      targetRightForearmX = -0.85;
+
+      // Soft knee bends
+      targetLeftCalfX = Math.max(0, Math.sin(danceBeat)) * 0.25;
+      targetRightCalfX = Math.max(0, -Math.sin(danceBeat)) * 0.25;
+    } else if (state === 'SHOCKED') {
+      // 8. SHOCKED EMOTE (Both hands clutch cheeks/head, body jolts back and trembles)
+      const tremor = Math.sin(time * 35 + studentSeed) * 0.015;
+      targetRootRotZ = tremor;
+      targetRootRotY = tremor * 1.5;
+      targetBounceY = -0.01 + tremor; // Crouch slightly in shock
+
+      // Both hands up to cheeks/head
+      targetLeftArmX = -1.35;
+      targetLeftArmY = 0.35;
+      targetLeftArmZ = 0.65;
+      targetLeftForearmX = -1.25;
+
+      targetRightArmX = -1.35;
+      targetRightArmY = -0.35;
+      targetRightArmZ = -0.65;
+      targetRightForearmX = -1.25;
+
+      // Knees slightly bent in shock stance
+      targetLeftCalfX = 0.15;
+      targetRightCalfX = 0.15;
     } else {
-      // 5. IDLE REST POSE (Alive subtle breathing, balanced straight stance)
+      // 9. IDLE REST POSE (Alive subtle breathing, balanced straight stance)
       const breathing = Math.sin(time * 1.8 + studentSeed) * 0.025;
       targetLeftArmX = 0.05 + breathing;
       targetRightArmX = 0.05 - breathing;

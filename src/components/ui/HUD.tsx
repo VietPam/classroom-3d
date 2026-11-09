@@ -6,6 +6,9 @@ import {
   PartyPopper,
   Volume2,
   VolumeX,
+  Hand,
+  Sparkles,
+  Zap,
 } from 'lucide-react';
 import type { ClassroomStore } from '../../hooks/useClassroomStore';
 import { useAudio } from '../../audio/useAudio';
@@ -19,6 +22,10 @@ export function HUD({ store }: HUDProps) {
     resetCamera,
     startQuizShowdown,
     celebrateAll,
+    triggerWaveAll,
+    triggerRaiseHandAll,
+    triggerDanceAll,
+    triggerShockedAll,
     quizStatus,
     isAutoPlay,
     toggleAutoPlay,
@@ -63,9 +70,56 @@ export function HUD({ store }: HUDProps) {
         </div>
       </header>
 
-      {/* Bottom Control Dock: Scenario Triggers, Group Selector & Audio */}
-      <footer className="pointer-events-auto flex flex-col items-center gap-2 w-full max-w-sm">
-        {/* 1. Category / Group Quick Filter Tabs */}
+      {/* Bottom Control Dock: Scenario Triggers, Quick Emotes & Audio */}
+      <footer className="pointer-events-auto flex flex-col items-center gap-1.5 w-full max-w-sm">
+        {/* 1. Quick Emote Bar: WAVE, RAISE_HAND, DANCE, SHOCKED */}
+        <div className="flex items-center justify-between gap-1 p-1 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800/80 shadow-md w-full">
+          {/* WAVE */}
+          <button
+            data-testid="btn-emote-wave"
+            onClick={triggerWaveAll}
+            className="flex-1 flex items-center justify-center gap-1 py-1 px-1.5 rounded-lg text-[11px] font-bold text-amber-300 hover:text-white hover:bg-amber-600/30 transition-all cursor-pointer active:scale-95"
+            title="Cả lớp vẫy tay chào khán giả"
+          >
+            <span>👋</span>
+            <span>Chào</span>
+          </button>
+
+          {/* RAISE_HAND */}
+          <button
+            data-testid="btn-emote-raise"
+            onClick={triggerRaiseHandAll}
+            className="flex-1 flex items-center justify-center gap-1 py-1 px-1.5 rounded-lg text-[11px] font-bold text-sky-300 hover:text-white hover:bg-sky-600/30 transition-all cursor-pointer active:scale-95"
+            title="Cả lớp giơ tay xin phát biểu"
+          >
+            <Hand className="w-3.5 h-3.5" />
+            <span>Phát Biểu</span>
+          </button>
+
+          {/* DANCE */}
+          <button
+            data-testid="btn-emote-dance"
+            onClick={triggerDanceAll}
+            className="flex-1 flex items-center justify-center gap-1 py-1 px-1.5 rounded-lg text-[11px] font-bold text-emerald-300 hover:text-white hover:bg-emerald-600/30 transition-all cursor-pointer active:scale-95"
+            title="Cả lớp quẩy vũ đạo Chibi vui nhộn"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Vũ Đạo</span>
+          </button>
+
+          {/* SHOCKED */}
+          <button
+            data-testid="btn-emote-shocked"
+            onClick={triggerShockedAll}
+            className="flex-1 flex items-center justify-center gap-1 py-1 px-1.5 rounded-lg text-[11px] font-bold text-rose-300 hover:text-white hover:bg-rose-600/30 transition-all cursor-pointer active:scale-95"
+            title="Cả lớp giật mình hốt hoảng (Vine Boom meme)"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            <span>Hốt Hoảng</span>
+          </button>
+        </div>
+
+        {/* 2. Category / Group Quick Filter Tabs */}
         <div className="flex items-center justify-between gap-1 p-1 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800 shadow-md w-full">
           {groupFilterTabs.map((tab) => {
             const isActive = activeGroupId === tab.id;
@@ -88,7 +142,7 @@ export function HUD({ store }: HUDProps) {
           })}
         </div>
 
-        {/* 2. Main Scenario Control Bar */}
+        {/* 3. Main Scenario Control Bar */}
         <div className="flex items-center justify-center gap-1.5 bg-slate-950/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/70 shadow-2xl w-full">
           {/* A. Auto Live Stream Loop Toggle */}
           <button

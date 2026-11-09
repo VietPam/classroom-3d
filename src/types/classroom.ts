@@ -3,7 +3,11 @@ export type CharacterState =
   | 'WALKING'
   | 'THINKING'
   | 'CELEBRATING'
-  | 'SAD';
+  | 'SAD'
+  | 'WAVE'
+  | 'RAISE_HAND'
+  | 'DANCE'
+  | 'SHOCKED';
 
 export type QuizStatus =
   | 'IDLE'

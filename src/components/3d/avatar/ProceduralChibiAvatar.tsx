@@ -47,6 +47,26 @@ export function ProceduralChibiAvatar({
       targetRotX = -0.04;
       targetRotY = 0.08;
       targetRotZ = 0.14;
+    } else if (state === 'WAVE') {
+      // Friendly smile tilt while waving to viewers
+      targetRotX = -0.10;
+      targetRotY = Math.sin(time * 4 + studentSeed) * 0.06;
+      targetRotZ = 0.08;
+    } else if (state === 'RAISE_HAND') {
+      // Eager look-up towards blackboard / teacher
+      targetRotX = -0.18;
+      targetRotY = 0;
+      targetRotZ = -0.05;
+    } else if (state === 'DANCE') {
+      // Rhythmic side-to-side head bobbing
+      targetRotX = -0.12 + Math.abs(Math.sin(time * 8)) * 0.06;
+      targetRotY = Math.sin(time * 8 + studentSeed) * 0.10;
+      targetRotZ = Math.cos(time * 8 + studentSeed) * 0.08;
+    } else if (state === 'SHOCKED') {
+      // Head jolts back in shock and trembles
+      targetRotX = 0.15;
+      targetRotY = Math.sin(time * 30 + studentSeed) * 0.05;
+      targetRotZ = Math.cos(time * 35 + studentSeed) * 0.03;
     } else if (isWalking) {
       // Subtle rhythmic stride bobbing while walking
       targetRotX = -0.06 + Math.sin(time * 9 + studentSeed) * 0.03;
@@ -94,7 +114,7 @@ export function ProceduralChibiAvatar({
       {/* 2. CHIBI HEAD, HAIR & ACCESSORIES (PIVOTED AT EXACT NECK ROOT [0, 0.40, 0]) */}
       <group ref={headGroupRef} position={[0, 0.40, 0]}>
         {/* Cute Chibi Head with Obsidian Eyes & Rosy Cheeks */}
-        <ChibiHead skinTone={data.skinTone} />
+        <ChibiHead skinTone={data.skinTone} state={state} />
 
         {/* Personalized Hair Style & Color */}
         <ChibiHair hairStyle={data.hairStyle} hairColor={data.hairColor} />
