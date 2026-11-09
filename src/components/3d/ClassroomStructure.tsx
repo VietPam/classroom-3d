@@ -142,91 +142,91 @@ export function ClassroomStructure() {
         </mesh>
       </group>
 
-      {/* ================= MINIMALIST OPEN BOARD (Front Wall, Spacious for Future Dynamic Content) ================= */}
-      <group position={[0, 2.2, 5.92]} rotation={[0, Math.PI, 0]}>
+      {/* ================= MASSIVE SMARTBOARD (Front Wall, Optimized for TikTok 9:16 Canvas) ================= */}
+      <group position={[0, 2.35, 5.92]} rotation={[0, Math.PI, 0]}>
         {/* Sleek Minimalist Outer Bezel (Anodized Dark Titanium) */}
         <mesh receiveShadow castShadow>
-          <boxGeometry args={[6.48, 2.88, 0.06]} />
+          <boxGeometry args={[9.2, 3.8, 0.06]} />
           <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
         </mesh>
 
         {/* Inner Slim Frame Bevel */}
         <mesh position={[0, 0, 0.015]}>
-          <boxGeometry args={[6.40, 2.80, 0.04]} />
+          <boxGeometry args={[9.1, 3.7, 0.04]} />
           <meshStandardMaterial color="#0f172a" roughness={0.5} />
         </mesh>
 
-        {/* Vast Pristine Slate / Smartboard Writing Surface (Clean & Open) */}
+        {/* Vast Pristine Slate / Smartboard Writing Surface (Huge TikTok Content Space) */}
         <mesh position={[0, 0, 0.032]} receiveShadow>
-          <planeGeometry args={[6.36, 2.76]} />
-          <meshStandardMaterial color="#0c1322" roughness={0.85} metalness={0.05} />
+          <planeGeometry args={[9.0, 3.6]} />
+          <meshStandardMaterial color="#0b1120" roughness={0.85} metalness={0.05} />
         </mesh>
 
         {/* Minimalist Slim Aluminum Accessory / Stylus Ledge at Bottom */}
-        <mesh position={[0, -1.39, 0.055]} castShadow>
-          <boxGeometry args={[6.36, 0.03, 0.08]} />
+        <mesh position={[0, -1.82, 0.055]} castShadow>
+          <boxGeometry args={[9.0, 0.03, 0.08]} />
           <meshStandardMaterial color="#475569" metalness={0.7} roughness={0.3} />
         </mesh>
 
         {/* Sleek Magnetic Stylus / Chalk Markers & Eraser */}
-        <mesh position={[-0.5, -1.365, 0.06]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh position={[-0.5, -1.795, 0.06]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.009, 0.009, 0.12]} />
           <meshStandardMaterial color="#38bdf8" roughness={0.3} />
         </mesh>
-        <mesh position={[-0.35, -1.365, 0.06]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh position={[-0.35, -1.795, 0.06]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.009, 0.009, 0.12]} />
           <meshStandardMaterial color="#ffffff" roughness={0.3} />
         </mesh>
-        <mesh position={[0.5, -1.365, 0.06]}>
+        <mesh position={[0.5, -1.795, 0.06]}>
           <boxGeometry args={[0.12, 0.025, 0.05]} />
           <meshStandardMaterial color="#334155" roughness={0.6} />
         </mesh>
 
         {/* Modern Overhead Gallery Track Light Fixture */}
-        <group position={[0, 1.48, 0.15]}>
+        <group position={[0, 1.93, 0.15]}>
           <mesh>
-            <boxGeometry args={[6.2, 0.035, 0.06]} />
+            <boxGeometry args={[8.8, 0.035, 0.06]} />
             <meshStandardMaterial color="#1e293b" metalness={0.8} />
           </mesh>
           {/* Subtle warm LED illumination strip */}
           <mesh position={[0, -0.018, 0]}>
-            <planeGeometry args={[6.0, 0.02]} />
+            <planeGeometry args={[8.6, 0.02]} />
             <meshBasicMaterial color="#fef3c7" />
           </mesh>
         </group>
       </group>
 
-      {/* ================= WALL CLOCK (Cleanly above board) ================= */}
-      <group position={[0, 3.90, 5.9]}>
+      {/* ================= WALL CLOCK (Compact at Upper Right Corner of Board) ================= */}
+      <group position={[4.1, 3.8, 5.9]}>
         {/* Outer Rim */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.22, 0.22, 0.04, 32]} />
+          <cylinderGeometry args={[0.18, 0.18, 0.04, 32]} />
           <meshStandardMaterial color="#1e293b" roughness={0.4} />
         </mesh>
         {/* Clock Face */}
         <mesh position={[0, 0, -0.025]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.20, 0.20, 0.01, 32]} />
+          <cylinderGeometry args={[0.16, 0.16, 0.01, 32]} />
           <meshStandardMaterial color="#ffffff" roughness={0.2} />
         </mesh>
         {/* Center pin */}
         <mesh position={[0, 0, -0.03]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.015, 0.015, 0.02, 16]} />
+          <cylinderGeometry args={[0.012, 0.012, 0.02, 16]} />
           <meshStandardMaterial color="#000000" />
         </mesh>
         {/* Hour Hand */}
-        <mesh position={[0.04, 0.04, -0.03]} rotation={[0, 0, -Math.PI / 4]}>
-          <boxGeometry args={[0.012, 0.10, 0.005]} />
+        <mesh position={[0.03, 0.03, -0.03]} rotation={[0, 0, -Math.PI / 4]}>
+          <boxGeometry args={[0.01, 0.08, 0.005]} />
           <meshStandardMaterial color="#0f172a" />
         </mesh>
         {/* Minute Hand */}
-        <mesh position={[0, 0.065, -0.03]}>
-          <boxGeometry args={[0.01, 0.14, 0.005]} />
+        <mesh position={[0, 0.05, -0.03]}>
+          <boxGeometry args={[0.008, 0.11, 0.005]} />
           <meshStandardMaterial color="#0f172a" />
         </mesh>
         {/* Animated Second Hand */}
         <mesh ref={clockSecondRef} position={[0, 0, -0.032]}>
-          <group position={[0, 0.065, 0]}>
-            <boxGeometry args={[0.006, 0.15, 0.004]} />
+          <group position={[0, 0.05, 0]}>
+            <boxGeometry args={[0.005, 0.12, 0.004]} />
             <meshStandardMaterial color="#dc2626" />
           </group>
         </mesh>
