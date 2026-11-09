@@ -9,16 +9,7 @@ interface ClassroomSceneProps {
 }
 
 export function ClassroomScene({ store }: ClassroomSceneProps) {
-  const {
-    students,
-    studentStates,
-    activeStudentId,
-    hoveredStudentId,
-    cameraMode,
-    callStudent,
-    updateStudentState,
-    setHoveredStudentId,
-  } = store;
+  const { students, cameraResetCount } = store;
 
   return (
     <>
@@ -50,62 +41,28 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
       <pointLight position={[0, 3.8, 0]} intensity={0.8} distance={12} color="#ffffff" />
       <pointLight position={[0, 3.8, 3.5]} intensity={0.6} distance={8} color="#fef3c7" />
 
-      {/* ================= CAMERA CONTROLS ================= */}
-      <CameraRig mode={cameraMode} />
+      {/* ================= CAMERA CONTROLS (Always OrbitControls) ================= */}
+      <CameraRig resetTrigger={cameraResetCount} />
 
       {/* ================= CLASSROOM ROOM ARCHITECTURE ================= */}
       <ClassroomStructure />
 
       {/* ================= STUDENT STATIONS & AVATARS ================= */}
-      {students.map((student) => {
-        const state = studentStates[student.id];
-        const isHovered = hoveredStudentId === student.id;
-        const isActive = activeStudentId === student.id;
+      {students.map((student) => (
+        <group key={student.id}>
+          {/* 3D Desk & Chair */}
+          <StudentDesk
+            position={student.deskPosition}
+            seatId={student.seatId}
+            isHovered={false}
+            hasPaper={true}
+            chairPushedBack={0}
+          />
 
-        // Paper remains on desk only when writing or before standing
-        const hasDeskPaper = state === 'SEATED_WRITING';
-
-        // Desk chair pushes back slightly when standing or out of seat
-        const isOutOfSeat =
-          state === 'STANDING' ||
-          state === 'STEPPING_TO_AISLE' ||
-          state === 'WALKING_TO_TEACHER' ||
-          state === 'HANDING_PAPER' ||
-          state === 'TURNING_AROUND' ||
-          state === 'WALKING_TO_SEAT';
-        const chairPushedBack = isOutOfSeat ? 0.22 : 0;
-
-        return (
-          <group
-            key={student.id}
-            onPointerOver={() => setHoveredStudentId(student.id)}
-            onPointerOut={() => {
-              if (hoveredStudentId === student.id) {
-                setHoveredStudentId(null);
-              }
-            }}
-          >
-            {/* 3D Desk & Chair */}
-            <StudentDesk
-              position={student.deskPosition}
-              seatId={student.seatId}
-              isHovered={isHovered}
-              hasPaper={hasDeskPaper}
-              chairPushedBack={chairPushedBack}
-            />
-
-            {/* 3D Student Avatar */}
-            <StudentAvatar
-              data={student}
-              state={state}
-              isActive={isActive}
-              isHovered={isHovered}
-              onSelect={() => callStudent(student.id)}
-              onStateAdvance={(newState) => updateStudentState(student.id, newState)}
-            />
-          </group>
-        );
-      })}
+          {/* 3D Student Avatar (peacefully writing) */}
+          <StudentAvatar data={student} />
+        </group>
+      ))}
     </>
   );
 }

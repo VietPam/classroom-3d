@@ -3,44 +3,30 @@ import * as THREE from 'three';
 import { useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import type { CameraMode } from '../../types/classroom';
 
 interface CameraRigProps {
-  mode: CameraMode;
+  resetTrigger?: number;
 }
 
-export function CameraRig({ mode }: CameraRigProps) {
+export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera, size } = useThree();
 
-  // Target positions & look-ats for each camera mode (Bottom-Left Corner looking diagonally up towards board)
-  const targetCamPos = useRef(new THREE.Vector3(-2.8, 1.35, -1.0));
-  const targetLookAt = useRef(new THREE.Vector3(0.1, 1.85, 5.0));
+  const isPortrait = size.width < size.height;
+  const initialCamPos = useRef(
+    isPortrait ? new THREE.Vector3(0, 1.35, -3.2) : new THREE.Vector3(0, 1.45, -3.5)
+  );
+  const initialTarget = useRef(new THREE.Vector3(0, 1.5, 3.0));
 
+  // Responsive camera setup on mount & resize
   useEffect(() => {
     const isPortrait = size.width < size.height;
-
-    // Bottom-Left Corner Up-View: Looking from the bottom-left of the classroom diagonally up towards the front board
-    if (mode === 'teacher_pov') {
-      if (isPortrait) {
-        // Mobile portrait: eye level at bottom-left corner, angled up towards board
-        targetCamPos.current.set(-2.8, 1.35, -1.0);
-        targetLookAt.current.set(0.1, 1.85, 5.0);
-      } else {
-        // Desktop landscape POV: slightly wider
-        targetCamPos.current.set(-3.5, 1.40, -0.8);
-        targetLookAt.current.set(0.2, 1.90, 5.0);
-      }
-    } else if (mode === 'overview') {
-      if (isPortrait) {
-        // Overview in portrait mode: high diagonal corner looking down at class & board
-        targetCamPos.current.set(3.4, 3.4, 0.2);
-        targetLookAt.current.set(0, 1.2, 2.5);
-      } else {
-        // Desktop landscape overview
-        targetCamPos.current.set(3.8, 3.2, 0.5);
-        targetLookAt.current.set(0, 1.2, 2.5);
-      }
+    if (isPortrait) {
+      initialCamPos.current.set(0, 1.35, -3.2);
+      initialTarget.current.set(0, 1.5, 3.0);
+    } else {
+      initialCamPos.current.set(0, 1.45, -3.5);
+      initialTarget.current.set(0, 1.5, 3.0);
     }
 
     if ('isPerspectiveCamera' in camera && (camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
@@ -53,39 +39,45 @@ export function CameraRig({ mode }: CameraRigProps) {
     }
 
     if (controlsRef.current) {
-      controlsRef.current.target.copy(targetLookAt.current);
+      controlsRef.current.target.copy(initialTarget.current);
+      controlsRef.current.update();
     }
-  }, [mode, size.width, size.height, camera]);
+  }, [size.width, size.height, camera]);
 
-  useFrame((_, delta) => {
-    if (mode === 'teacher_pov') {
-      camera.position.lerp(targetCamPos.current, delta * 4.0);
-      camera.lookAt(targetLookAt.current);
-    } else {
-      if (controlsRef.current) {
-        controlsRef.current.update();
-      }
+  // Handle reset button / trigger
+  useEffect(() => {
+    if (resetTrigger > 0 && controlsRef.current) {
+      camera.position.copy(initialCamPos.current);
+      controlsRef.current.target.copy(initialTarget.current);
+      controlsRef.current.update();
+    }
+  }, [resetTrigger, camera]);
+
+  useFrame(() => {
+    if (controlsRef.current) {
+      controlsRef.current.update();
     }
 
-    // Boundary safety: stay safely within the 3D room perimeter
-    camera.position.z = Math.max(-7.5, Math.min(camera.position.z, 5.45));
-    camera.position.y = Math.max(0.5, Math.min(camera.position.y, 3.9));
-    camera.position.x = Math.max(-6.0, Math.min(camera.position.x, 6.0));
+    // Boundary safety: keep camera within reasonable 3D classroom boundary
+    camera.position.z = Math.max(-8.5, Math.min(camera.position.z, 5.5));
+    camera.position.y = Math.max(0.4, Math.min(camera.position.y, 4.1));
+    camera.position.x = Math.max(-6.5, Math.min(camera.position.x, 6.5));
   });
 
-  return mode === 'overview' ? (
+  return (
     <OrbitControls
       ref={controlsRef}
-      target={[0, 1.2, 2.5]}
+      target={[initialTarget.current.x, initialTarget.current.y, initialTarget.current.z]}
       makeDefault
       enableDamping
       dampingFactor={0.06}
       maxPolarAngle={Math.PI / 2.05}
-      minPolarAngle={Math.PI / 6}
-      minDistance={1.2}
-      maxDistance={16}
+      minPolarAngle={Math.PI / 12}
+      minDistance={1.0}
+      maxDistance={18}
       enablePan={true}
+      enableRotate={true}
+      enableZoom={true}
     />
-  ) : null;
+  );
 }
-

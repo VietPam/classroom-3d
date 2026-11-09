@@ -1,26 +1,13 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import type { StudentData, StudentState } from '../../types/classroom';
-import { soundEngine } from '../../audio/SoundEngine';
+import type { StudentData } from '../../types/classroom';
 
 interface StudentAvatarProps {
   data: StudentData;
-  state: StudentState;
-  isActive: boolean;
-  isHovered: boolean;
-  onSelect: () => void;
-  onStateAdvance: (newState: StudentState) => void;
 }
 
-export function StudentAvatar({
-  data,
-  state,
-  isActive,
-  isHovered,
-  onSelect,
-  onStateAdvance,
-}: StudentAvatarProps) {
+export function StudentAvatar({ data }: StudentAvatarProps) {
   // Master root group
   const rootGroupRef = useRef<THREE.Group>(null);
 
@@ -35,15 +22,9 @@ export function StudentAvatar({
   const leftKneeRef = useRef<THREE.Group>(null);
   const rightKneeRef = useRef<THREE.Group>(null);
 
-  // Kinematic state trackers
-  const progressRef = useRef(0);
-  const lastFootstepRef = useRef(0);
-
   // Desk coordinates
   const [dx, , dz] = data.deskPosition;
   const seatPos: [number, number, number] = [dx, 0, dz - 0.26];
-  const aislePos: [number, number, number] = [0, 0, dz - 0.26];
-  const teacherDeskPos: [number, number, number] = data.submissionWaypoint || [0, 0, 4.8];
 
   // Warm Stylized Capybara Color Palette
   const furColor = data.capybaraTone || data.skinTone || '#9d633b';
@@ -52,394 +33,69 @@ export function StudentAvatar({
   const bellyColor = '#caa078';
   const innerEarColor = '#be8261';
 
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock }) => {
     if (!rootGroupRef.current) return;
     const time = clock.getElapsedTime();
 
     // Subtle random seed per student so idle movements aren't synchronized
     const studentSeed = parseInt(data.id.replace('student-', ''), 10) * 1.37;
 
-    // Helper to trigger footstep sound at gait peaks
-    const checkFootstep = (gaitPhase: number) => {
-      const step = Math.floor((gaitPhase / Math.PI) * 2);
-      if (step !== lastFootstepRef.current) {
-        lastFootstepRef.current = step;
-        soundEngine.playFootstep();
-      }
-    };
+    // Natural seated idle: writing with right hand, subtle breathing, head nodding peacefully
+    rootGroupRef.current.position.set(seatPos[0], 0, seatPos[2]);
+    rootGroupRef.current.rotation.set(0, 0, 0); // facing forward toward board
 
-    // ================= STATE 1: SEATED WRITING =================
-    if (state === 'SEATED_WRITING') {
-      rootGroupRef.current.position.set(seatPos[0], 0, seatPos[2]);
-      rootGroupRef.current.rotation.set(0, 0, 0); // facing forward (+Z toward front/teacher)
-
-      // Seated hips & thighs bent 90 deg forward
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = -Math.PI / 2;
-        rightLegRef.current.rotation.x = -Math.PI / 2;
-      }
-      // Knees bent 90 deg down
-      if (leftKneeRef.current && rightKneeRef.current) {
-        leftKneeRef.current.rotation.x = Math.PI / 2;
-        rightKneeRef.current.rotation.x = Math.PI / 2;
-      }
-
-      // Torso breathing & leaning slightly forward over desk
-      if (torsoRef.current) {
-        torsoRef.current.position.y = 0.44;
-        torsoRef.current.rotation.x = 0.12 + Math.sin(time * 1.5 + studentSeed) * 0.02;
-        torsoRef.current.rotation.y = 0;
-        torsoRef.current.rotation.z = 0;
-      }
-
-      // Head thinking, looking down at paper and nodding peacefully (facing teacher comfortably)
-      if (headRef.current) {
-        headRef.current.rotation.x = 0.08 + Math.cos(time * 1.1 + studentSeed) * 0.03;
-        headRef.current.rotation.y = Math.sin(time * 0.6 + studentSeed) * 0.08;
-      }
-
-      // Left paw resting comfortably holding paper flat on desk
-      if (leftArmRef.current) {
-        leftArmRef.current.rotation.set(-0.62, 0, -0.25);
-      }
-
-      // Right paw actively scribbling pencil on test paper
-      if (rightArmRef.current && rightForearmRef.current) {
-        rightArmRef.current.rotation.set(
-          -0.65 + Math.sin(time * 4 + studentSeed) * 0.04,
-          0,
-          0.2
-        );
-        rightForearmRef.current.rotation.set(
-          -0.5 + Math.sin(time * 8 + studentSeed) * 0.05,
-          0,
-          0
-        );
-      }
+    // Seated hips & thighs bent 90 deg forward
+    if (leftLegRef.current && rightLegRef.current) {
+      leftLegRef.current.rotation.x = -Math.PI / 2;
+      rightLegRef.current.rotation.x = -Math.PI / 2;
+    }
+    // Knees bent 90 deg down
+    if (leftKneeRef.current && rightKneeRef.current) {
+      leftKneeRef.current.rotation.x = Math.PI / 2;
+      rightKneeRef.current.rotation.x = Math.PI / 2;
     }
 
-    // ================= STATE 2: STANDING UP =================
-    else if (state === 'STANDING') {
-      progressRef.current += delta * 1.2; // ~0.8s
-      const t = Math.min(1, progressRef.current);
-
-      // Thighs straighten from -PI/2 to 0
-      const legAngle = (-Math.PI / 2) * (1 - t);
-      const kneeAngle = (Math.PI / 2) * (1 - t);
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = legAngle;
-        rightLegRef.current.rotation.x = legAngle;
-      }
-      if (leftKneeRef.current && rightKneeRef.current) {
-        leftKneeRef.current.rotation.x = kneeAngle;
-        rightKneeRef.current.rotation.x = kneeAngle;
-      }
-
-      // Torso shifts and rises to standing height (0.46)
-      if (torsoRef.current) {
-        torsoRef.current.position.y = 0.44 + t * 0.02;
-        torsoRef.current.rotation.x = Math.sin(t * Math.PI) * 0.15;
-      }
-
-      // Student steps back slightly as they stand
-      rootGroupRef.current.position.set(seatPos[0], 0, seatPos[2] - t * 0.15);
-
-      // Right paw lifts paper from desk
-      if (rightArmRef.current) {
-        rightArmRef.current.rotation.set(-0.4 * t, 0, 0.2);
-      }
-
-      if (t >= 1) {
-        progressRef.current = 0;
-        onStateAdvance('STEPPING_TO_AISLE');
-      }
+    // Torso breathing & leaning slightly forward over desk
+    if (torsoRef.current) {
+      torsoRef.current.position.y = 0.44;
+      torsoRef.current.rotation.x = 0.12 + Math.sin(time * 1.5 + studentSeed) * 0.02;
+      torsoRef.current.rotation.y = 0;
+      torsoRef.current.rotation.z = 0;
     }
 
-    // ================= STATE 3: STEPPING TO AISLE =================
-    else if (state === 'STEPPING_TO_AISLE') {
-      progressRef.current += delta * 0.9;
-      const t = Math.min(1, progressRef.current);
-
-      // Interpolate from seat to aisle
-      const curX = THREE.MathUtils.lerp(seatPos[0], aislePos[0], t);
-      const curZ = seatPos[2] - 0.15;
-      rootGroupRef.current.position.set(curX, 0, curZ);
-
-      // Turn facing towards aisle center
-      const targetAngle = seatPos[0] < 0 ? Math.PI / 2 : -Math.PI / 2;
-      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(0, targetAngle, Math.min(1, t * 2));
-
-      // Side-step waddle walk cycle
-      const gait = time * 7;
-      checkFootstep(gait);
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = Math.sin(gait) * 0.45;
-        rightLegRef.current.rotation.x = -Math.sin(gait) * 0.45;
-      }
-      if (torsoRef.current) {
-        torsoRef.current.position.y = 0.46 + Math.abs(Math.sin(gait)) * 0.025;
-      }
-
-      if (t >= 1) {
-        progressRef.current = 0;
-        onStateAdvance('WALKING_TO_TEACHER');
-      }
+    // Head thinking, looking down at paper and nodding peacefully
+    if (headRef.current) {
+      headRef.current.rotation.x = 0.08 + Math.cos(time * 1.1 + studentSeed) * 0.03;
+      headRef.current.rotation.y = Math.sin(time * 0.6 + studentSeed) * 0.08;
     }
 
-    // ================= STATE 4: WALKING TO TEACHER =================
-    else if (state === 'WALKING_TO_TEACHER') {
-      progressRef.current += delta * 0.35;
-      const t = Math.min(1, progressRef.current);
-
-      // Walk up center aisle (X = 0, Z from aislePos to teacher desk)
-      const startZ = seatPos[2] - 0.15;
-      const targetZ = teacherDeskPos[2];
-      const curZ = THREE.MathUtils.lerp(startZ, targetZ, t);
-      rootGroupRef.current.position.set(0, 0, curZ);
-
-      // Face forward toward teacher (+Z is front)
-      rootGroupRef.current.rotation.y = 0;
-
-      // Cute energetic Capybara waddle walk cycle
-      const gait = time * 8;
-      checkFootstep(gait);
-
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = Math.sin(gait) * 0.55;
-        rightLegRef.current.rotation.x = -Math.sin(gait) * 0.55;
-      }
-      if (leftArmRef.current) {
-        leftArmRef.current.rotation.x = -Math.sin(gait) * 0.4;
-      }
-      if (rightArmRef.current) {
-        rightArmRef.current.rotation.set(-0.35, 0, 0.15); // holds test paper high
-      }
-      if (torsoRef.current) {
-        torsoRef.current.position.y = 0.46 + Math.abs(Math.sin(gait)) * 0.025;
-        torsoRef.current.rotation.z = Math.sin(gait) * 0.06;
-      }
-      if (headRef.current) {
-        headRef.current.rotation.x = Math.sin(gait * 2) * 0.05;
-      }
-
-      if (t >= 1) {
-        progressRef.current = 0;
-        onStateAdvance('HANDING_PAPER');
-      }
+    // Left paw resting comfortably holding paper flat on desk
+    if (leftArmRef.current) {
+      leftArmRef.current.rotation.set(-0.62, 0, -0.25);
     }
 
-    // ================= STATE 5: HANDING PAPER =================
-    else if (state === 'HANDING_PAPER') {
-      progressRef.current += delta * 0.9;
-      const t = Math.min(1, progressRef.current);
-
-      rootGroupRef.current.position.set(0, 0, teacherDeskPos[2]);
-      // Smoothly rotate to face directly towards the bottom-left corner camera
-      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI * 0.84, Math.min(1, t * 2.5));
-
-      // Proud chibi pose holding certificate/paper with both paws
-      const reachProgress = Math.sin(t * Math.PI);
-      if (leftArmRef.current && rightArmRef.current) {
-        leftArmRef.current.rotation.set(-0.62, 0, -0.22);
-        rightArmRef.current.rotation.set(-0.62, 0, 0.22);
-      }
-      if (torsoRef.current) {
-        torsoRef.current.rotation.x = reachProgress * 0.08;
-        torsoRef.current.position.y = 0.46;
-      }
-      if (headRef.current) {
-        headRef.current.rotation.x = -0.05 + reachProgress * 0.06;
-      }
-
-      if (t >= 1) {
-        progressRef.current = 0;
-        onStateAdvance('TURNING_AROUND');
-      }
-    }
-
-    // ================= STATE 6: TURNING AROUND =================
-    else if (state === 'TURNING_AROUND') {
-      progressRef.current += delta * 1.5;
-      const t = Math.min(1, progressRef.current);
-
-      rootGroupRef.current.position.set(0, 0, teacherDeskPos[2]);
-      // Student is already facing the classroom (-Z)
-      rootGroupRef.current.rotation.y = Math.PI;
-
-      // Reset arm posture
-      if (rightArmRef.current) {
-        rightArmRef.current.rotation.set(0, 0, 0);
-      }
-      if (leftArmRef.current) {
-        leftArmRef.current.rotation.set(0, 0, 0);
-      }
-      if (torsoRef.current) {
-        torsoRef.current.rotation.set(0, 0, 0);
-      }
-
-      if (t >= 1) {
-        progressRef.current = 0;
-        onStateAdvance('WALKING_TO_SEAT');
-      }
-    }
-
-    // ================= STATE 7: WALKING TO SEAT =================
-    else if (state === 'WALKING_TO_SEAT') {
-      progressRef.current += delta * 0.35;
-      const t = Math.min(1, progressRef.current);
-
-      // Walk back down aisle toward student row
-      const startZ = teacherDeskPos[2];
-      const targetZ = seatPos[2] - 0.15;
-      const curZ = THREE.MathUtils.lerp(startZ, targetZ, t);
-      rootGroupRef.current.position.set(0, 0, curZ);
-
-      // Face back toward desk (-Z)
-      rootGroupRef.current.rotation.y = Math.PI;
-
-      // Relaxed, relieved happy walk waddle
-      const gait = time * 7.5;
-      checkFootstep(gait);
-
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = Math.sin(gait) * 0.45;
-        rightLegRef.current.rotation.x = -Math.sin(gait) * 0.45;
-      }
-      if (leftArmRef.current && rightArmRef.current) {
-        leftArmRef.current.rotation.x = -Math.sin(gait) * 0.35;
-        rightArmRef.current.rotation.x = Math.sin(gait) * 0.35;
-      }
-      if (torsoRef.current) {
-        torsoRef.current.position.y = 0.46 + Math.abs(Math.sin(gait)) * 0.025;
-        torsoRef.current.rotation.z = -Math.sin(gait) * 0.05;
-      }
-      if (headRef.current) {
-        headRef.current.rotation.x = Math.sin(gait * 2) * 0.04;
-      }
-
-      if (t >= 1) {
-        progressRef.current = 0;
-        onStateAdvance('SITTING_DOWN');
-      }
-    }
-
-    // ================= STATE 8: SITTING DOWN =================
-    else if (state === 'SITTING_DOWN') {
-      progressRef.current += delta * 1.0;
-      const t = Math.min(1, progressRef.current);
-
-      // Step back from aisle to chair seat
-      const curX = THREE.MathUtils.lerp(aislePos[0], seatPos[0], t);
-      const curZ = seatPos[2] - 0.15 * (1 - t);
-      rootGroupRef.current.position.set(curX, 0, curZ);
-
-      // Rotate to face forward again
-      const startAngle = seatPos[0] < 0 ? Math.PI / 2 : -Math.PI / 2;
-      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(startAngle, 0, t);
-
-      // Legs bend back to sitting -PI/2
-      const legAngle = (-Math.PI / 2) * t;
-      const kneeAngle = (Math.PI / 2) * t;
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = legAngle;
-        rightLegRef.current.rotation.x = legAngle;
-      }
-      if (leftKneeRef.current && rightKneeRef.current) {
-        leftKneeRef.current.rotation.x = kneeAngle;
-        rightKneeRef.current.rotation.x = kneeAngle;
-      }
-
-      // Torso lowers smoothly to seated height (0.44)
-      if (torsoRef.current) {
-        torsoRef.current.position.y = 0.46 - t * 0.02;
-      }
-
-      if (t >= 1) {
-        progressRef.current = 0;
-        onStateAdvance('COMPLETED');
-      }
-    }
-
-    // ================= STATE 9: COMPLETED (DONE EXAM) =================
-    else if (state === 'COMPLETED') {
-      rootGroupRef.current.position.set(seatPos[0], 0, seatPos[2]);
-      rootGroupRef.current.rotation.set(0, 0, 0);
-
-      // Relaxed, happy, zen seated posture
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = -Math.PI / 2;
-        rightLegRef.current.rotation.x = -Math.PI / 2;
-      }
-      if (leftKneeRef.current && rightKneeRef.current) {
-        leftKneeRef.current.rotation.x = Math.PI / 2;
-        rightKneeRef.current.rotation.x = Math.PI / 2;
-      }
-      if (torsoRef.current) {
-        torsoRef.current.position.y = 0.44;
-        torsoRef.current.rotation.set(0, 0, 0);
-      }
-      if (headRef.current) {
-        headRef.current.rotation.set(
-          Math.sin(time * 0.7 + studentSeed) * 0.05,
-          Math.cos(time * 0.5 + studentSeed) * 0.1,
-          0
-        );
-      }
-      if (leftArmRef.current && rightArmRef.current) {
-        leftArmRef.current.rotation.set(-0.5, 0, 0.2);
-        rightArmRef.current.rotation.set(-0.5, 0, -0.2);
-      }
+    // Right paw actively scribbling pencil on test paper
+    if (rightArmRef.current && rightForearmRef.current) {
+      rightArmRef.current.rotation.set(
+        -0.65 + Math.sin(time * 4 + studentSeed) * 0.04,
+        0,
+        0.2
+      );
+      rightForearmRef.current.rotation.set(
+        -0.5 + Math.sin(time * 8 + studentSeed) * 0.05,
+        0,
+        0
+      );
     }
   });
 
-  const isCarryingPaper =
-    state === 'STANDING' ||
-    state === 'STEPPING_TO_AISLE' ||
-    state === 'WALKING_TO_TEACHER' ||
-    state === 'HANDING_PAPER';
+  const isCarryingPaper = false;
 
   return (
     <group
       ref={rootGroupRef}
       scale={[0.62, 0.62, 0.62]}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = 'auto';
-      }}
     >
-      {/* Selection / Hover Glow ring on ground */}
-      {(isHovered || isActive) && (
-        <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.32, 0.48, 32]} />
-          <meshBasicMaterial
-            color={isActive ? '#38bdf8' : '#facc15'}
-            transparent
-            opacity={0.85}
-          />
-        </mesh>
-      )}
-
-      {/* Floating Name Badge when hovered or active */}
-      {(isHovered || isActive) && (
-        <group position={[0, 1.88, 0]}>
-          <mesh>
-            <boxGeometry args={[0.82, 0.22, 0.02]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.4} />
-          </mesh>
-          <mesh position={[0, 0, 0.015]}>
-            <planeGeometry args={[0.78, 0.18]} />
-            <meshBasicMaterial color={isActive ? '#0284c7' : '#1e293b'} />
-          </mesh>
-        </group>
-      )}
-
       {/* ================= TORSO & CAPYBARA BODY ================= */}
       <group ref={torsoRef} position={[0, 0.44, 0]}>
         {/* Chubby Pear-shaped Pelvis / Lower Body */}
@@ -459,7 +115,7 @@ export function StudentAvatar({
           <mesh castShadow scale={[1.16, 1.0, 1.08]}>
             <capsuleGeometry args={[0.17, 0.16, 16, 28]} />
             <meshStandardMaterial
-              color={isHovered ? '#fbbf24' : data.shirtColor}
+              color={data.shirtColor}
               roughness={0.65}
             />
           </mesh>
