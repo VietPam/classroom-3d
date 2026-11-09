@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import type { QuizStatus } from '../../types/classroom';
 import { QUIZ_ZONES, PODIUM_POSITION } from '../../data/floorZones';
+import { BRAND_COLORS } from '../../theme/brandTokens';
 
 interface FloorZonesProps {
   quizStatus: QuizStatus;
@@ -18,7 +19,7 @@ export function FloorZones({
   const podiumGlowRef = useRef<THREE.MeshStandardMaterial>(null);
   const zonesRef = useRef<Map<string, THREE.MeshStandardMaterial>>(new Map());
 
-  // Generate crisp 256x256 letter textures for A, B, C, D
+  // Generate crisp 256x256 letter textures for A, B, C, D using Montserrat / Be Vietnam Pro
   const letterTextures = useMemo(() => {
     const map = new Map<string, THREE.CanvasTexture>();
     ['A', 'B', 'C', 'D'].forEach((letter) => {
@@ -36,15 +37,15 @@ export function FloorZones({
         ctx.arc(128, 128, 116, 0, Math.PI * 2);
         ctx.fillStyle = '#1e293b';
         ctx.fill();
-        ctx.strokeStyle = '#64748b';
+        ctx.strokeStyle = '#475569';
         ctx.lineWidth = 12;
         ctx.stroke();
 
-        // Bold letter centered
-        ctx.font = '900 160px "Arial Black", "Segoe UI", sans-serif';
+        // Bold letter centered with brand typography
+        ctx.font = '900 160px "Montserrat", "Be Vietnam Pro", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = BRAND_COLORS.textInverse;
         ctx.fillText(letter, 128, 138);
       }
 
@@ -79,16 +80,16 @@ export function FloorZones({
     // Animate Podium glow
     if (podiumGlowRef.current) {
       if (activePodium) {
-        podiumGlowRef.current.emissiveIntensity = 1.2 + Math.sin(time * 4) * 0.4;
+        podiumGlowRef.current.emissiveIntensity = 1.3 + Math.sin(time * 4) * 0.4;
       } else {
-        podiumGlowRef.current.emissiveIntensity = 0.35 + Math.sin(time * 1.5) * 0.15;
+        podiumGlowRef.current.emissiveIntensity = 0.4 + Math.sin(time * 1.5) * 0.15;
       }
     }
   });
 
   return (
     <group>
-      {/* ================= 4 QUIZ ZONES (A, B, C, D) ================= */}
+      {/* ================= 4 BRAND QUIZ ZONES (A, B, C, D) ================= */}
       {QUIZ_ZONES.map((zone) => {
         const isCorrect = quizStatus === 'REVEAL' && zone.id === correctOption;
 
@@ -98,7 +99,7 @@ export function FloorZones({
             <mesh position={[0, 0.007, 0]} receiveShadow>
               <boxGeometry args={[1.2, 0.014, 1.2]} />
               <meshStandardMaterial
-                color={isCorrect ? '#14532d' : '#0f172a'}
+                color={isCorrect ? '#064e3b' : '#0f172a'}
                 roughness={0.7}
                 metalness={0.3}
               />
@@ -123,7 +124,7 @@ export function FloorZones({
             <mesh position={[0, 0.016, 0]}>
               <boxGeometry args={[1.10, 0.02, 1.10]} />
               <meshStandardMaterial
-                color={isCorrect ? '#064e3b' : '#1e293b'}
+                color={isCorrect ? '#022c22' : '#1e293b'}
                 roughness={0.8}
               />
             </mesh>
@@ -162,22 +163,22 @@ export function FloorZones({
         );
       })}
 
-      {/* ================= PRESENTATION PODIUM STAGE ================= */}
+      {/* ================= PRESENTATION PODIUM STAGE (Primary Brand) ================= */}
       <group position={PODIUM_POSITION}>
-        {/* Raised Circular Stage Platform */}
+        {/* Raised Circular Stage Platform (Royal Blue Base) */}
         <mesh position={[0, 0.025, 0]} receiveShadow>
           <cylinderGeometry args={[0.85, 0.90, 0.05, 32]} />
-          <meshStandardMaterial color="#1e1b4b" roughness={0.6} metalness={0.4} />
+          <meshStandardMaterial color={BRAND_COLORS.primaryDark} roughness={0.6} metalness={0.4} />
         </mesh>
 
-        {/* Outer Glowing Stage Ring */}
+        {/* Outer Glowing Stage Ring (Amber Accent Glow) */}
         <mesh position={[0, 0.052, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <torusGeometry args={[0.85, 0.018, 8, 32]} />
           <meshStandardMaterial
             ref={podiumGlowRef}
-            color="#818cf8"
-            emissive="#6366f1"
-            emissiveIntensity={0.5}
+            color={BRAND_COLORS.accentAmber}
+            emissive={BRAND_COLORS.glowAmber}
+            emissiveIntensity={0.6}
             roughness={0.2}
           />
         </mesh>
@@ -185,13 +186,17 @@ export function FloorZones({
         {/* Top Step Inset */}
         <mesh position={[0, 0.054, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[0.78, 32]} />
-          <meshStandardMaterial color="#312e81" roughness={0.7} />
+          <meshStandardMaterial color="#0f172a" roughness={0.8} />
         </mesh>
 
-        {/* Center Star / Spotlight Emblem */}
+        {/* Center Spotlight Disc */}
         <mesh position={[0, 0.056, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[0.25, 16]} />
-          <meshStandardMaterial color="#a5b4fc" emissive="#818cf8" emissiveIntensity={0.8} />
+          <meshStandardMaterial
+            color={BRAND_COLORS.primaryLight}
+            emissive={BRAND_COLORS.glowBlue}
+            emissiveIntensity={0.8}
+          />
         </mesh>
       </group>
     </group>

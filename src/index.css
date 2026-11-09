@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Be Vietnam Pro', 'Montserrat', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: 'Montserrat', 'Be Vietnam Pro', sans-serif;
+
+  --color-primary: #1F3EB7;
+  --color-primary-dark: #293486;
+  --color-primary-light: #EEF6FF;
+
+  --color-accent-amber: #F08806;
+  --color-accent-amber-light: #FFFBEB;
+
+  --color-semantic-green: #059669;
+  --color-semantic-red: #DC2626;
+
+  --color-marker-bg: #FEF08A;
+  --color-marker-text: #854D0E;
+}
+
 html, body, #root {
   width: 100%;
   height: 100%;
@@ -7,6 +25,6 @@ html, body, #root {
   padding: 0;
   overflow: hidden;
   user-select: none;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   background-color: #0f172a;
 }
