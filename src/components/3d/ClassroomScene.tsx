@@ -1,8 +1,11 @@
 import { ClassroomStructure } from './ClassroomStructure';
 import { FloorZones } from './FloorZones';
 import { SmartboardDisplay } from './SmartboardDisplay';
-import { StudentAvatar } from './StudentAvatar';
+import { CharacterController } from './CharacterController';
+import { ProceduralChibiAvatar } from './avatar/ProceduralChibiAvatar';
+import { VRMAvatar } from './avatar/VRMAvatar';
 import { CameraRig } from './CameraRig';
+import { CHARACTER_CONFIG } from '../../config/characterConfig';
 import type { ClassroomStore } from '../../hooks/useClassroomStore';
 
 interface ClassroomSceneProps {
@@ -57,9 +60,25 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
         correctOption={quiz.correctOption}
       />
 
-      {/* ================= DYNAMIC MOVING AVATARS (SÀN GỖ TỰ NHIÊN, KHÔNG CÒN VÒNG TRÒN) ================= */}
+      {/* ================= DECOUPLED MOVING AVATARS (FEATURE TOGGLE: PROCEDURAL vs VRM) ================= */}
       {students.map((student) => (
-        <StudentAvatar key={student.id} data={student} />
+        <CharacterController key={student.id} data={student}>
+          {({ isWalking, state }) =>
+            CHARACTER_CONFIG.engineType === 'vrm' ? (
+              <VRMAvatar
+                data={student}
+                isWalking={isWalking}
+                state={state}
+              />
+            ) : (
+              <ProceduralChibiAvatar
+                data={student}
+                isWalking={isWalking}
+                state={state}
+              />
+            )
+          }
+        </CharacterController>
       ))}
     </>
   );

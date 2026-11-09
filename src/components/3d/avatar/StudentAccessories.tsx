@@ -1,8 +1,8 @@
-interface CapybaraAccessoriesProps {
+interface StudentAccessoriesProps {
   accessory?: 'orange' | 'lotus' | 'glasses' | 'scholar_hat' | 'red_bow' | 'none';
 }
 
-export function CapybaraAccessories({ accessory }: CapybaraAccessoriesProps) {
+export function StudentAccessories({ accessory }: StudentAccessoriesProps) {
   if (!accessory || accessory === 'none') return null;
 
   return (
