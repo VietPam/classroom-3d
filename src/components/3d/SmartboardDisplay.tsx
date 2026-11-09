@@ -86,7 +86,7 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
     const categoryText = `⚡ ${quiz.groupName ? quiz.groupName.toUpperCase() : (quiz.category ? quiz.category.toUpperCase() : 'VOCABULARY')} • CÂU ${quiz.quizNumber || 1}/${quiz.totalQuizzes || 12}`;
     ctx.font = '700 24px "Be Vietnam Pro", sans-serif';
     const catMetrics = ctx.measureText(categoryText);
-    const catPillW = Math.max(500, catMetrics.width + 48);
+    const catPillW = Math.max(480, catMetrics.width + 48);
     const catPillH = 38;
     const catPillX = w / 2 - catPillW / 2;
     const catPillY = questionY + 16;
@@ -103,23 +103,33 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
     ctx.textAlign = 'center';
     ctx.fillText(categoryText, w / 2, catPillY + 26);
 
-    // Question Prompt (e.g. "CHOOSE THE CLOSEST SYNONYM FOR:")
-    ctx.font = '700 36px "Be Vietnam Pro", sans-serif';
-    ctx.fillStyle = '#475569';
-    ctx.fillText(quiz.question, w / 2, questionY + 98);
+    // Smart Prompting & Target Word (Tập trung thị giác, loại bỏ text thừa)
+    let promptHeadline = '';
+    const rawTarget = quiz.targetWord || quiz.title || 'ACCURATE';
 
-    // Target Word (e.g. "METICULOUS" - Giant bold brand headline)
-    const target = quiz.targetWord || quiz.title || 'METICULOUS';
-    ctx.font = '900 64px "Montserrat", "Be Vietnam Pro", sans-serif';
-    ctx.fillStyle = BRAND_COLORS.primary;
-    ctx.fillText(target, w / 2, questionY + 165);
-
-    // Context Sentence (Optional subtle example sentence)
-    if (quiz.contextSentence) {
-      ctx.font = '500 26px "Be Vietnam Pro", sans-serif';
-      ctx.fillStyle = '#64748B';
-      ctx.fillText(quiz.contextSentence, w / 2, questionY + 204);
+    if (quiz.groupId === 'antonyms') {
+      promptHeadline = `${rawTarget.toUpperCase()}  ≠  ?`;
+    } else if (quiz.groupId === 'fill_blank') {
+      promptHeadline = quiz.contextSentence
+        ? quiz.contextSentence.replace(/^"|"$/g, '')
+        : quiz.question || rawTarget;
+    } else {
+      promptHeadline = `${rawTarget.toUpperCase()}  =  ?`;
     }
+
+    // Dynamic Font Scaling for Question Headline to prevent overflow
+    let headlineFontSize = quiz.groupId === 'fill_blank' ? 44 : 76;
+    ctx.font = `900 ${headlineFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+    while (ctx.measureText(promptHeadline).width > boxW - 80 && headlineFontSize > 30) {
+      headlineFontSize -= 2;
+      ctx.font = `900 ${headlineFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+    }
+
+    ctx.fillStyle = quiz.groupId === 'antonyms' ? BRAND_COLORS.semanticRed : BRAND_COLORS.primary;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(promptHeadline, w / 2, questionY + 140);
+    ctx.textBaseline = 'alphabetic'; // restore baseline
     ctx.textAlign = 'start';
 
     // 3. 4 Option Cards (A, B, C, D) - ĐÁP ÁN CĂN GIỮA TUYỆT ĐỐI (Chiều cao 595px)
@@ -186,7 +196,7 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
       ctx.lineWidth = isCorrect ? 8 : isWrong ? 2 : 4;
       ctx.stroke();
 
-      // 1. Option Letter Badge (Montserrat 900, Giant 54px font - CĂN GIỮA)
+      // 1. Option Letter Badge (Montserrat 900, Giant 56px font - CĂN GIỮA)
       const badgeSize = 88;
       const badgeX = centerX - badgeSize / 2;
       const badgeY = cardY + 36;
@@ -201,42 +211,72 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
       ctx.textAlign = 'center';
       ctx.fillText(opt.id, centerX, badgeY + 64);
 
-      // 2. Main Vocab Word (Extra Large 52px - CĂN GIỮA)
+      // 2. Main Vocab Word (Extra Large - CĂN GIỮA)
       const wordText = opt.word || opt.code || '';
-      ctx.font = '800 52px "Be Vietnam Pro", "Montserrat", sans-serif';
-      ctx.fillStyle = isCorrect ? '#065F46' : isWrong ? '#94A3B8' : theme.codeText;
-      ctx.fillText(wordText, centerX, cardY + 205);
 
-      // 3. Phonetics IPA (32px Monospace - CĂN GIỮA)
-      if (opt.ipa) {
-        ctx.font = '500 32px "Be Vietnam Pro", monospace';
-        ctx.fillStyle = isWrong ? '#CBD5E1' : '#64748B';
-        ctx.fillText(opt.ipa, centerX, cardY + 270);
+      if (status === 'REVEAL') {
+        if (isCorrect) {
+          // Thẻ ĐÚNG: Nổi bật, bung nghĩa tiếng Việt và banner chúc mừng
+          let wordFontSize = 64;
+          ctx.font = `800 ${wordFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+          while (ctx.measureText(wordText).width > cardW - 40 && wordFontSize > 36) {
+            wordFontSize -= 2;
+            ctx.font = `800 ${wordFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+          }
+          ctx.fillStyle = '#065F46';
+          ctx.fillText(wordText, centerX, cardY + 225);
+
+          // Vietnamese Meaning (Bung ra giải thích khi công bố kết quả)
+          if (opt.meaning) {
+            let meaningFontSize = 32;
+            ctx.font = `700 ${meaningFontSize}px "Be Vietnam Pro", sans-serif`;
+            while (ctx.measureText(opt.meaning).width > cardW - 36 && meaningFontSize > 22) {
+              meaningFontSize -= 2;
+              ctx.font = `700 ${meaningFontSize}px "Be Vietnam Pro", sans-serif`;
+            }
+            ctx.fillStyle = '#047857';
+            ctx.fillText(opt.meaning, centerX, cardY + 310);
+          }
+
+          // Correct Celebration Banner (CĂN GIỮA ĐÁY THẺ)
+          const bannerW = cardW - 56;
+          const bannerH = 72;
+          const bannerX = centerX - bannerW / 2;
+          const bannerY = cardY + 475;
+
+          ctx.fillStyle = BRAND_COLORS.semanticGreen;
+          ctx.beginPath();
+          ctx.roundRect(bannerX, bannerY, bannerW, bannerH, 16);
+          ctx.fill();
+
+          ctx.font = '800 30px "Be Vietnam Pro", sans-serif';
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillText('✓ ĐÁP ÁN ĐÚNG!', centerX, bannerY + 46);
+        } else {
+          // Thẻ SAI: Dimmed nhẹ, giữ từ vựng ở trung tâm, không làm rối mắt
+          let wordFontSize = 58;
+          ctx.font = `800 ${wordFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+          while (ctx.measureText(wordText).width > cardW - 40 && wordFontSize > 36) {
+            wordFontSize -= 2;
+            ctx.font = `800 ${wordFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+          }
+          ctx.fillStyle = '#94A3B8';
+          ctx.fillText(wordText, centerX, cardY + 345);
+        }
+      } else {
+        // GIAI ĐOẠN ĐANG ĐỐ (RUNNING / THINKING / IDLE):
+        // Tuyệt đối KHÔNG hiện IPA hoặc Tiếng Việt để tránh spoil và rác thị giác!
+        // Từ vựng được phóng to cực đại, căn giữa hoàn hảo
+        let wordFontSize = 68;
+        ctx.font = `800 ${wordFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+        while (ctx.measureText(wordText).width > cardW - 40 && wordFontSize > 40) {
+          wordFontSize -= 2;
+          ctx.font = `800 ${wordFontSize}px "Montserrat", "Be Vietnam Pro", sans-serif`;
+        }
+        ctx.fillStyle = theme.codeText;
+        ctx.fillText(wordText, centerX, cardY + 355);
       }
 
-      // 4. Vietnamese Meaning (30px SemiBold - CĂN GIỮA)
-      if (opt.meaning) {
-        ctx.font = '600 30px "Be Vietnam Pro", sans-serif';
-        ctx.fillStyle = isWrong ? '#CBD5E1' : '#334155';
-        ctx.fillText(opt.meaning, centerX, cardY + 340);
-      }
-
-      // 5. Correct Celebration Banner if Revealed (CĂN GIỮA ĐÁY THẺ)
-      if (isCorrect) {
-        const bannerW = cardW - 56;
-        const bannerH = 70;
-        const bannerX = centerX - bannerW / 2;
-        const bannerY = cardY + 480;
-
-        ctx.fillStyle = BRAND_COLORS.semanticGreen;
-        ctx.beginPath();
-        ctx.roundRect(bannerX, bannerY, bannerW, bannerH, 16);
-        ctx.fill();
-
-        ctx.font = '800 30px "Be Vietnam Pro", sans-serif';
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillText('✓ ĐÁP ÁN ĐÚNG!', centerX, bannerY + 45);
-      }
       ctx.textAlign = 'start';
     });
 
