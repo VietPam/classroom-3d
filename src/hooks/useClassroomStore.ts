@@ -14,6 +14,17 @@ import {
   getTotalQuizCount,
 } from '../config/quizConfig';
 import { STREAM_TIMING } from '../config/streamConfig';
+import type {
+  VoteOption,
+  VotingState,
+  VoteEvent,
+} from '../modules/voting/votingTypes';
+import {
+  createInitialVotingState,
+  calculateStudentDistribution,
+  distributionToChoiceList,
+  registerVote,
+} from '../modules/voting/votingEngine';
 
 // Slot offsets bên trong mỗi ô đáp án (1.4m x 1.8m)
 // Lưới 4 cột x 5 hàng hỗ trợ tối đa 20 học sinh đứng chung một ô mà không bị chồng lấn
@@ -70,6 +81,13 @@ export interface ClassroomStore {
   triggerRaiseHandAll: () => void;
   triggerDanceAll: () => void;
   triggerShockedAll: () => void;
+  // Crowd Voting & Live Simulator Module
+  votingState: VotingState;
+  isSimulatorOpen: boolean;
+  toggleSimulator: (open?: boolean) => void;
+  castVote: (option: VoteOption, user?: string, rawComment?: string) => void;
+  resetVotes: () => void;
+  castVoteBatch: (counts: Partial<Record<VoteOption, number>>) => void;
 }
 
 export function useClassroomStore(): ClassroomStore {
@@ -86,6 +104,63 @@ export function useClassroomStore(): ClassroomStore {
   const [isAutoPlay, setIsAutoPlay] = useState<boolean>(true);
   const [quizStatus, setQuizStatus] = useState<QuizStatus>('IDLE');
   const [cameraResetCount, setCameraResetCount] = useState<number>(0);
+
+  // Voting & Simulator State
+  const [votingState, setVotingState] = useState<VotingState>(() =>
+    createInitialVotingState()
+  );
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState<boolean>(false);
+  const votingStateRef = useRef(votingState);
+
+  useEffect(() => {
+    votingStateRef.current = votingState;
+  }, [votingState]);
+
+  const toggleSimulator = useCallback((open?: boolean) => {
+    setIsSimulatorOpen((prev) => (open !== undefined ? open : !prev));
+  }, []);
+
+  const castVote = useCallback(
+    (option: VoteOption, user = 'Khán giả', rawComment?: string) => {
+      const event: VoteEvent = {
+        id: `vote_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        option,
+        user,
+        rawComment: rawComment || option,
+        timestamp: Date.now(),
+      };
+      setVotingState((prev) => registerVote(prev, event));
+      audioEngine.playSFX('pop_mouth');
+    },
+    []
+  );
+
+  const resetVotes = useCallback(() => {
+    setVotingState(createInitialVotingState());
+  }, []);
+
+  const castVoteBatch = useCallback(
+    (counts: Partial<Record<VoteOption, number>>) => {
+      setVotingState((prev) => {
+        let current = prev;
+        for (const [opt, count] of Object.entries(counts)) {
+          if (!count || count <= 0) continue;
+          const option = opt as VoteOption;
+          for (let i = 0; i < count; i++) {
+            current = registerVote(current, {
+              id: `vote_${Date.now()}_${i}_${Math.random().toString(36).substring(2, 6)}`,
+              option,
+              user: 'Đám đông Live',
+              timestamp: Date.now(),
+            });
+          }
+        }
+        return current;
+      });
+      audioEngine.playSFX('coin_reward');
+    },
+    []
+  );
 
   // Sync refs to avoid stale closure issues in continuous loop timers
   const activeGroupIdRef = useRef(activeGroupId);
@@ -141,22 +216,14 @@ export function useClassroomStore(): ClassroomStore {
 
     const targetQuiz = getQuizByIndex(quizIndexRef.current, activeGroupIdRef.current);
     const correct = targetQuiz.correctOption;
-    const allOptions: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
-    const wrongOptions = allOptions.filter((opt) => opt !== correct);
 
-    // Phân bổ 20 học sinh tự nhiên & kịch tính:
-    // ~11 bạn chọn đúng (tạo hiệu ứng đám đông thắng áp đảo),
-    // 9 bạn còn lại chia đều cho 3 đáp án sai gây hồi hộp (4 - 3 - 2)
-    const w0 = wrongOptions[0] || 'B';
-    const w1 = wrongOptions[1] || 'C';
-    const w2 = wrongOptions[2] || 'D';
-
-    const choices: ('A' | 'B' | 'C' | 'D')[] = [
-      correct, w0, correct, w1, correct,
-      correct, w2, correct, w0, correct,
-      w1, correct, correct, w0, correct,
-      w2, correct, w0, correct, w1,
-    ];
+    // Phân bổ 20 học sinh theo tỷ lệ phiếu bầu thực tế của khán giả (Thuật toán Hamilton)
+    const distribution = calculateStudentDistribution(
+      20,
+      votingStateRef.current.voteCounts,
+      correct
+    );
+    const choices = distributionToChoiceList(distribution, 20);
 
     const zoneSlotCounts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
 
@@ -234,9 +301,10 @@ export function useClassroomStore(): ClassroomStore {
       const autoNextTimer = setTimeout(() => {
         if (!isAutoPlayRef.current) return;
 
-        // Đưa học sinh về vạch xuất phát
+        // Đưa học sinh về vạch xuất phát và làm mới lượt bình chọn
         audioEngine.playSFX('card_slide');
         setQuizStatus('IDLE');
+        setVotingState(createInitialVotingState());
         setStudents((prev) =>
           prev.map((student) => ({
             ...student,
@@ -284,6 +352,7 @@ export function useClassroomStore(): ClassroomStore {
   const resetAllToSpawn = useCallback(() => {
     clearTimers();
     setQuizStatus('IDLE');
+    setVotingState(createInitialVotingState());
     audioEngine.playSFX('card_slide');
 
     setStudents((prev) =>
@@ -528,5 +597,12 @@ export function useClassroomStore(): ClassroomStore {
     triggerRaiseHandAll,
     triggerDanceAll,
     triggerShockedAll,
+    // Crowd Voting & Simulator Module
+    votingState,
+    isSimulatorOpen,
+    toggleSimulator,
+    castVote,
+    resetVotes,
+    castVoteBatch,
   };
 }

@@ -9,9 +9,11 @@ import {
   Hand,
   Sparkles,
   Zap,
+  Bot,
 } from 'lucide-react';
 import type { ClassroomStore } from '../../hooks/useClassroomStore';
 import { useAudio } from '../../audio/useAudio';
+import { SimulatorDock } from './SimulatorDock';
 
 interface HUDProps {
   store: ClassroomStore;
@@ -34,6 +36,9 @@ export function HUD({ store }: HUDProps) {
     activeGroupId,
     quizIndex,
     totalQuizzes,
+    isSimulatorOpen,
+    toggleSimulator,
+    votingState,
   } = store;
 
   const { isMuted, toggleMute, playSFX } = useAudio();
@@ -59,6 +64,11 @@ export function HUD({ store }: HUDProps) {
           <span className="text-slate-600">|</span>
           <span className="text-amber-400 font-mono font-bold">
             Câu {quizIndex + 1}/{totalQuizzes}
+          </span>
+          <span className="text-slate-600">|</span>
+          <span className="text-emerald-400 font-mono font-bold flex items-center gap-1">
+            <span>🗳️</span>
+            <span>{votingState.totalVotes}</span>
           </span>
           <span className="text-slate-600">|</span>
           <span className="text-[#38BDF8] font-mono">
@@ -230,8 +240,28 @@ export function HUD({ store }: HUDProps) {
           >
             <Camera className="w-4 h-4" />
           </button>
+
+          {/* G. Toggle TikTok Live Simulator Dock */}
+          <button
+            data-testid="btn-toggle-simulator"
+            onClick={() => {
+              playSFX('click_ui');
+              toggleSimulator();
+            }}
+            className={`p-2 rounded-xl border transition-all cursor-pointer active:scale-95 shrink-0 ${
+              isSimulatorOpen
+                ? 'bg-amber-600 text-white border-amber-500 shadow-md shadow-amber-950/40'
+                : 'bg-slate-850 hover:bg-slate-750 text-amber-300 hover:text-white border-slate-700'
+            }`}
+            title="Bảng giả lập bình chọn TikTok Live (phím ~)"
+          >
+            <Bot className="w-4 h-4" />
+          </button>
         </div>
       </footer>
+
+      {/* In-App Live Simulator Dock */}
+      <SimulatorDock store={store} />
     </div>
   );
 }

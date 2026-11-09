@@ -13,7 +13,7 @@ interface ClassroomSceneProps {
 }
 
 export function ClassroomScene({ store }: ClassroomSceneProps) {
-  const { students, quiz, quizStatus, cameraResetCount } = store;
+  const { students, quiz, quizStatus, cameraResetCount, votingState } = store;
 
   return (
     <>
@@ -55,12 +55,21 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
       <ClassroomStructure />
 
       {/* ================= SMARTBOARD INTERACTIVE CONTENT ================= */}
-      <SmartboardDisplay quiz={quiz} status={quizStatus} />
+      <SmartboardDisplay
+        quiz={quiz}
+        status={quizStatus}
+        votePercentages={votingState?.votePercentages}
+        voteCounts={votingState?.voteCounts}
+        totalVotes={votingState?.totalVotes}
+      />
 
       {/* ================= 4 QUIZ FLOOR ZONES (PHÓNG TO CHO NHIỀU NGƯỜI ĐỨNG) ================= */}
       <FloorZones
         quizStatus={quizStatus}
         correctOption={quiz.correctOption}
+        votePercentages={votingState?.votePercentages}
+        voteCounts={votingState?.voteCounts}
+        totalVotes={votingState?.totalVotes}
       />
 
       {/* ================= DECOUPLED MOVING AVATARS (FEATURE TOGGLE: PROCEDURAL vs VRM) ================= */}

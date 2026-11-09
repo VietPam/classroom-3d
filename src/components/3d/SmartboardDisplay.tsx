@@ -6,9 +6,18 @@ import { BRAND_COLORS } from '../../theme/brandTokens';
 interface SmartboardDisplayProps {
   quiz: QuizData;
   status: QuizStatus;
+  votePercentages?: Record<'A' | 'B' | 'C' | 'D', number>;
+  voteCounts?: Record<'A' | 'B' | 'C' | 'D', number>;
+  totalVotes?: number;
 }
 
-export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
+export function SmartboardDisplay({
+  quiz,
+  status,
+  votePercentages,
+  voteCounts,
+  totalVotes = 0,
+}: SmartboardDisplayProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [fontsLoaded, setFontsLoaded] = useState(() => typeof document === 'undefined' || !('fonts' in document));
 
@@ -249,9 +258,10 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
           ctx.roundRect(bannerX, bannerY, bannerW, bannerH, 16);
           ctx.fill();
 
-          ctx.font = '800 30px "Be Vietnam Pro", sans-serif';
+          const correctPct = votePercentages?.[opt.id] ?? 0;
+          ctx.font = '800 28px "Be Vietnam Pro", sans-serif';
           ctx.fillStyle = '#FFFFFF';
-          ctx.fillText('✓ ĐÁP ÁN ĐÚNG!', centerX, bannerY + 46);
+          ctx.fillText(`✓ ĐÚNG! (${correctPct}%)`, centerX, bannerY + 46);
         } else {
           // Thẻ SAI: Dimmed nhẹ, giữ từ vựng ở trung tâm, không làm rối mắt
           let wordFontSize = 58;
@@ -262,6 +272,26 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
           }
           ctx.fillStyle = '#94A3B8';
           ctx.fillText(wordText, centerX, cardY + 345);
+
+          // Vote Pill at bottom for wrong card
+          const wrongCount = voteCounts?.[opt.id] ?? 0;
+          const wrongPct = votePercentages?.[opt.id] ?? 0;
+          const pillW = cardW - 56;
+          const pillH = 56;
+          const pillX = centerX - pillW / 2;
+          const pillY = cardY + 485;
+
+          ctx.fillStyle = '#F1F5F9';
+          ctx.beginPath();
+          ctx.roundRect(pillX, pillY, pillW, pillH, 14);
+          ctx.fill();
+
+          ctx.font = '700 24px "Montserrat", "Be Vietnam Pro", sans-serif';
+          ctx.fillStyle = '#64748B';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(`${wrongPct}% • ${wrongCount} phiếu`, centerX, pillY + pillH / 2);
+          ctx.textBaseline = 'alphabetic';
         }
       } else {
         // GIAI ĐOẠN ĐANG ĐỐ (RUNNING / THINKING / IDLE):
@@ -275,13 +305,50 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
         }
         ctx.fillStyle = theme.codeText;
         ctx.fillText(wordText, centerX, cardY + 355);
+
+        // Live Crowd Vote Stats Badge (Progress bar + % + count)
+        const voteCount = voteCounts?.[opt.id] ?? 0;
+        const votePct = votePercentages?.[opt.id] ?? 0;
+        const pillW = cardW - 56;
+        const pillH = 60;
+        const pillX = centerX - pillW / 2;
+        const pillY = cardY + 480;
+
+        // Pill background
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.roundRect(pillX, pillY, pillW, pillH, 14);
+        ctx.fill();
+        ctx.strokeStyle = theme.border;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Progress fill inside pill
+        if (votePct > 0) {
+          const fillW = Math.max(14, ((pillW - 8) * votePct) / 100);
+          ctx.fillStyle = theme.badgeBg;
+          ctx.globalAlpha = 0.16;
+          ctx.beginPath();
+          ctx.roundRect(pillX + 4, pillY + 4, fillW, pillH - 8, 10);
+          ctx.fill();
+          ctx.globalAlpha = 1.0;
+        }
+
+        // Percentage & Votes text
+        ctx.font = '800 26px "Montserrat", "Be Vietnam Pro", sans-serif';
+        ctx.fillStyle = theme.codeText;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const voteLabel = totalVotes > 0 ? `${votePct}% • ${voteCount} phiếu` : '0% • 0 phiếu';
+        ctx.fillText(voteLabel, centerX, pillY + pillH / 2);
+        ctx.textBaseline = 'alphabetic';
       }
 
       ctx.textAlign = 'start';
     });
 
     texture.needsUpdate = true;
-  }, [quiz, status, canvas, texture]);
+  }, [quiz, status, canvas, texture, votePercentages, voteCounts, totalVotes]);
 
   useEffect(() => {
     redraw();

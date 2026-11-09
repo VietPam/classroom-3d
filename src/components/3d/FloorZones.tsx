@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import type { QuizStatus } from '../../types/classroom';
@@ -7,56 +7,112 @@ import { QUIZ_ZONES } from '../../data/floorZones';
 interface FloorZonesProps {
   quizStatus: QuizStatus;
   correctOption?: 'A' | 'B' | 'C' | 'D';
+  votePercentages?: Record<'A' | 'B' | 'C' | 'D', number>;
+  voteCounts?: Record<'A' | 'B' | 'C' | 'D', number>;
+  totalVotes?: number;
 }
 
 export function FloorZones({
   quizStatus,
   correctOption = 'A',
+  votePercentages,
+  voteCounts,
+  totalVotes = 0,
 }: FloorZonesProps) {
   const zonesRef = useRef<Map<string, THREE.MeshStandardMaterial>>(new Map());
 
-  // Generate crisp 512x512 letter textures for A, B, C, D using Montserrat / Be Vietnam Pro
-  const letterTextures = useMemo(() => {
-    const map = new Map<string, THREE.CanvasTexture>();
-    const zoneThemeMap: Record<string, { bg: string; ring: string; text: string }> = {
-      A: { bg: '#FFFFFF', ring: '#F08806', text: '#D97706' },
-      B: { bg: '#FFFFFF', ring: '#1F3EB7', text: '#1E40AF' },
-      C: { bg: '#FFFFFF', ring: '#059669', text: '#059669' },
-      D: { bg: '#FFFFFF', ring: '#DC2626', text: '#DC2626' },
-    };
-
-    ['A', 'B', 'C', 'D'].forEach((letter) => {
-      const theme = zoneThemeMap[letter] || { bg: '#FFFFFF', ring: '#334155', text: '#0F172A' };
+  // Setup dynamic 512x800 canvas textures for A, B, C, D displaying letter and live vote stats
+  const zoneTextures = useMemo(() => {
+    const map = new Map<string, { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture }>();
+    (['A', 'B', 'C', 'D'] as const).forEach((letter) => {
       const canvas = document.createElement('canvas');
       canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        // High-contrast pure white rounded badge background
-        ctx.fillStyle = theme.bg;
-        ctx.beginPath();
-        ctx.roundRect(24, 24, 464, 464, 90);
-        ctx.fill();
-
-        // Thick vibrant color border ring
-        ctx.strokeStyle = theme.ring;
-        ctx.lineWidth = 42;
-        ctx.stroke();
-
-        // Extra large bold letter centered with brand typography
-        ctx.font = '900 330px "Montserrat", "Be Vietnam Pro", system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = theme.text;
-        ctx.fillText(letter, 256, 275);
-      }
-
+      canvas.height = 800;
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
-      map.set(letter, texture);
+      map.set(letter, { canvas, texture });
     });
     return map;
   }, []);
+
+  // Update canvas textures whenever votes or status changes
+  useEffect(() => {
+    const zoneThemeMap: Record<string, { bg: string; ring: string; text: string; pillBg: string }> = {
+      A: { bg: '#FFFFFF', ring: '#F59E0B', text: '#D97706', pillBg: '#FEF3C7' },
+      B: { bg: '#FFFFFF', ring: '#3B82F6', text: '#1E40AF', pillBg: '#DBEAFE' },
+      C: { bg: '#FFFFFF', ring: '#10B981', text: '#059669', pillBg: '#D1FAE5' },
+      D: { bg: '#FFFFFF', ring: '#EF4444', text: '#DC2626', pillBg: '#FEE2E2' },
+    };
+
+    (['A', 'B', 'C', 'D'] as const).forEach((letter) => {
+      const item = zoneTextures.get(letter);
+      if (!item) return;
+      const { canvas, texture } = item;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const theme = zoneThemeMap[letter];
+      const count = voteCounts?.[letter] ?? 0;
+      const pct = votePercentages?.[letter] ?? 0;
+
+      // Clear
+      ctx.clearRect(0, 0, 512, 800);
+
+      // 1. High-contrast pure white rounded badge background
+      ctx.fillStyle = theme.bg;
+      ctx.beginPath();
+      ctx.roundRect(16, 16, 480, 768, 64);
+      ctx.fill();
+
+      // Thick vibrant color border ring
+      ctx.strokeStyle = theme.ring;
+      ctx.lineWidth = 28;
+      ctx.stroke();
+
+      // 2. Extra large bold letter in upper half (center at Y=280)
+      ctx.font = '900 280px "Montserrat", "Be Vietnam Pro", system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = theme.text;
+      ctx.fillText(letter, 256, 270);
+
+      // Subtle divider line
+      ctx.strokeStyle = '#E2E8F0';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(48, 480);
+      ctx.lineTo(464, 480);
+      ctx.stroke();
+
+      // 3. Vote Stat Pill in lower half (closest to front camera edge)
+      const pillW = 416;
+      const pillH = 220;
+      const pillX = 256 - pillW / 2;
+      const pillY = 510;
+
+      ctx.fillStyle = theme.pillBg;
+      ctx.beginPath();
+      ctx.roundRect(pillX, pillY, pillW, pillH, 32);
+      ctx.fill();
+
+      ctx.strokeStyle = theme.ring;
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      // Vote percentage (Big bold 92px)
+      ctx.font = '900 92px "Montserrat", "Be Vietnam Pro", sans-serif';
+      ctx.fillStyle = theme.text;
+      ctx.fillText(`${pct}%`, 256, pillY + 90);
+
+      // Vote count badge (40px)
+      ctx.font = '700 40px "Be Vietnam Pro", sans-serif';
+      ctx.fillStyle = '#475569';
+      const labelText = totalVotes > 0 ? `${count} phiếu` : '0 phiếu';
+      ctx.fillText(labelText, 256, pillY + 168);
+
+      texture.needsUpdate = true;
+    });
+  }, [zoneTextures, votePercentages, voteCounts, totalVotes]);
 
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
@@ -177,7 +233,7 @@ export function FloorZones({
               {/* Inner High-Contrast Flat Letter Decal lying completely flat on floor */}
               <mesh position={[0, 0, 0.003]}>
                 <planeGeometry args={[0.78, 1.24]} />
-                <meshBasicMaterial map={letterTextures.get(zone.id)} toneMapped={false} />
+                <meshBasicMaterial map={zoneTextures.get(zone.id)?.texture} toneMapped={false} />
               </mesh>
             </group>
           </group>
