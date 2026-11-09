@@ -1,32 +1,45 @@
-# React + TypeScript + Vite
+# 🏫 Classroom 3D
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Mô phỏng không gian phòng học 3D tương tác với các chú Capybara chibi dễ thương, xây dựng trên nền tảng WebGL/Three.js và React.
 
-Currently, two official plugins are available:
+## 🚀 Công Nghệ Sử Dụng
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend**: React 19, TypeScript, Vite
+- **3D Graphics**: Three.js, [@react-three/fiber](https://docs.pmnd.rs/react-three-fiber), [@react-three/drei](https://github.com/pmndrs/drei)
+- **Styling**: Tailwind CSS
+- **Code Quality**: Oxlint
 
-## React Compiler
+## 🛠️ Cài Đặt & Phát Triển
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Cài đặt dependencies
+npm install
 
-## Expanding the Oxlint configuration
+# Khởi chạy môi trường phát triển (Dev Server)
+npm run dev
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+# Kiểm tra linting
+npx oxlint
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Đóng gói sản phẩm (Production Build)
+npm run build
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 📂 Cấu Trúc Dự Án
+
+```
+classroom-3d/
+├── docs/                # Kế hoạch thiết kế và tài liệu tham khảo
+├── public/              # Static assets
+└── src/
+    ├── components/
+    │   ├── 3d/          # Các đối tượng 3D (Room, Desks, Capybara Avatars, CameraRig)
+    │   └── ui/          # Giao diện HUD (Dock điều khiển góc nhìn)
+    ├── data/            # Cấu hình danh sách học sinh & vị trí bàn học
+    ├── hooks/           # State store quản lý góc nhìn và dữ liệu lớp học
+    └── types/           # Định nghĩa TypeScript interface
+```
+
+## 🌐 Triển Khai (Deployment)
+
+Dự án tự động triển khai lên **Cloudflare Pages** thông qua GitHub Actions pipeline (`.github/workflows/deploy.yml`).
