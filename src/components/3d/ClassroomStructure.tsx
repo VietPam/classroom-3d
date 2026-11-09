@@ -143,47 +143,47 @@ export function ClassroomStructure() {
       </group>
 
       {/* ================= MASSIVE SMARTBOARD (Front Wall, Optimized for TikTok 9:16 Canvas) ================= */}
-      <group position={[0, 2.70, 5.92]} rotation={[0, Math.PI, 0]}>
-        {/* Sleek Minimalist Outer Bezel (Anodized Dark Titanium) */}
+      <group position={[0, 2.25, 5.92]} rotation={[0, Math.PI, 0]}>
+        {/* Sleek Minimalist Outer Bezel (Anodized Dark Titanium) - Height 4.0m */}
         <mesh receiveShadow castShadow>
-          <boxGeometry args={[9.2, 3.2, 0.06]} />
+          <boxGeometry args={[9.2, 4.0, 0.06]} />
           <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
         </mesh>
 
         {/* Inner Slim Frame Bevel */}
         <mesh position={[0, 0, 0.015]}>
-          <boxGeometry args={[9.1, 3.1, 0.04]} />
+          <boxGeometry args={[9.1, 3.9, 0.04]} />
           <meshStandardMaterial color="#0f172a" roughness={0.5} />
         </mesh>
 
         {/* Vast Pristine Slate / Smartboard Writing Surface (Huge TikTok Content Space) */}
         <mesh position={[0, 0, 0.032]} receiveShadow>
-          <planeGeometry args={[9.0, 3.0]} />
+          <planeGeometry args={[9.0, 3.84]} />
           <meshStandardMaterial color="#0b1120" roughness={0.85} metalness={0.05} />
         </mesh>
 
         {/* Minimalist Slim Aluminum Accessory / Stylus Ledge at Bottom */}
-        <mesh position={[0, -1.52, 0.055]} castShadow>
+        <mesh position={[0, -1.92, 0.055]} castShadow>
           <boxGeometry args={[9.0, 0.03, 0.08]} />
           <meshStandardMaterial color="#475569" metalness={0.7} roughness={0.3} />
         </mesh>
 
         {/* Sleek Magnetic Stylus / Chalk Markers & Eraser */}
-        <mesh position={[-0.5, -1.495, 0.06]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh position={[-0.5, -1.895, 0.06]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.009, 0.009, 0.12]} />
           <meshStandardMaterial color="#38bdf8" roughness={0.3} />
         </mesh>
-        <mesh position={[-0.35, -1.495, 0.06]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh position={[-0.35, -1.895, 0.06]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.009, 0.009, 0.12]} />
           <meshStandardMaterial color="#ffffff" roughness={0.3} />
         </mesh>
-        <mesh position={[0.5, -1.495, 0.06]}>
+        <mesh position={[0.5, -1.895, 0.06]}>
           <boxGeometry args={[0.12, 0.025, 0.05]} />
           <meshStandardMaterial color="#334155" roughness={0.6} />
         </mesh>
 
         {/* Modern Overhead Gallery Track Light Fixture */}
-        <group position={[0, 1.63, 0.15]}>
+        <group position={[0, 2.03, 0.15]}>
           <mesh>
             <boxGeometry args={[8.8, 0.035, 0.06]} />
             <meshStandardMaterial color="#1e293b" metalness={0.8} />
