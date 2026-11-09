@@ -26,6 +26,10 @@ export function ChibiHead({ skinTone, state = 'IDLE' }: ChibiHeadProps) {
       // Dilated wide shock eyes, no blinking while shocked
       baseEyeScaleY = 1.35;
       baseEyeScaleX = 1.35;
+    } else if (state === 'CELEBRATING') {
+      // Joyful squinting smile eyes
+      baseEyeScaleY = 0.78;
+      baseEyeScaleX = 1.15;
     } else {
       if (cycle > 3.66) {
         const progress = (cycle - 3.66) / 0.14;
@@ -45,7 +49,7 @@ export function ChibiHead({ skinTone, state = 'IDLE' }: ChibiHeadProps) {
 
     // Mouth expression transition
     if (mouthRef.current) {
-      const targetMouthScale = state === 'SHOCKED' ? 1.4 : 1.0;
+      const targetMouthScale = state === 'SHOCKED' ? 1.4 : state === 'CELEBRATING' ? 1.35 : 1.0;
       mouthRef.current.scale.setScalar(
         THREE.MathUtils.lerp(mouthRef.current.scale.x, targetMouthScale, lerpFactor)
       );

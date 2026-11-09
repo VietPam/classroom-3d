@@ -37,7 +37,6 @@ export function ChibiBody({
     const time = clock.getElapsedTime();
 
     // Targets for smooth lerp / damping
-    let targetBounceY = 0;
     let targetRootRotZ = 0; // Hip sway (Chibi Waddle)
     let targetRootRotY = 0; // Torso counter-twist
 
@@ -78,25 +77,67 @@ export function ChibiBody({
       targetRightArmZ = 0.14;
       targetRightForearmX = -0.28 - Math.max(0, -armAngle) * 0.35;
 
-      // Chibi Waddle: cute lateral hip sway & bounce
+      // Chibi Waddle: cute lateral hip sway & torso twist
       targetRootRotZ = Math.sin(walkCycle) * 0.045;
       targetRootRotY = -Math.sin(walkCycle) * 0.05;
-      targetBounceY = Math.abs(Math.sin(walkCycle)) * 0.032;
     } else if (state === 'CELEBRATING') {
-      // 2. CELEBRATING VICTORY JUMP & DOUBLE V-RAISE
-      targetBounceY = Math.abs(Math.sin(time * 9 + studentSeed)) * 0.14;
-      targetRootRotZ = Math.sin(time * 6 + studentSeed) * 0.03;
+      // 2. CELEBRATING VICTORY JUMP WITH 3-PHASE KINEMATICS & PROUD V-RAISE
+      const jumpCycle = (time * 3.6 + studentSeed * 0.7) % 1;
 
-      // Both arms raised high in victory with bent elbows
-      targetLeftArmX = 0.05;
-      targetLeftArmY = 0;
-      targetLeftArmZ = 2.4 + Math.sin(time * 8 + studentSeed) * 0.1;
-      targetLeftForearmX = -0.35;
+      if (jumpCycle < 0.2) {
+        // Phase 1: Anticipation crouch (knees bend forward, arms coil)
+        const norm = jumpCycle / 0.2;
+        const curve = Math.sin(norm * Math.PI);
+        targetLeftLegX = -0.25 * curve;
+        targetRightLegX = -0.25 * curve;
+        targetLeftCalfX = 0.35 * curve;
+        targetRightCalfX = 0.35 * curve;
 
-      targetRightArmX = 0.05;
-      targetRightArmY = 0;
-      targetRightArmZ = -2.4 - Math.sin(time * 8 + studentSeed) * 0.1;
-      targetRightForearmX = -0.35;
+        targetLeftArmX = 0.1;
+        targetLeftArmZ = -0.3;
+        targetRightArmX = 0.1;
+        targetRightArmZ = 0.3;
+        targetLeftForearmX = -0.2;
+        targetRightForearmX = -0.2;
+      } else if (jumpCycle < 0.75) {
+        // Phase 2: Airborne Flight & Peak (calves tuck back cutely, arms high in Victory V)
+        const airTime = (jumpCycle - 0.2) / 0.55;
+        const tuck = Math.sin(airTime * Math.PI);
+
+        // Knees bend backward cutely in midair!
+        targetLeftLegX = -0.18 * tuck;
+        targetRightLegX = -0.18 * tuck;
+        targetLeftCalfX = 0.50 * tuck;
+        targetRightCalfX = 0.50 * tuck;
+
+        // Both arms raised high outward & upward into proud Victory V!
+        const pump = Math.sin(airTime * Math.PI * 2) * 0.12;
+        targetLeftArmX = 0.05;
+        targetLeftArmY = 0;
+        targetLeftArmZ = -2.35 - pump; // Outward away from body & upward (negative Z is outward for left arm)
+        targetLeftForearmX = -0.45;    // Energetic bent elbow
+
+        targetRightArmX = 0.05;
+        targetRightArmY = 0;
+        targetRightArmZ = 2.35 + pump;  // Outward away from body & upward (positive Z is outward for right arm)
+        targetRightForearmX = -0.45;   // Energetic bent elbow
+
+        // Energetic hip sway
+        targetRootRotZ = Math.sin(airTime * Math.PI * 2) * 0.04;
+      } else {
+        // Phase 3: Landing cushion (knees flex to absorb impact smoothly)
+        const landTime = (jumpCycle - 0.75) / 0.25;
+        const impact = Math.sin(landTime * Math.PI);
+        targetLeftLegX = -0.22 * impact;
+        targetRightLegX = -0.22 * impact;
+        targetLeftCalfX = 0.32 * impact;
+        targetRightCalfX = 0.32 * impact;
+
+        targetLeftArmZ = -2.1;
+        targetRightArmZ = 2.1;
+        targetLeftForearmX = -0.3;
+        targetRightForearmX = -0.3;
+      }
     } else if (state === 'SAD') {
       // 3. SAD / DISAPPOINTED EMOTE (Arms drooped together, quiet stance)
       targetLeftArmX = 0.22;
@@ -108,100 +149,88 @@ export function ChibiBody({
       targetRightArmY = -0.05;
       targetRightArmZ = 0.06;
       targetRightForearmX = -0.15;
-
-      targetBounceY = 0;
     } else if (state === 'THINKING') {
       // 4. THINKING EMOTE (Left arm across waist, right hand touching chin)
-      // Left arm crossed
       targetLeftArmX = -0.45;
       targetLeftArmY = 0.35;
       targetLeftArmZ = -0.28;
       targetLeftForearmX = -0.85;
 
-      // Right arm to chin
       targetRightArmX = -1.15;
       targetRightArmY = -0.25;
       targetRightArmZ = 0.22;
       targetRightForearmX = -1.35;
-
-      targetBounceY = Math.sin(time * 2 + studentSeed) * 0.005;
     } else if (state === 'WAVE') {
       // 5. WAVE EMOTE (Right arm raised high waving briskly, left hand on hip)
-      targetLeftArmX = 0.15;
-      targetLeftArmY = 0.2;
+      targetLeftArmX = 0.12;
+      targetLeftArmY = 0.15;
       targetLeftArmZ = -0.22;
-      targetLeftForearmX = -0.3;
+      targetLeftForearmX = -0.35;
 
       // Right arm raised high waving side to side
       const waveCycle = Math.sin(time * 9 + studentSeed) * 0.32;
-      targetRightArmX = 0.05;
+      targetRightArmX = -0.12;
       targetRightArmY = -0.1;
-      targetRightArmZ = -2.15 + waveCycle;
-      targetRightForearmX = -0.55;
+      targetRightArmZ = 2.25 + waveCycle; // Outward and up
+      targetRightForearmX = -0.65;
 
       targetRootRotZ = Math.sin(time * 4.5 + studentSeed) * 0.035;
-      targetBounceY = Math.sin(time * 4.5 + studentSeed) * 0.008;
     } else if (state === 'RAISE_HAND') {
       // 6. RAISE HAND EMOTE (Right arm straight up eager to answer, subtle enthusiastic pulse)
       targetLeftArmX = 0.08;
       targetLeftArmY = 0;
-      targetLeftArmZ = -0.12;
+      targetLeftArmZ = -0.15;
       targetLeftForearmX = -0.15;
 
-      // Right arm reaches straight up high
+      // Right arm reaches straight up high towards blackboard / teacher
       const handPulse = Math.sin(time * 6 + studentSeed) * 0.06;
-      targetRightArmX = 0.1;
+      targetRightArmX = -0.15;
       targetRightArmY = 0;
-      targetRightArmZ = -2.85 + handPulse;
+      targetRightArmZ = 2.85 + handPulse; // Outward and straight up
       targetRightForearmX = -0.08; // Almost straight elbow
-
-      targetBounceY = 0.015 + Math.sin(time * 3 + studentSeed) * 0.004; // Stand tall
     } else if (state === 'DANCE') {
       // 7. DANCE EMOTE (Energetic hip swing, rhythmic alternating disco arms & knee bounces)
       const danceBeat = time * 7.5 + studentSeed;
       targetRootRotZ = Math.sin(danceBeat) * 0.09;
       targetRootRotY = -Math.cos(danceBeat) * 0.08;
-      targetBounceY = Math.abs(Math.sin(danceBeat)) * 0.045;
 
       // Alternating disco arms
-      targetLeftArmX = Math.sin(danceBeat) * 0.75;
-      targetLeftArmZ = -0.35;
-      targetLeftForearmX = -0.85;
+      targetLeftArmX = Math.sin(danceBeat) * 0.65;
+      targetLeftArmZ = -0.45 + Math.cos(danceBeat) * 0.25;
+      targetLeftForearmX = -0.75;
 
-      targetRightArmX = -Math.sin(danceBeat) * 0.75;
-      targetRightArmZ = 0.35;
-      targetRightForearmX = -0.85;
+      targetRightArmX = -Math.sin(danceBeat) * 0.65;
+      targetRightArmZ = 0.45 - Math.cos(danceBeat) * 0.25;
+      targetRightForearmX = -0.75;
 
       // Soft knee bends
       targetLeftCalfX = Math.max(0, Math.sin(danceBeat)) * 0.25;
       targetRightCalfX = Math.max(0, -Math.sin(danceBeat)) * 0.25;
     } else if (state === 'SHOCKED') {
-      // 8. SHOCKED EMOTE (Both hands clutch cheeks/head, body jolts back and trembles)
+      // 8. SHOCKED EMOTE (Both hands clutch cheeks/head, body trembles)
       const tremor = Math.sin(time * 35 + studentSeed) * 0.015;
       targetRootRotZ = tremor;
       targetRootRotY = tremor * 1.5;
-      targetBounceY = -0.01 + tremor; // Crouch slightly in shock
 
-      // Both hands up to cheeks/head
-      targetLeftArmX = -1.35;
+      // Both hands up to cheeks
+      targetLeftArmX = -0.95;
       targetLeftArmY = 0.35;
-      targetLeftArmZ = 0.65;
+      targetLeftArmZ = -0.35;
       targetLeftForearmX = -1.25;
 
-      targetRightArmX = -1.35;
+      targetRightArmX = -0.95;
       targetRightArmY = -0.35;
-      targetRightArmZ = -0.65;
+      targetRightArmZ = 0.35;
       targetRightForearmX = -1.25;
 
       // Knees slightly bent in shock stance
-      targetLeftCalfX = 0.15;
-      targetRightCalfX = 0.15;
+      targetLeftCalfX = 0.18;
+      targetRightCalfX = 0.18;
     } else {
       // 9. IDLE REST POSE (Alive subtle breathing, balanced straight stance)
       const breathing = Math.sin(time * 1.8 + studentSeed) * 0.025;
       targetLeftArmX = 0.05 + breathing;
       targetRightArmX = 0.05 - breathing;
-      targetBounceY = Math.sin(time * 1.8 + studentSeed) * 0.006;
     }
 
     // High quality damping factor for smooth transitions without popping
@@ -209,11 +238,7 @@ export function ChibiBody({
 
     // Apply to Body Root
     if (bodyRootRef.current) {
-      bodyRootRef.current.position.y = THREE.MathUtils.lerp(
-        bodyRootRef.current.position.y,
-        targetBounceY,
-        factor
-      );
+      bodyRootRef.current.position.y = 0; // Vertical locomotion handled by ProceduralChibiAvatar motionRootRef
       bodyRootRef.current.rotation.z = THREE.MathUtils.lerp(
         bodyRootRef.current.rotation.z,
         targetRootRotZ,
