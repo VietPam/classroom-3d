@@ -15,13 +15,38 @@ import {
 } from '../config/quizConfig';
 import { STREAM_TIMING } from '../config/streamConfig';
 
-// Slot offsets bên trong mỗi ô đáp án phóng to (1.4m x 1.8m)
-// Giúp 2 đến 4 học sinh cùng đứng chung một ô mà không bị đè người
+// Slot offsets bên trong mỗi ô đáp án (1.4m x 1.8m)
+// Lưới 4 cột x 5 hàng hỗ trợ tối đa 20 học sinh đứng chung một ô mà không bị chồng lấn
 const ZONE_SLOT_OFFSETS: [number, number, number][] = [
-  [-0.32, 0, 0.25],
-  [0.32, 0, 0.25],
-  [-0.32, 0, -0.10],
-  [0.32, 0, -0.10],
+  // Hàng 1 (phía sau, Z = 0.55)
+  [-0.45, 0, 0.55],
+  [-0.15, 0, 0.55],
+  [0.15, 0, 0.55],
+  [0.45, 0, 0.55],
+
+  // Hàng 2 (Z = 0.25)
+  [-0.45, 0, 0.25],
+  [-0.15, 0, 0.25],
+  [0.15, 0, 0.25],
+  [0.45, 0, 0.25],
+
+  // Hàng 3 (Z = -0.05)
+  [-0.45, 0, -0.05],
+  [-0.15, 0, -0.05],
+  [0.15, 0, -0.05],
+  [0.45, 0, -0.05],
+
+  // Hàng 4 (hai bên mép decal chữ, Z = -0.35)
+  [-0.45, 0, -0.35],
+  [-0.15, 0, -0.35],
+  [0.15, 0, -0.35],
+  [0.45, 0, -0.35],
+
+  // Hàng 5 (phía trước mép sàn, Z = -0.65)
+  [-0.45, 0, -0.65],
+  [-0.15, 0, -0.65],
+  [0.15, 0, -0.65],
+  [0.45, 0, -0.65],
 ];
 
 export interface ClassroomStore {
@@ -115,12 +140,18 @@ export function useClassroomStore(): ClassroomStore {
     const allOptions: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
     const wrongOptions = allOptions.filter((opt) => opt !== correct);
 
-    // Phân bổ 4 học sinh: 2 bạn chọn đúng, 2 bạn chia về 2 ô sai
+    // Phân bổ 20 học sinh tự nhiên & kịch tính:
+    // ~11 bạn chọn đúng (tạo hiệu ứng đám đông thắng áp đảo),
+    // 9 bạn còn lại chia đều cho 3 đáp án sai gây hồi hộp (4 - 3 - 2)
+    const w0 = wrongOptions[0] || 'B';
+    const w1 = wrongOptions[1] || 'C';
+    const w2 = wrongOptions[2] || 'D';
+
     const choices: ('A' | 'B' | 'C' | 'D')[] = [
-      correct,
-      correct,
-      wrongOptions[0] || 'B',
-      wrongOptions[1] || 'C',
+      correct, w0, correct, w1, correct,
+      correct, w2, correct, w0, correct,
+      w1, correct, correct, w0, correct,
+      w2, correct, w0, correct, w1,
     ];
 
     const zoneSlotCounts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
