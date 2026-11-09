@@ -14,19 +14,19 @@ export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
 
   const isPortrait = size.width < size.height;
   const initialCamPos = useRef(
-    isPortrait ? new THREE.Vector3(0, 1.35, -3.2) : new THREE.Vector3(0, 1.45, -3.5)
+    isPortrait ? new THREE.Vector3(0, 2.8, -6.5) : new THREE.Vector3(0, 2.6, -6.2)
   );
-  const initialTarget = useRef(new THREE.Vector3(0, 1.5, 3.0));
+  const initialTarget = useRef(new THREE.Vector3(0, 1.8, 3.5));
 
   // Responsive camera setup on mount & resize
   useEffect(() => {
     const isPortrait = size.width < size.height;
     if (isPortrait) {
-      initialCamPos.current.set(0, 1.35, -3.2);
-      initialTarget.current.set(0, 1.5, 3.0);
+      initialCamPos.current.set(0, 2.8, -6.5);
+      initialTarget.current.set(0, 1.8, 3.5);
     } else {
-      initialCamPos.current.set(0, 1.45, -3.5);
-      initialTarget.current.set(0, 1.5, 3.0);
+      initialCamPos.current.set(0, 2.6, -6.2);
+      initialTarget.current.set(0, 1.8, 3.5);
     }
 
     if ('isPerspectiveCamera' in camera && (camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
@@ -59,9 +59,9 @@ export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
     }
 
     // Boundary safety: keep camera within reasonable 3D classroom boundary
-    camera.position.z = Math.max(-8.5, Math.min(camera.position.z, 5.5));
-    camera.position.y = Math.max(0.4, Math.min(camera.position.y, 4.1));
-    camera.position.x = Math.max(-6.5, Math.min(camera.position.x, 6.5));
+    camera.position.z = Math.max(-10.0, Math.min(camera.position.z, 6.0));
+    camera.position.y = Math.max(0.4, Math.min(camera.position.y, 6.0));
+    camera.position.x = Math.max(-7.5, Math.min(camera.position.x, 7.5));
   });
 
   return (
@@ -74,7 +74,7 @@ export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
       maxPolarAngle={Math.PI / 2.05}
       minPolarAngle={Math.PI / 12}
       minDistance={1.0}
-      maxDistance={18}
+      maxDistance={22.0}
       enablePan={true}
       enableRotate={true}
       enableZoom={true}

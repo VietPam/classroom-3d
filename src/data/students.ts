@@ -1,302 +1,142 @@
 import type { StudentData } from '../types/classroom';
 
-// Compact 3x3 Grid layout: 3 columns x 3 rows = 9 Chibi Capybara students
-// Columns: X in [-0.72, 0, 0.72]
-// Rows: Z in [3.6 (Front Row A close to board), 2.4 (Middle Row B), 1.2 (Back Row C)]
-// Minimalist Board is at Z = 5.92, Submission / Presentation spot is at Z = 4.8
-
 export const STUDENTS_DATA: StudentData[] = [
-  // ================= ROW 1 (Front Row closest to Board) =================
+  // Row 1 (Near Front - Z = 2.0)
   {
-    id: 'student-1',
-    name: 'Emily Zhang',
+    id: 's1',
+    name: 'Bình An',
     seatId: 'A1',
-    gender: 'f',
-    skinTone: '#b8753e', // Warm Caramel Fur
-    hairColor: '#2b1d0c',
-    hairStyle: 'ponytail',
-    shirtColor: '#4f46e5', // Royal Indigo Sweater
-    pantsColor: '#1e293b',
-    shoesColor: '#6d3c19',
-    accessory: 'orange', // Iconic Yuzu Orange on head
-    capybaraTone: '#b8753e',
-    deskPosition: [-0.72, 0, 3.6],
-    aisleWaypoint: [0, 0, 3.6],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 96,
-      maxScore: 100,
-      grade: 'A+',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:42 AM',
-      feedback: 'Flawless execution on multivariate integrals and Taylor approximations. Outstanding work, Capy Emily!',
-      strengths: ['Multivariable Integration', 'Series Convergence', 'Lagrange Multipliers'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 24, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 22, maxScore: 25, status: 'correct' }
-      ]
-    }
-  },
-  {
-    id: 'student-2',
-    name: 'Marcus Vance',
-    seatId: 'A2',
     gender: 'm',
-    skinTone: '#9a5c2f', // Toffee Brown Fur
-    hairColor: '#1a110a',
+    skinTone: '#a5734c',
+    hairColor: '#4a2f13',
     hairStyle: 'short',
-    shirtColor: '#059669', // Emerald Green Sweater
-    pantsColor: '#334155',
-    shoesColor: '#5c3214',
-    accessory: 'lotus', // Peaceful Pink Lotus on head
-    capybaraTone: '#9a5c2f',
-    deskPosition: [0, 0, 3.6],
-    aisleWaypoint: [0, 0, 3.6],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 91,
-      maxScore: 100,
-      grade: 'A',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:44 AM',
-      feedback: 'Very solid reasoning on the divergence theorem; minor algebraic sign slip in question 4.',
-      strengths: ['Vector Fields', 'Stokes Theorem', 'Boundary Conditions'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 24, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 23, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 19, maxScore: 25, status: 'partial' }
-      ]
-    }
+    shirtColor: '#4f46e5',
+    pantsColor: '#1e293b',
+    shoesColor: '#0f172a',
+    accessory: 'orange',
+    capybaraTone: '#94633c',
+    deskPosition: [-1.4, 0, 2.0],
   },
   {
-    id: 'student-3',
-    name: 'Sophia Patel',
-    seatId: 'A3',
+    id: 's2',
+    name: 'Cẩm Tú',
+    seatId: 'A2',
     gender: 'f',
-    skinTone: '#a86a3d', // Golden Toffee Fur
-    hairColor: '#171717',
-    hairStyle: 'curly',
-    shirtColor: '#d97706', // Amber Gold Sweater
-    pantsColor: '#1e1e24',
-    shoesColor: '#633718',
-    accessory: 'glasses', // Round Wire Glasses
-    capybaraTone: '#a86a3d',
-    deskPosition: [0.72, 0, 3.6],
-    aisleWaypoint: [0, 0, 3.6],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 98,
-      maxScore: 100,
-      grade: 'A+',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:39 AM',
-      feedback: 'Remarkable speed and precision! Full marks on all proofs with elegant notation.',
-      strengths: ['Proof Rigor', 'Geometric Intuition', 'Rapid Computation'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 23, maxScore: 25, status: 'correct' }
-      ]
-    }
+    skinTone: '#b88358',
+    hairColor: '#3d2314',
+    hairStyle: 'ponytail',
+    shirtColor: '#ec4899',
+    pantsColor: '#334155',
+    shoesColor: '#f43f5e',
+    accessory: 'red_bow',
+    capybaraTone: '#a5734c',
+    deskPosition: [0, 0, 2.0],
   },
-
-  // ================= ROW 2 (Middle Row) =================
   {
-    id: 'student-4',
-    name: 'Lucas Kim',
+    id: 's3',
+    name: 'Đăng Khoa',
+    seatId: 'A3',
+    gender: 'm',
+    skinTone: '#94633c',
+    hairColor: '#2b1810',
+    hairStyle: 'buzz',
+    shirtColor: '#10b981',
+    pantsColor: '#0f172a',
+    shoesColor: '#0284c7',
+    accessory: 'glasses',
+    capybaraTone: '#8c5832',
+    deskPosition: [1.4, 0, 2.0],
+  },
+  // Row 2 (Middle - Z = 0.5)
+  {
+    id: 's4',
+    name: 'Hải Đăng',
     seatId: 'B1',
     gender: 'm',
-    skinTone: '#8e4f24', // Chestnut Fur
-    hairColor: '#1c1917',
-    hairStyle: 'short',
-    shirtColor: '#2563eb', // Sapphire Blue Sweater
-    pantsColor: '#374151',
-    shoesColor: '#522b10',
-    accessory: 'scholar_hat', // Scholar Mortarboard Hat
-    capybaraTone: '#8e4f24',
-    deskPosition: [-0.72, 0, 2.4],
-    aisleWaypoint: [0, 0, 2.4],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 84,
-      maxScore: 100,
-      grade: 'B',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:48 AM',
-      feedback: 'Good overall grasp of line integrals. Double check limits of integration in polar coordinates.',
-      strengths: ['Partial Derivatives', 'Gradient Ascent'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 22, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 18, maxScore: 25, status: 'partial' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 23, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 21, maxScore: 25, status: 'correct' }
-      ]
-    }
+    skinTone: '#a5734c',
+    hairColor: '#5c3a21',
+    hairStyle: 'curly',
+    shirtColor: '#f59e0b',
+    pantsColor: '#1e293b',
+    shoesColor: '#d97706',
+    accessory: 'orange',
+    capybaraTone: '#9a6840',
+    deskPosition: [-1.4, 0, 0.5],
   },
   {
-    id: 'student-5',
-    name: 'Amina Diallo',
+    id: 's5',
+    name: 'Khánh Linh',
     seatId: 'B2',
     gender: 'f',
-    skinTone: '#ba7b44', // Cinnamon Fur
-    hairColor: '#0a0a0a',
+    skinTone: '#b88358',
+    hairColor: '#26140d',
     hairStyle: 'curly',
-    shirtColor: '#db2777', // Rose Pink Sweater
-    pantsColor: '#18181b',
-    shoesColor: '#6a3b1a',
-    accessory: 'red_bow', // Cute Red Ribbon Bow
-    capybaraTone: '#ba7b44',
-    deskPosition: [0, 0, 2.4],
-    aisleWaypoint: [0, 0, 2.4],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 89,
-      maxScore: 100,
-      grade: 'B+',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:46 AM',
-      feedback: 'Clean step-by-step calculus work. Great intuition on directional derivatives.',
-      strengths: ['Directional Derivatives', 'Critical Point Classification'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 24, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 22, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 21, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 22, maxScore: 25, status: 'correct' }
-      ]
-    }
+    shirtColor: '#8b5cf6',
+    pantsColor: '#334155',
+    shoesColor: '#7c3aed',
+    accessory: 'lotus',
+    capybaraTone: '#ab7850',
+    deskPosition: [0, 0, 0.5],
   },
   {
-    id: 'student-6',
-    name: 'Jin-Woo Park',
+    id: 's6',
+    name: 'Minh Quân',
     seatId: 'B3',
     gender: 'm',
-    skinTone: '#945528', // Cocoa Fur
-    hairColor: '#171717',
+    skinTone: '#8c5832',
+    hairColor: '#1a0f0a',
     hairStyle: 'short',
-    shirtColor: '#0284c7', // Sky Blue Sweater
-    pantsColor: '#3f3f46',
-    shoesColor: '#552e12',
-    accessory: 'orange', // Yuzu Orange on head
-    capybaraTone: '#945528',
-    deskPosition: [0.72, 0, 2.4],
-    aisleWaypoint: [0, 0, 2.4],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 94,
-      maxScore: 100,
-      grade: 'A',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:41 AM',
-      feedback: 'Very thorough derivations. Excellent symmetry arguments to simplify volume integrals.',
-      strengths: ['Symmetry Reduction', 'Iterated Integrals'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 24, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 23, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 22, maxScore: 25, status: 'correct' }
-      ]
-    }
+    shirtColor: '#06b6d4',
+    pantsColor: '#0f172a',
+    shoesColor: '#0891b2',
+    accessory: 'scholar_hat',
+    capybaraTone: '#85512c',
+    deskPosition: [1.4, 0, 0.5],
   },
-
-  // ================= ROW 3 (Back Row) =================
+  // Row 3 (Back - Z = -1.0)
   {
-    id: 'student-7',
-    name: 'Isabella Rossi',
+    id: 's7',
+    name: 'Ngọc Mai',
     seatId: 'C1',
     gender: 'f',
-    skinTone: '#a36437', // Warm Amber Fur
-    hairColor: '#451a03',
+    skinTone: '#b88358',
+    hairColor: '#4a2f13',
     hairStyle: 'ponytail',
-    shirtColor: '#7c3aed', // Purple Robe
+    shirtColor: '#14b8a6',
     pantsColor: '#1e293b',
-    shoesColor: '#603517',
-    accessory: 'lotus', // Zen Lotus Flower
-    capybaraTone: '#a36437',
-    deskPosition: [-0.72, 0, 1.2],
-    aisleWaypoint: [0, 0, 1.2],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 92,
-      maxScore: 100,
-      grade: 'A',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:43 AM',
-      feedback: 'Great presentation and clear diagrams. Solved question 1 with impressive elegance.',
-      strengths: ['Geometric Visualization', 'Vector Calculus'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 22, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 23, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 22, maxScore: 25, status: 'correct' }
-      ]
-    }
+    shoesColor: '#0d9488',
+    accessory: 'lotus',
+    capybaraTone: '#a5734c',
+    deskPosition: [-1.4, 0, -1.0],
   },
   {
-    id: 'student-8',
-    name: 'Dev Patel',
+    id: 's8',
+    name: 'Quốc Bảo',
     seatId: 'C2',
     gender: 'm',
-    skinTone: '#b3723c', // Golden Cinnamon Fur
-    hairColor: '#18181b',
-    hairStyle: 'buzz',
-    shirtColor: '#0d9488', // Teal Sweater
-    pantsColor: '#1e293b',
-    shoesColor: '#653919',
-    accessory: 'scholar_hat', // Scholar Mortarboard Hat
-    capybaraTone: '#b3723c',
-    deskPosition: [0, 0, 1.2],
-    aisleWaypoint: [0, 0, 1.2],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 95,
-      maxScore: 100,
-      grade: 'A',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:40 AM',
-      feedback: 'Superb mastery of spherical coordinate transformations. Well done!',
-      strengths: ['Coordinate Transformations', 'Jacobian Determinants'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 25, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 24, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 24, maxScore: 25, status: 'correct' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 22, maxScore: 25, status: 'correct' }
-      ]
-    }
+    skinTone: '#a5734c',
+    hairColor: '#3d2314',
+    hairStyle: 'short',
+    shirtColor: '#ef4444',
+    pantsColor: '#0f172a',
+    shoesColor: '#b91c1c',
+    accessory: 'orange',
+    capybaraTone: '#94633c',
+    deskPosition: [0, 0, -1.0],
   },
   {
-    id: 'student-9',
-    name: 'Chloe Dubois',
+    id: 's9',
+    name: 'Thảo My',
     seatId: 'C3',
     gender: 'f',
-    skinTone: '#9c5e31', // Caramel Fur
-    hairColor: '#713f12',
-    hairStyle: 'ponytail',
-    shirtColor: '#e11d48', // Crimson Sweater
-    pantsColor: '#1c1917',
-    shoesColor: '#5c3214',
-    accessory: 'orange', // Yuzu Orange
-    capybaraTone: '#9c5e31',
-    deskPosition: [0.72, 0, 1.2],
-    aisleWaypoint: [0, 0, 1.2],
-    submissionWaypoint: [0, 0, 4.8],
-    scorecard: {
-      totalScore: 87,
-      maxScore: 100,
-      grade: 'B+',
-      subject: 'IELTS Academic & Calculus Midterm',
-      timestamp: '10:47 AM',
-      feedback: 'Solid computation of Jacobian matrices. Minor issue on question 3 boundary setup.',
-      strengths: ['Jacobian Matrices', 'Chain Rule in Multivariable'],
-      questions: [
-        { id: 'q1', question: 'Find global extrema using Lagrange Multipliers', score: 24, maxScore: 25, status: 'correct' },
-        { id: 'q2', question: 'Triple integral over cylindrical coordinate region', score: 22, maxScore: 25, status: 'correct' },
-        { id: 'q3', question: 'Divergence Theorem verification on Gaussian surface', score: 20, maxScore: 25, status: 'partial' },
-        { id: 'q4', question: 'Derive Taylor Series for composite function', score: 21, maxScore: 25, status: 'correct' }
-      ]
-    }
-  }
+    skinTone: '#c28f64',
+    hairColor: '#2b1810',
+    hairStyle: 'short',
+    shirtColor: '#f43f5e',
+    pantsColor: '#334155',
+    shoesColor: '#e11d48',
+    accessory: 'red_bow',
+    capybaraTone: '#b37f54',
+    deskPosition: [1.4, 0, -1.0],
+  },
 ];

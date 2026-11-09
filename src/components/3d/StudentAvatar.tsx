@@ -89,8 +89,6 @@ export function StudentAvatar({ data }: StudentAvatarProps) {
     }
   });
 
-  const isCarryingPaper = false;
-
   return (
     <group
       ref={rootGroupRef}
@@ -511,34 +509,6 @@ export function StudentAvatar({ data }: StudentAvatarProps) {
                   <meshStandardMaterial color={nosePadColor} roughness={0.5} />
                 </mesh>
               ))}
-
-              {/* Exam Paper held in right paw while walking or handing in */}
-              {isCarryingPaper && (
-                <group position={[0.02, -0.15, 0.14]} rotation={[0.4, 0, 0]}>
-                  <mesh castShadow>
-                    <boxGeometry args={[0.22, 0.005, 0.28]} />
-                    <meshStandardMaterial color="#ffffff" roughness={0.5} />
-                  </mesh>
-                  {/* Red Exam Seal on paper */}
-                  <mesh position={[0.06, 0.004, 0.08]}>
-                    <cylinderGeometry args={[0.022, 0.022, 0.006, 16]} />
-                    <meshBasicMaterial color="#e11d48" />
-                  </mesh>
-                  {/* Paper Header Lines */}
-                  <mesh position={[-0.02, 0.004, -0.08]}>
-                    <planeGeometry args={[0.14, 0.018]} />
-                    <meshBasicMaterial color="#1e293b" />
-                  </mesh>
-                  <mesh position={[0, 0.004, -0.03]}>
-                    <planeGeometry args={[0.18, 0.012]} />
-                    <meshBasicMaterial color="#94a3b8" />
-                  </mesh>
-                  <mesh position={[0, 0.004, 0.01]}>
-                    <planeGeometry args={[0.18, 0.012]} />
-                    <meshBasicMaterial color="#94a3b8" />
-                  </mesh>
-                </group>
-              )}
             </group>
           </group>
         </group>

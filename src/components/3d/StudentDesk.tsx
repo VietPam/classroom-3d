@@ -3,17 +3,11 @@ import * as THREE from 'three';
 
 interface StudentDeskProps {
   position: [number, number, number];
-  isHovered?: boolean;
-  hasPaper?: boolean;
-  chairPushedBack?: number; // 0 (standard) to 0.25 (when student stands up)
   seatId: string;
 }
 
 export function StudentDesk({
   position,
-  isHovered = false,
-  hasPaper = true,
-  chairPushedBack = 0,
   seatId,
 }: StudentDeskProps) {
   const deskRef = useRef<THREE.Group>(null);
@@ -25,7 +19,7 @@ export function StudentDesk({
       <mesh position={[0, 0.72, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.78, 0.04, 0.54]} />
         <meshStandardMaterial
-          color={isHovered ? '#fde047' : '#d4a373'}
+          color="#d4a373"
           roughness={0.4}
         />
       </mesh>
@@ -57,24 +51,22 @@ export function StudentDesk({
 
       {/* ================= ACCESSORIES ON DESK ================= */}
       {/* Test Exam Paper Sheet */}
-      {hasPaper && (
-        <group position={[0.05, 0.742, 0.02]} rotation={[0, 0.04, 0]}>
-          <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.22, 0.28]} />
-            <meshStandardMaterial
-              color="#ffffff"
-              roughness={0.9}
-            />
+      <group position={[0.05, 0.742, 0.02]} rotation={[0, 0.04, 0]}>
+        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.22, 0.28]} />
+          <meshStandardMaterial
+            color="#ffffff"
+            roughness={0.9}
+          />
+        </mesh>
+        {/* Printed lines */}
+        {[-0.08, -0.04, 0, 0.04, 0.08].map((z, idx) => (
+          <mesh key={`paper-line-${idx}`} position={[0, 0.001, z]}>
+            <boxGeometry args={[0.16, 0.001, 0.01]} />
+            <meshBasicMaterial color="#94a3b8" />
           </mesh>
-          {/* Subtle printed questions lines */}
-          {[-0.08, -0.04, 0, 0.04, 0.08].map((z, idx) => (
-            <mesh key={`paper-line-${idx}`} position={[0, 0.001, z]}>
-              <boxGeometry args={[0.16, 0.001, 0.01]} />
-              <meshBasicMaterial color="#94a3b8" />
-            </mesh>
-          ))}
-        </group>
-      )}
+        ))}
+      </group>
 
       {/* Yellow Pencil */}
       <mesh position={[-0.22, 0.745, -0.08]} rotation={[0, 0.25, Math.PI / 2]}>
@@ -108,13 +100,12 @@ export function StudentDesk({
       </group>
 
       {/* ================= CHAIR ================= */}
-      {/* Chair shifts back slightly when chairPushedBack > 0 */}
-      <group position={[0, 0, -0.42 - chairPushedBack]}>
+      <group position={[0, 0, -0.42]}>
         {/* Chair Seat */}
         <mesh position={[0, 0.44, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.42, 0.03, 0.4]} />
           <meshStandardMaterial
-            color={isHovered ? '#fef08a' : '#b45309'}
+            color="#b45309"
             roughness={0.5}
           />
         </mesh>
@@ -146,7 +137,7 @@ export function StudentDesk({
         <mesh position={[0, 0.75, -0.19]} castShadow>
           <boxGeometry args={[0.4, 0.18, 0.025]} />
           <meshStandardMaterial
-            color={isHovered ? '#fef08a' : '#b45309'}
+            color="#b45309"
             roughness={0.5}
           />
         </mesh>

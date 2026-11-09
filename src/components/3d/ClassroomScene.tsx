@@ -54,9 +54,6 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
           <StudentDesk
             position={student.deskPosition}
             seatId={student.seatId}
-            isHovered={false}
-            hasPaper={true}
-            chairPushedBack={0}
           />
 
           {/* 3D Student Avatar (peacefully writing) */}
