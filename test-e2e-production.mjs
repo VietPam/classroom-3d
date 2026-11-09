@@ -104,7 +104,7 @@ async function runE2ETest() {
     for (const b of buttons) {
       const text = await page.evaluate((el) => el.innerText, b);
       if (text.includes('Toàn Cảnh') || text.includes('Overview')) overviewBtn = b;
-      if (text.includes('Góc Lên Bảng') || text.includes('Teacher POV')) teacherPovBtn = b;
+      if (text.includes('Góc Trái') || text.includes('Góc Lên Bảng') || text.includes('Teacher POV')) teacherPovBtn = b;
       if (text.includes('Call Random')) randomBtn = b;
     }
 
@@ -115,7 +115,7 @@ async function runE2ETest() {
 
       await teacherPovBtn.click();
       await new Promise((r) => setTimeout(r, 1000));
-      record('Chuyển lại góc nhìn Góc Lên Bảng (Up-View)', true);
+      record('Chuyển lại góc nhìn Góc Trái Nhìn Lên (Bottom-Left Corner Up-View)', true);
     } else {
       record('Kiểm tra nút chuyển Camera', false, 'Không tìm thấy đủ nút');
     }

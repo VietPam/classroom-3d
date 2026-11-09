@@ -60,7 +60,7 @@ export function HUD({ store }: HUDProps) {
               </span>
             </h1>
             <p className="hidden md:block text-xs text-slate-400 m-0 p-0 truncate">
-              Chibi Capybara Mascots & IELTS Honor Board
+              Chibi Capybara Mascots & Minimalist Open Board
             </p>
           </div>
         </div>
@@ -106,7 +106,7 @@ export function HUD({ store }: HUDProps) {
           <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-sky-400 shrink-0" />
           <span className="text-[11px] sm:text-xs text-slate-200 truncate">
             <strong className="text-sky-300">{activeStudent.name}</strong> (Desk{' '}
-            {activeStudent.seatId}) is walking to teacher desk...
+            {activeStudent.seatId}) is walking up to the board...
           </span>
         </div>
       )}
@@ -173,7 +173,7 @@ export function HUD({ store }: HUDProps) {
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Góc Lên Bảng</span>
+                <span>Góc Trái Nhìn Lên</span>
               </button>
               <button
                 onClick={() => setCameraMode('overview')}

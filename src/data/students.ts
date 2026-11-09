@@ -1,12 +1,12 @@
 import type { StudentData } from '../types/classroom';
 
-// Compact 3x3 Grid layout for Mobile-First Viewport: 3 columns x 3 rows = 9 Chibi Capybara students
-// Columns: X in [-0.72, 0, 0.72] (Compact width ~1.8m fits vertically inside 9:16 mobile screen without clipping)
-// Rows: Z in [1.2 (Front Row A), 0.0 (Middle Row B), -1.2 (Back Row C)]
-// Stage / Submission spot: Z = 2.4 (in front of teacher desk and directly beneath the IELTS Honor Board)
+// Compact 3x3 Grid layout: 3 columns x 3 rows = 9 Chibi Capybara students
+// Columns: X in [-0.72, 0, 0.72]
+// Rows: Z in [3.6 (Front Row A close to board), 2.4 (Middle Row B), 1.2 (Back Row C)]
+// Minimalist Board is at Z = 5.92, Submission / Presentation spot is at Z = 4.8
 
 export const STUDENTS_DATA: StudentData[] = [
-  // ================= ROW 1 (Front Row near Board) =================
+  // ================= ROW 1 (Front Row closest to Board) =================
   {
     id: 'student-1',
     name: 'Emily Zhang',
@@ -20,9 +20,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#6d3c19',
     accessory: 'orange', // Iconic Yuzu Orange on head
     capybaraTone: '#b8753e',
-    deskPosition: [-0.72, 0, 1.2],
-    aisleWaypoint: [0, 0, 1.2],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [-0.72, 0, 3.6],
+    aisleWaypoint: [0, 0, 3.6],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 96,
       maxScore: 100,
@@ -52,9 +52,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#5c3214',
     accessory: 'lotus', // Peaceful Pink Lotus on head
     capybaraTone: '#9a5c2f',
-    deskPosition: [0, 0, 1.2],
-    aisleWaypoint: [0, 0, 1.2],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [0, 0, 3.6],
+    aisleWaypoint: [0, 0, 3.6],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 91,
       maxScore: 100,
@@ -84,9 +84,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#633718',
     accessory: 'glasses', // Round Wire Glasses
     capybaraTone: '#a86a3d',
-    deskPosition: [0.72, 0, 1.2],
-    aisleWaypoint: [0, 0, 1.2],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [0.72, 0, 3.6],
+    aisleWaypoint: [0, 0, 3.6],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 98,
       maxScore: 100,
@@ -118,9 +118,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#522b10',
     accessory: 'scholar_hat', // Scholar Mortarboard Hat
     capybaraTone: '#8e4f24',
-    deskPosition: [-0.72, 0, 0.0],
-    aisleWaypoint: [0, 0, 0.0],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [-0.72, 0, 2.4],
+    aisleWaypoint: [0, 0, 2.4],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 84,
       maxScore: 100,
@@ -150,9 +150,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#6a3b1a',
     accessory: 'red_bow', // Cute Red Ribbon Bow
     capybaraTone: '#ba7b44',
-    deskPosition: [0, 0, 0.0],
-    aisleWaypoint: [0, 0, 0.0],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [0, 0, 2.4],
+    aisleWaypoint: [0, 0, 2.4],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 89,
       maxScore: 100,
@@ -182,9 +182,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#552e12',
     accessory: 'orange', // Yuzu Orange on head
     capybaraTone: '#945528',
-    deskPosition: [0.72, 0, 0.0],
-    aisleWaypoint: [0, 0, 0.0],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [0.72, 0, 2.4],
+    aisleWaypoint: [0, 0, 2.4],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 94,
       maxScore: 100,
@@ -216,9 +216,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#603517',
     accessory: 'lotus', // Zen Lotus Flower
     capybaraTone: '#a36437',
-    deskPosition: [-0.72, 0, -1.2],
-    aisleWaypoint: [0, 0, -1.2],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [-0.72, 0, 1.2],
+    aisleWaypoint: [0, 0, 1.2],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 92,
       maxScore: 100,
@@ -248,9 +248,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#653919',
     accessory: 'scholar_hat', // Scholar Mortarboard Hat
     capybaraTone: '#b3723c',
-    deskPosition: [0, 0, -1.2],
-    aisleWaypoint: [0, 0, -1.2],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [0, 0, 1.2],
+    aisleWaypoint: [0, 0, 1.2],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 95,
       maxScore: 100,
@@ -280,9 +280,9 @@ export const STUDENTS_DATA: StudentData[] = [
     shoesColor: '#5c3214',
     accessory: 'orange', // Yuzu Orange
     capybaraTone: '#9c5e31',
-    deskPosition: [0.72, 0, -1.2],
-    aisleWaypoint: [0, 0, -1.2],
-    submissionWaypoint: [0, 0, 2.4],
+    deskPosition: [0.72, 0, 1.2],
+    aisleWaypoint: [0, 0, 1.2],
+    submissionWaypoint: [0, 0, 4.8],
     scorecard: {
       totalScore: 87,
       maxScore: 100,

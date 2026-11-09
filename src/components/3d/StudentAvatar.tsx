@@ -43,7 +43,7 @@ export function StudentAvatar({
   const [dx, , dz] = data.deskPosition;
   const seatPos: [number, number, number] = [dx, 0, dz - 0.26];
   const aislePos: [number, number, number] = [0, 0, dz - 0.26];
-  const teacherDeskPos: [number, number, number] = data.submissionWaypoint || [0, 0, 2.4];
+  const teacherDeskPos: [number, number, number] = data.submissionWaypoint || [0, 0, 4.8];
 
   // Warm Stylized Capybara Color Palette
   const furColor = data.capybaraTone || data.skinTone || '#9d633b';
@@ -234,8 +234,8 @@ export function StudentAvatar({
       const t = Math.min(1, progressRef.current);
 
       rootGroupRef.current.position.set(0, 0, teacherDeskPos[2]);
-      // Smoothly rotate 180 degrees to face forward toward camera/classroom (matching IMG_3190)
-      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI, Math.min(1, t * 2.5));
+      // Smoothly rotate to face directly towards the bottom-left corner camera
+      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI * 0.84, Math.min(1, t * 2.5));
 
       // Proud chibi pose holding certificate/paper with both paws
       const reachProgress = Math.sin(t * Math.PI);

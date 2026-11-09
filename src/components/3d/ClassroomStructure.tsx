@@ -142,142 +142,91 @@ export function ClassroomStructure() {
         </mesh>
       </group>
 
-      {/* ================= IELTS HONOR BOARD (Front Wall, Centerpiece behind teacher) ================= */}
-      <group position={[0, 2.25, 5.90]} rotation={[0, Math.PI, 0]}>
-        {/* Rich Walnut Wooden Frame */}
+      {/* ================= MINIMALIST OPEN BOARD (Front Wall, Spacious for Future Dynamic Content) ================= */}
+      <group position={[0, 2.2, 5.92]} rotation={[0, Math.PI, 0]}>
+        {/* Sleek Minimalist Outer Bezel (Anodized Dark Titanium) */}
         <mesh receiveShadow castShadow>
-          <boxGeometry args={[5.2, 2.6, 0.08]} />
-          <meshStandardMaterial color="#5c2d11" roughness={0.5} />
-        </mesh>
-        {/* Inner Gold Bevel Rim */}
-        <mesh position={[0, 0, 0.02]}>
-          <boxGeometry args={[5.06, 2.46, 0.06]} />
-          <meshStandardMaterial color="#d97706" metalness={0.6} roughness={0.3} />
-        </mesh>
-        {/* Dark Navy / Midnight Honor Backdrop */}
-        <mesh position={[0, 0, 0.045]} receiveShadow>
-          <planeGeometry args={[4.96, 2.36]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.6} />
+          <boxGeometry args={[6.48, 2.88, 0.06]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
         </mesh>
 
-        {/* Top Header Banner - IELTS Official Score Board */}
-        <group position={[0, 0.98, 0.055]}>
+        {/* Inner Slim Frame Bevel */}
+        <mesh position={[0, 0, 0.015]}>
+          <boxGeometry args={[6.40, 2.80, 0.04]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.5} />
+        </mesh>
+
+        {/* Vast Pristine Slate / Smartboard Writing Surface (Clean & Open) */}
+        <mesh position={[0, 0, 0.032]} receiveShadow>
+          <planeGeometry args={[6.36, 2.76]} />
+          <meshStandardMaterial color="#0c1322" roughness={0.85} metalness={0.05} />
+        </mesh>
+
+        {/* Minimalist Slim Aluminum Accessory / Stylus Ledge at Bottom */}
+        <mesh position={[0, -1.39, 0.055]} castShadow>
+          <boxGeometry args={[6.36, 0.03, 0.08]} />
+          <meshStandardMaterial color="#475569" metalness={0.7} roughness={0.3} />
+        </mesh>
+
+        {/* Sleek Magnetic Stylus / Chalk Markers & Eraser */}
+        <mesh position={[-0.5, -1.365, 0.06]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.009, 0.009, 0.12]} />
+          <meshStandardMaterial color="#38bdf8" roughness={0.3} />
+        </mesh>
+        <mesh position={[-0.35, -1.365, 0.06]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.009, 0.009, 0.12]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.3} />
+        </mesh>
+        <mesh position={[0.5, -1.365, 0.06]}>
+          <boxGeometry args={[0.12, 0.025, 0.05]} />
+          <meshStandardMaterial color="#334155" roughness={0.6} />
+        </mesh>
+
+        {/* Modern Overhead Gallery Track Light Fixture */}
+        <group position={[0, 1.48, 0.15]}>
           <mesh>
-            <planeGeometry args={[4.6, 0.26]} />
-            <meshStandardMaterial color="#dc2626" roughness={0.3} />
+            <boxGeometry args={[6.2, 0.035, 0.06]} />
+            <meshStandardMaterial color="#1e293b" metalness={0.8} />
           </mesh>
-          {/* Gold Accent Ribbons */}
-          <mesh position={[0, 0.11, 0.002]}>
-            <planeGeometry args={[4.56, 0.018]} />
-            <meshBasicMaterial color="#facc15" />
-          </mesh>
-          <mesh position={[0, -0.11, 0.002]}>
-            <planeGeometry args={[4.56, 0.018]} />
-            <meshBasicMaterial color="#facc15" />
-          </mesh>
-          {/* Center Trophy / Laurel Emblem */}
-          <mesh position={[0, 0, 0.005]}>
-            <circleGeometry args={[0.075, 24]} />
-            <meshStandardMaterial color="#facc15" metalness={0.9} roughness={0.2} />
+          {/* Subtle warm LED illumination strip */}
+          <mesh position={[0, -0.018, 0]}>
+            <planeGeometry args={[6.0, 0.02]} />
+            <meshBasicMaterial color="#fef3c7" />
           </mesh>
         </group>
-
-        {/* 10 Official IELTS Test Report Forms in a 5x2 Grid (matching IMG_3190) */}
-        {[-1.8, -0.9, 0, 0.9, 1.8].map((colX, colIdx) =>
-          [0.36, -0.56].map((rowY, rowIdx) => {
-            const bands = ['8.5', '7.5', '8.0', '9.0', '8.5', '8.0', '7.5', '8.5', '8.0', '8.5'];
-            const band = bands[colIdx * 2 + rowIdx] || '8.5';
-            return (
-              <group key={`front-ielts-${colIdx}-${rowIdx}`} position={[colX, rowY, 0.055]}>
-                {/* Certificate Parchment */}
-                <mesh castShadow receiveShadow>
-                  <planeGeometry args={[0.74, 0.76]} />
-                  <meshStandardMaterial color="#fefefe" roughness={0.4} />
-                </mesh>
-                {/* Red IELTS Logo Header */}
-                <mesh position={[0, 0.30, 0.005]}>
-                  <planeGeometry args={[0.62, 0.08]} />
-                  <meshBasicMaterial color="#dc2626" />
-                </mesh>
-                {/* Candidate Photo placeholder */}
-                <mesh position={[-0.20, 0.12, 0.005]}>
-                  <planeGeometry args={[0.22, 0.22]} />
-                  <meshBasicMaterial color="#e2e8f0" />
-                </mesh>
-                {/* Score Band Badge Box */}
-                <mesh position={[0.15, 0.12, 0.005]}>
-                  <planeGeometry args={[0.32, 0.20]} />
-                  <meshBasicMaterial color="#f0f9ff" />
-                </mesh>
-                {/* Band Score Number Stamp */}
-                <mesh position={[0.15, 0.12, 0.008]}>
-                  <planeGeometry args={[0.24, 0.10]} />
-                  <meshBasicMaterial color={band === '9.0' ? '#16a34a' : '#2563eb'} />
-                </mesh>
-                {/* Form Detail Lines */}
-                <mesh position={[0, -0.06, 0.005]}>
-                  <planeGeometry args={[0.64, 0.02]} />
-                  <meshBasicMaterial color="#cbd5e1" />
-                </mesh>
-                <mesh position={[0, -0.13, 0.005]}>
-                  <planeGeometry args={[0.64, 0.02]} />
-                  <meshBasicMaterial color="#cbd5e1" />
-                </mesh>
-                <mesh position={[0, -0.20, 0.005]}>
-                  <planeGeometry args={[0.64, 0.02]} />
-                  <meshBasicMaterial color="#cbd5e1" />
-                </mesh>
-                <mesh position={[0, -0.27, 0.005]}>
-                  <planeGeometry args={[0.64, 0.02]} />
-                  <meshBasicMaterial color="#cbd5e1" />
-                </mesh>
-                {/* Official Red Stamp Seal */}
-                <mesh position={[0.22, -0.25, 0.008]}>
-                  <circleGeometry args={[0.045, 16]} />
-                  <meshBasicMaterial color="#ef4444" />
-                </mesh>
-                {/* Golden Push Pin */}
-                <mesh position={[0, 0.35, 0.012]} castShadow>
-                  <sphereGeometry args={[0.02, 14, 14]} />
-                  <meshStandardMaterial color="#facc15" metalness={0.9} roughness={0.2} />
-                </mesh>
-              </group>
-            );
-          })
-        )}
       </group>
 
-      {/* ================= WALL CLOCK ================= */}
-      <group position={[0, 3.5, 5.9]}>
+      {/* ================= WALL CLOCK (Cleanly above board) ================= */}
+      <group position={[0, 3.90, 5.9]}>
         {/* Outer Rim */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.38, 0.38, 0.06, 32]} />
+          <cylinderGeometry args={[0.22, 0.22, 0.04, 32]} />
           <meshStandardMaterial color="#1e293b" roughness={0.4} />
         </mesh>
         {/* Clock Face */}
-        <mesh position={[0, 0, -0.035]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.34, 0.34, 0.01, 32]} />
+        <mesh position={[0, 0, -0.025]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.20, 0.20, 0.01, 32]} />
           <meshStandardMaterial color="#ffffff" roughness={0.2} />
         </mesh>
         {/* Center pin */}
-        <mesh position={[0, 0, -0.042]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.02, 0.02, 0.02, 16]} />
+        <mesh position={[0, 0, -0.03]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.015, 0.015, 0.02, 16]} />
           <meshStandardMaterial color="#000000" />
         </mesh>
         {/* Hour Hand */}
-        <mesh position={[0.06, 0.06, -0.04]} rotation={[0, 0, -Math.PI / 4]}>
-          <boxGeometry args={[0.02, 0.16, 0.005]} />
+        <mesh position={[0.04, 0.04, -0.03]} rotation={[0, 0, -Math.PI / 4]}>
+          <boxGeometry args={[0.012, 0.10, 0.005]} />
           <meshStandardMaterial color="#0f172a" />
         </mesh>
         {/* Minute Hand */}
-        <mesh position={[0, 0.1, -0.04]}>
-          <boxGeometry args={[0.015, 0.22, 0.005]} />
+        <mesh position={[0, 0.065, -0.03]}>
+          <boxGeometry args={[0.01, 0.14, 0.005]} />
           <meshStandardMaterial color="#0f172a" />
         </mesh>
         {/* Animated Second Hand */}
-        <mesh ref={clockSecondRef} position={[0, 0, -0.042]}>
-          <group position={[0, 0.1, 0]}>
-            <boxGeometry args={[0.008, 0.24, 0.004]} />
+        <mesh ref={clockSecondRef} position={[0, 0, -0.032]}>
+          <group position={[0, 0.065, 0]}>
+            <boxGeometry args={[0.006, 0.15, 0.004]} />
             <meshStandardMaterial color="#dc2626" />
           </group>
         </mesh>

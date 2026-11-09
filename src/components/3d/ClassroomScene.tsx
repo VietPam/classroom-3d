@@ -1,5 +1,4 @@
 import { ClassroomStructure } from './ClassroomStructure';
-import { TeacherStation } from './TeacherStation';
 import { StudentDesk } from './StudentDesk';
 import { StudentAvatar } from './StudentAvatar';
 import { CameraRig } from './CameraRig';
@@ -20,12 +19,6 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
     updateStudentState,
     setHoveredStudentId,
   } = store;
-
-  // Active student state helper
-  const activeStudent = students.find((s) => s.id === activeStudentId);
-  const isHandingPaper = activeStudentId
-    ? studentStates[activeStudentId] === 'HANDING_PAPER'
-    : false;
 
   return (
     <>
@@ -62,12 +55,6 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
 
       {/* ================= CLASSROOM ROOM ARCHITECTURE ================= */}
       <ClassroomStructure />
-
-      {/* ================= TEACHER PODIUM & STATION ================= */}
-      <TeacherStation
-        hasSubmittedPaper={isHandingPaper || store.completedCount > 0}
-        submittedStudentName={activeStudent?.name}
-      />
 
       {/* ================= STUDENT STATIONS & AVATARS ================= */}
       {students.map((student) => {

@@ -13,39 +13,39 @@ export function CameraRig({ mode }: CameraRigProps) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera, size } = useThree();
 
-  // Target positions & look-ats for each camera mode (Up-View looking from back towards IELTS board)
-  const targetCamPos = useRef(new THREE.Vector3(0, 1.25, -3.2));
-  const targetLookAt = useRef(new THREE.Vector3(0, 1.65, 3.8));
+  // Target positions & look-ats for each camera mode (Bottom-Left Corner looking diagonally up towards board)
+  const targetCamPos = useRef(new THREE.Vector3(-2.8, 1.35, -1.0));
+  const targetLookAt = useRef(new THREE.Vector3(0.1, 1.85, 5.0));
 
   useEffect(() => {
     const isPortrait = size.width < size.height;
 
-    // Up-View: Looking from the audience/back of the classroom up towards the front stage & IELTS board
+    // Bottom-Left Corner Up-View: Looking from the bottom-left of the classroom diagonally up towards the front board
     if (mode === 'teacher_pov') {
       if (isPortrait) {
-        // Mobile portrait: eye level behind 3x3 rows, framed on IELTS Board & stage
-        targetCamPos.current.set(0, 1.25, -3.2);
-        targetLookAt.current.set(0, 1.65, 3.8);
+        // Mobile portrait: eye level at bottom-left corner, angled up towards board
+        targetCamPos.current.set(-2.8, 1.35, -1.0);
+        targetLookAt.current.set(0.1, 1.85, 5.0);
       } else {
         // Desktop landscape POV: slightly wider
-        targetCamPos.current.set(0, 1.35, -3.4);
-        targetLookAt.current.set(0, 1.65, 3.8);
+        targetCamPos.current.set(-3.5, 1.40, -0.8);
+        targetLookAt.current.set(0.2, 1.90, 5.0);
       }
     } else if (mode === 'overview') {
       if (isPortrait) {
         // Overview in portrait mode: high diagonal corner looking down at class & board
-        targetCamPos.current.set(3.2, 3.2, -2.8);
-        targetLookAt.current.set(0, 1.2, 1.0);
+        targetCamPos.current.set(3.4, 3.4, 0.2);
+        targetLookAt.current.set(0, 1.2, 2.5);
       } else {
         // Desktop landscape overview
-        targetCamPos.current.set(3.8, 3.0, -2.5);
-        targetLookAt.current.set(0, 1.2, 1.0);
+        targetCamPos.current.set(3.8, 3.2, 0.5);
+        targetLookAt.current.set(0, 1.2, 2.5);
       }
     }
 
     if ('isPerspectiveCamera' in camera && (camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
       const persCamera = camera as THREE.PerspectiveCamera;
-      const targetFov = isPortrait ? 66 : 52;
+      const targetFov = isPortrait ? 68 : 54;
       if (Math.abs(persCamera.fov - targetFov) > 0.5) {
         persCamera.fov = targetFov;
         persCamera.updateProjectionMatrix();
@@ -76,7 +76,7 @@ export function CameraRig({ mode }: CameraRigProps) {
   return mode === 'overview' ? (
     <OrbitControls
       ref={controlsRef}
-      target={[0, 1.2, 1.0]}
+      target={[0, 1.2, 2.5]}
       makeDefault
       enableDamping
       dampingFactor={0.06}
