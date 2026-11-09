@@ -1,0 +1,203 @@
+{
+  "$schema": "./sfx-catalog.schema.json",
+  "version": "1.0.0",
+  "description": "Single Source of Truth (SSOT) Registry cho toàn bộ 28 hiệu ứng âm thanh SFX dùng chung",
+  "sfx": {
+    "whoosh_fast": {
+      "file": "whoosh_fast.mp3",
+      "category": "Transition",
+      "duration_sec": 0.86,
+      "default_volume": 0.22,
+      "description": "Tiếng gió vút nhanh khi chuyển cảnh hoặc lướt màn hình"
+    },
+    "throwing_sound": {
+      "file": "throwing_sound.mp3",
+      "category": "Motion",
+      "duration_sec": 0.74,
+      "default_volume": 0.22,
+      "description": "Tiếng quăng/ném khi đẩy card hoặc sticker vào khung hình"
+    },
+    "card_slide": {
+      "file": "card_slide.mp3",
+      "category": "Motion",
+      "duration_sec": 0.34,
+      "default_volume": 0.20,
+      "description": "Tiếng trượt nhẹ khi thẻ bài học xuất hiện"
+    },
+    "pop_soft": {
+      "file": "pop_soft.mp3",
+      "category": "UI",
+      "duration_sec": 0.31,
+      "default_volume": 0.25,
+      "description": "Tiếng nảy nhẹ khi hiện chữ, icon hoặc badge"
+    },
+    "click_ui": {
+      "file": "click_ui.mp3",
+      "category": "UI",
+      "duration_sec": 0.18,
+      "default_volume": 0.25,
+      "description": "Tiếng nhấp chuột hoặc nút bấm giao diện"
+    },
+    "keyboard_tap": {
+      "file": "keyboard_tap.mp3",
+      "category": "UI",
+      "duration_sec": 0.84,
+      "default_volume": 0.18,
+      "description": "Tiếng gõ phím máy tính nhanh"
+    },
+    "marker_swipe": {
+      "file": "marker_swipe.mp3",
+      "category": "UI",
+      "duration_sec": 1.06,
+      "default_volume": 0.20,
+      "description": "Tiếng quẹt bút dạ quang khi highlight từ khóa quan trọng"
+    },
+    "piuw": {
+      "file": "piuw.mp3",
+      "category": "UI",
+      "duration_sec": 0.46,
+      "default_volume": 0.25,
+      "description": "Tiếng laser hoạt hình khi bắn ra mũi tên hoặc nhãn chú thích"
+    },
+    "cat_huh": {
+      "file": "cat_huh.mp3",
+      "category": "Meme",
+      "duration_sec": 0.34,
+      "default_volume": 0.40,
+      "description": "Tiếng 'Huh?' của chú mèo meme thể hiện sự ngơ ngác, bất ngờ"
+    },
+    "bonk": {
+      "file": "bonk.mp3",
+      "category": "Meme",
+      "duration_sec": 0.42,
+      "default_volume": 0.30,
+      "description": "Tiếng gõ đầu hài hước khi phát hiện lỗi sai ngớ ngẩn"
+    },
+    "dry_fart": {
+      "file": "dry_fart.mp3",
+      "category": "Meme",
+      "duration_sec": 0.34,
+      "default_volume": 0.30,
+      "description": "Tiếng xì hơi châm biếm cách phát âm hoặc diễn đạt quê xệ"
+    },
+    "mac_quack": {
+      "file": "mac_quack.mp3",
+      "category": "Meme",
+      "duration_sec": 0.44,
+      "default_volume": 0.28,
+      "description": "Tiếng vịt cạp ngộ nghĩnh của Mac OS khi ngắt lời hoặc ngơ ngác"
+    },
+    "pop_mouth": {
+      "file": "pop_mouth.mp3",
+      "category": "Meme",
+      "duration_sec": 0.44,
+      "default_volume": 0.30,
+      "description": "Tiếng búng miệng vui nhộn"
+    },
+    "rizz_sound": {
+      "file": "rizz_sound.mp3",
+      "category": "Meme",
+      "duration_sec": 1.49,
+      "default_volume": 0.28,
+      "description": "Riff guitar điện quyến rũ khi đưa ra câu tiếng Anh chuẩn ngầu"
+    },
+    "vine_boom": {
+      "file": "vine_boom.mp3",
+      "category": "Drama",
+      "duration_sec": 1.23,
+      "default_volume": 0.30,
+      "description": "Tiếng nổ trầm kinh điển tạo cú sốc thính giác ngắt quán tính lướt"
+    },
+    "dun_dun_dun": {
+      "file": "dun_dun_dun.mp3",
+      "category": "Drama",
+      "duration_sec": 3.45,
+      "default_volume": 0.22,
+      "description": "Ba nốt kèn cao trào kinh điển báo hiệu bí mật hoặc tình huống kịch tính"
+    },
+    "among_us_role": {
+      "file": "among_us_role.mp3",
+      "category": "Drama",
+      "duration_sec": 2.35,
+      "default_volume": 0.24,
+      "description": "Âm thanh bí ẩn khi đặt câu hỏi gây hoang mang hoặc lật tẩy lỗi sai"
+    },
+    "record_scratch": {
+      "file": "record_scratch.mp3",
+      "category": "Drama",
+      "duration_sec": 0.63,
+      "default_volume": 0.25,
+      "description": "Tiếng đĩa than bị cào dừng đột ngột khi ngắt mạch suy nghĩ"
+    },
+    "punch_sound": {
+      "file": "punch_sound.mp3",
+      "category": "Drama",
+      "duration_sec": 0.53,
+      "default_volume": 0.28,
+      "description": "Tiếng đấm trúng đích uy lực khi nói về va chạm, tranh cãi"
+    },
+    "bone_crack": {
+      "file": "bone_crack.mp3",
+      "category": "Drama",
+      "duration_sec": 0.55,
+      "default_volume": 0.25,
+      "description": "Tiếng bẻ khớp/gãy xương khi nói về việc học cày cuốc kiệt sức"
+    },
+    "loading_lost": {
+      "file": "loading_lost.mp3",
+      "category": "Tech",
+      "duration_sec": 2.54,
+      "default_volume": 0.22,
+      "description": "Âm thanh máy tính bị treo/lag khi người học bị đứng hình quên từ"
+    },
+    "windows_error": {
+      "file": "windows_error.mp3",
+      "category": "Tech",
+      "duration_sec": 0.94,
+      "default_volume": 0.22,
+      "description": "Tiếng báo lỗi Windows XP huyền thoại khi gặp lỗi ngữ pháp nghiêm trọng"
+    },
+    "glitch": {
+      "file": "glitch.mp3",
+      "category": "Tech",
+      "duration_sec": 0.62,
+      "default_volume": 0.18,
+      "description": "Tiếng nhiễu sóng công nghệ khi chuyển pha hoặc lỗi hệ thống"
+    },
+    "camera_shutter": {
+      "file": "camera_shutter.mp3",
+      "category": "Tech",
+      "duration_sec": 0.48,
+      "default_volume": 0.22,
+      "description": "Tiếng màn trập máy ảnh khi nhắc người xem chụp ảnh màn hình lưu lại"
+    },
+    "ding_correct": {
+      "file": "ding_correct.mp3",
+      "category": "Quiz",
+      "duration_sec": 1.30,
+      "default_volume": 0.22,
+      "description": "Tiếng chuông ngân báo đáp án đúng hoặc đưa ra cụm từ khuyên dùng"
+    },
+    "wrong_buzzer": {
+      "file": "wrong_buzzer.mp3",
+      "category": "Quiz",
+      "duration_sec": 1.04,
+      "default_volume": 0.22,
+      "description": "Tiếng còi báo lỗi sai hoặc cách dùng từ cần tránh"
+    },
+    "coin_reward": {
+      "file": "coin_reward.mp3",
+      "category": "Quiz",
+      "duration_sec": 0.99,
+      "default_volume": 0.20,
+      "description": "Tiếng nhận xu thưởng gamification khi người học vượt qua thử thách"
+    },
+    "ding_bell": {
+      "file": "ding_bell.mp3",
+      "category": "Quiz",
+      "duration_sec": 1.83,
+      "default_volume": 0.18,
+      "description": "Tiếng chuông lễ tân báo hiệu gợi ý hoặc mẹo quan trọng"
+    }
+  }
+}

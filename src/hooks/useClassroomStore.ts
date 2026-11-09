@@ -7,6 +7,7 @@ import type {
 } from '../types/classroom';
 import { STUDENTS_DATA } from '../data/students';
 import { QUIZ_ZONES, PODIUM_POSITION } from '../data/floorZones';
+import { audioEngine } from '../audio/audioEngine';
 
 export const DEFAULT_QUIZ: QuizData = {
   title: 'JavaScript Quiz Race',
@@ -62,6 +63,9 @@ export function useClassroomStore(): ClassroomStore {
     clearTimers();
     setQuizStatus('RUNNING');
 
+    // SFX: Tiếng vút gió xuất phát
+    audioEngine.playSFX('whoosh_fast');
+
     // Phân công 4 học sinh chạy về 4 ô A, B, C, D
     setStudents((prev) =>
       prev.map((student, idx) => {
@@ -75,9 +79,16 @@ export function useClassroomStore(): ClassroomStore {
       })
     );
 
+    // Tiếng bước chân lon ton khi chạy
+    const footstepTimer = setTimeout(() => {
+      audioEngine.playSFX('pop_soft');
+    }, 400);
+    timersRef.current.push(footstepTimer);
+
     // Giai đoạn 2: Đến nơi, đứng suy nghĩ đắn đo
     const timer1 = setTimeout(() => {
       setQuizStatus('THINKING');
+      audioEngine.playSFX('cat_huh');
       setStudents((prev) =>
         prev.map((student) => ({
           ...student,
@@ -90,6 +101,20 @@ export function useClassroomStore(): ClassroomStore {
     // Giai đoạn 3: Bảng công bố kết quả (Reveal)
     const timer2 = setTimeout(() => {
       setQuizStatus('REVEAL');
+
+      // Auto-duck BGM và phát chuông báo đúng
+      audioEngine.duckBGM(0.02, 1800);
+      audioEngine.playSFX('ding_correct');
+
+      // Thưởng xu cho người thắng và buzzer cho người thua
+      const winTimer = setTimeout(() => {
+        audioEngine.playSFX('coin_reward');
+      }, 350);
+      const loseTimer = setTimeout(() => {
+        audioEngine.playSFX('wrong_buzzer');
+      }, 700);
+      timersRef.current.push(winTimer, loseTimer);
+
       setStudents((prev) =>
         prev.map((student) => {
           const isWinner = student.chosenOption === DEFAULT_QUIZ.correctOption;
@@ -108,6 +133,9 @@ export function useClassroomStore(): ClassroomStore {
     clearTimers();
     setQuizStatus('PRESENTING');
 
+    // SFX: Tiếng vút gió bắt đầu chạy lên
+    audioEngine.playSFX('whoosh_fast');
+
     setStudents((prev) =>
       prev.map((student) => {
         if (student.id === studentId) {
@@ -124,8 +152,9 @@ export function useClassroomStore(): ClassroomStore {
       })
     );
 
-    // Đến bục giảng thì bắt đầu thuyết trình
+    // Đến bục giảng thì rung chuông lễ tân bắt đầu thuyết trình
     const timer = setTimeout(() => {
+      audioEngine.playSFX('ding_bell');
       setStudents((prev) =>
         prev.map((student) => {
           if (student.id === studentId) {
@@ -145,6 +174,7 @@ export function useClassroomStore(): ClassroomStore {
   const resetAllToSpawn = useCallback(() => {
     clearTimers();
     setQuizStatus('IDLE');
+    audioEngine.playSFX('card_slide');
 
     setStudents((prev) =>
       prev.map((student) => ({
@@ -169,6 +199,12 @@ export function useClassroomStore(): ClassroomStore {
   // 4. Cả lớp nhảy múa ăn mừng
   const celebrateAll = useCallback(() => {
     clearTimers();
+    audioEngine.playSFX('coin_reward');
+    const popTimer = setTimeout(() => {
+      audioEngine.playSFX('pop_mouth');
+    }, 300);
+    timersRef.current.push(popTimer);
+
     setStudents((prev) =>
       prev.map((student) => ({
         ...student,
