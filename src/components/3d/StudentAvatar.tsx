@@ -67,8 +67,7 @@ export function StudentAvatar({ data }: StudentAvatarProps) {
       if (
         state === 'THINKING' ||
         state === 'CELEBRATING' ||
-        state === 'SAD' ||
-        state === 'PRESENTING'
+        state === 'SAD'
       ) {
         targetYaw = Math.PI;
       }
@@ -110,11 +109,6 @@ export function StudentAvatar({ data }: StudentAvatarProps) {
         headGroupRef.current.rotation.x = 0.12;
         headGroupRef.current.rotation.y = 0.1;
         headGroupRef.current.rotation.z = 0.15;
-      } else if (state === 'PRESENTING') {
-        headGroupRef.current.rotation.x = 0.05;
-        headGroupRef.current.rotation.y =
-          Math.sin(time * 2 + studentSeed) * 0.15;
-        headGroupRef.current.rotation.z = 0;
       } else {
         // IDLE natural bobbing
         headGroupRef.current.rotation.x =

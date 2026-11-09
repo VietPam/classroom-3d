@@ -39,6 +39,20 @@ export const BRAND_COLORS = {
   glowGreen: '#34D399',
   glowRed: '#F87171',
   glowPodium: '#818CF8',
+
+  // Bảng Màu Pastel Thẻ Lựa Chọn (Light Theme Pastel Options)
+  pastelAmberBg: '#FFFBEB',
+  pastelAmberBorder: '#FCD34D',
+  pastelAmberText: '#92400E',
+  pastelBlueBg: '#EFF6FF',
+  pastelBlueBorder: '#93C5FD',
+  pastelBlueText: '#1E40AF',
+  pastelGreenBg: '#ECFDF5',
+  pastelGreenBorder: '#6EE7B7',
+  pastelGreenText: '#065F46',
+  pastelRedBg: '#FEF2F2',
+  pastelRedBorder: '#FCA5A5',
+  pastelRedText: '#991B1B',
 } as const;
 
 export const BRAND_FONTS = {

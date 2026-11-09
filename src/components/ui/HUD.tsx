@@ -1,4 +1,12 @@
-import { Play, Camera, User, PartyPopper, RefreshCw, Volume2, VolumeX } from 'lucide-react';
+import {
+  Play,
+  SkipForward,
+  Radio,
+  Camera,
+  PartyPopper,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import type { ClassroomStore } from '../../hooks/useClassroomStore';
 import { useAudio } from '../../audio/useAudio';
 
@@ -10,95 +18,142 @@ export function HUD({ store }: HUDProps) {
   const {
     resetCamera,
     startQuizShowdown,
-    callStudentToBoard,
-    resetAllToSpawn,
     celebrateAll,
     quizStatus,
+    isAutoPlay,
+    toggleAutoPlay,
+    nextQuiz,
+    selectGroup,
+    activeGroupId,
+    quizIndex,
+    totalQuizzes,
   } = store;
 
   const { isMuted, toggleMute, playSFX } = useAudio();
 
+  const groupFilterTabs = [
+    { id: 'all', label: 'Tất cả' },
+    { id: 'synonyms', label: 'Đồng nghĩa' },
+    { id: 'antonyms', label: 'Trái nghĩa' },
+    { id: 'fill_blank', label: 'Điền từ' },
+  ];
+
   return (
-    <div className="absolute inset-0 pointer-events-none flex flex-col justify-between items-center p-3 sm:p-5 select-none pb-[calc(1rem+env(safe-area-inset-bottom))] font-sans">
+    <div className="absolute inset-0 pointer-events-none flex flex-col justify-between items-center p-2.5 sm:p-4 select-none pb-[calc(0.75rem+env(safe-area-inset-bottom))] font-sans">
       {/* Top Floating Status Indicator */}
-      <header className="pointer-events-auto">
-        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/85 backdrop-blur-md border border-slate-700/60 shadow-lg text-xs font-semibold text-slate-200">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#F08806] animate-pulse" />
-          <span className="tracking-wide">TikTok 3D Live Studio</span>
+      <header className="pointer-events-auto flex flex-col items-center gap-1.5 mt-1">
+        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/90 backdrop-blur-md border border-slate-700/60 shadow-lg text-xs font-semibold text-slate-200">
+          <span
+            className={`w-2.5 h-2.5 rounded-full ${
+              isAutoPlay ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'
+            }`}
+          />
+          <span className="tracking-wide font-medium">TikTok Live</span>
+          <span className="text-slate-600">|</span>
+          <span className="text-amber-400 font-mono font-bold">
+            Câu {quizIndex + 1}/{totalQuizzes}
+          </span>
           <span className="text-slate-600">|</span>
           <span className="text-[#38BDF8] font-mono">
-            {quizStatus === 'RUNNING' && '🏃 Đang chạy đua...'}
+            {quizStatus === 'RUNNING' && '🏃 Đang chạy...'}
             {quizStatus === 'THINKING' && '🤔 Đang suy nghĩ...'}
-            {quizStatus === 'REVEAL' && '🎉 Đã công bố kết quả!'}
-            {quizStatus === 'PRESENTING' && '🎤 Lên bảng thuyết trình'}
+            {quizStatus === 'REVEAL' && '🎉 Công bố kết quả!'}
             {quizStatus === 'IDLE' && '⚡ Sẵn sàng'}
           </span>
         </div>
       </header>
 
-      {/* Bottom Control Dock: Scenario Triggers, Audio & Camera Controls */}
+      {/* Bottom Control Dock: Scenario Triggers, Group Selector & Audio */}
       <footer className="pointer-events-auto flex flex-col items-center gap-2 w-full max-w-sm">
-        {/* Main Scenario Control Bar */}
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2 bg-slate-950/90 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl border border-slate-700/70 shadow-2xl w-full">
-          {/* 1. Quiz Race Trigger (Brand Accent Amber) */}
+        {/* 1. Category / Group Quick Filter Tabs */}
+        <div className="flex items-center justify-between gap-1 p-1 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800 shadow-md w-full">
+          {groupFilterTabs.map((tab) => {
+            const isActive = activeGroupId === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  playSFX('click_ui');
+                  selectGroup(tab.id);
+                }}
+                className={`flex-1 py-1 px-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer text-center ${
+                  isActive
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 2. Main Scenario Control Bar */}
+        <div className="flex items-center justify-center gap-1.5 bg-slate-950/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/70 shadow-2xl w-full">
+          {/* A. Auto Live Stream Loop Toggle */}
+          <button
+            onClick={() => {
+              playSFX('click_ui');
+              toggleAutoPlay();
+            }}
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 border ${
+              isAutoPlay
+                ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/80 shadow-md shadow-emerald-950/50'
+                : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-slate-200'
+            }`}
+            title={isAutoPlay ? 'Tắt tự động chạy liên tục' : 'Bật tự động phát liên tục 24/7'}
+          >
+            <Radio
+              className={`w-3.5 h-3.5 ${isAutoPlay ? 'text-emerald-400 animate-pulse' : ''}`}
+            />
+            <span>{isAutoPlay ? 'Auto Live' : 'Auto Tắt'}</span>
+          </button>
+
+          {/* B. Manual Quiz Race Trigger */}
           <button
             onClick={() => {
               playSFX('click_ui');
               startQuizShowdown();
             }}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#F08806] to-[#D97706] hover:from-[#F59E0B] hover:to-[#EA580C] text-white text-xs font-bold shadow-md shadow-amber-950/40 transition-all cursor-pointer active:scale-95"
-            title="4 học sinh chạy đua chọn ô đáp án A/B/C/D"
+            className="flex-1 flex items-center justify-center gap-1 px-2.5 py-2 rounded-xl bg-gradient-to-r from-[#F08806] to-[#D97706] hover:from-[#F59E0B] hover:to-[#EA580C] text-white text-xs font-bold shadow-md shadow-amber-950/40 transition-all cursor-pointer active:scale-95"
+            title="Kích hoạt học sinh chạy đua chọn ô đáp án"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
-            <span>Quiz Race</span>
+            <span>Chạy Đua</span>
           </button>
 
-          {/* 2. Call to Board Trigger (Brand Royal Blue) */}
+          {/* C. Next Quiz (Tiếp theo) */}
           <button
             onClick={() => {
-              playSFX('click_ui');
-              callStudentToBoard('s1');
+              playSFX('card_slide');
+              nextQuiz();
             }}
-            data-testid="btn-call-board"
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#1F3EB7] hover:bg-[#293486] text-white text-xs font-bold shadow-md shadow-blue-950/40 transition-all cursor-pointer active:scale-95"
-            title="Gọi học sinh lên bảng phát biểu"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 transition-all cursor-pointer active:scale-95 shrink-0"
+            title="Chuyển ngay sang câu hỏi tiếp theo"
           >
-            <User className="w-3.5 h-3.5" />
-            <span>Lên bảng</span>
+            <SkipForward className="w-4 h-4" />
           </button>
 
-          {/* 3. Celebrate All Trigger (Brand Semantic Green) */}
+          {/* D. Celebrate All */}
           <button
             onClick={() => {
               playSFX('click_ui');
               celebrateAll();
             }}
-            className="p-2.5 rounded-xl bg-[#059669] hover:bg-[#047857] text-white transition-all cursor-pointer active:scale-95 shrink-0"
+            className="p-2 rounded-xl bg-[#059669] hover:bg-[#047857] text-white transition-all cursor-pointer active:scale-95 shrink-0"
             title="Cả lớp cùng nhảy ăn mừng"
           >
             <PartyPopper className="w-4 h-4" />
           </button>
 
-          {/* 4. Reset All to Spawn Pods */}
-          <button
-            onClick={() => {
-              playSFX('click_ui');
-              resetAllToSpawn();
-            }}
-            className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer active:scale-95 shrink-0"
-            title="Đưa học sinh về vị trí xuất phát"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-
-          {/* 5. Mute / Unmute Audio Toggle (Speaker) */}
+          {/* E. Mute / Unmute Audio Toggle */}
           <button
             onClick={() => {
               toggleMute();
               playSFX('click_ui');
             }}
             data-testid="btn-audio-mute"
-            className={`p-2.5 rounded-xl border transition-all cursor-pointer active:scale-95 shrink-0 ${
+            className={`p-2 rounded-xl border transition-all cursor-pointer active:scale-95 shrink-0 ${
               isMuted
                 ? 'bg-rose-950/50 text-rose-400 border-rose-800/80 hover:bg-rose-900/60'
                 : 'bg-emerald-950/50 text-emerald-400 border-emerald-800/80 hover:bg-emerald-900/60'
@@ -108,13 +163,13 @@ export function HUD({ store }: HUDProps) {
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
 
-          {/* 6. Reset Camera View */}
+          {/* F. Reset Camera View */}
           <button
             onClick={() => {
               playSFX('click_ui');
               resetCamera();
             }}
-            className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer active:scale-95 shrink-0"
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer active:scale-95 shrink-0"
             title="Đặt lại góc nhìn camera mặc định"
           >
             <Camera className="w-4 h-4" />

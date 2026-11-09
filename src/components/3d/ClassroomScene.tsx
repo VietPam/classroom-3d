@@ -1,5 +1,4 @@
 import { ClassroomStructure } from './ClassroomStructure';
-import { SpawnPod } from './SpawnPod';
 import { FloorZones } from './FloorZones';
 import { SmartboardDisplay } from './SmartboardDisplay';
 import { StudentAvatar } from './StudentAvatar';
@@ -52,25 +51,15 @@ export function ClassroomScene({ store }: ClassroomSceneProps) {
       {/* ================= SMARTBOARD INTERACTIVE CONTENT ================= */}
       <SmartboardDisplay quiz={quiz} status={quizStatus} />
 
-      {/* ================= 4 QUIZ FLOOR ZONES & PODIUM STAGE ================= */}
+      {/* ================= 4 QUIZ FLOOR ZONES (PHÓNG TO CHO NHIỀU NGƯỜI ĐỨNG) ================= */}
       <FloorZones
         quizStatus={quizStatus}
         correctOption={quiz.correctOption}
-        activePodium={quizStatus === 'PRESENTING'}
       />
 
-      {/* ================= STUDENT SPAWN PODS & MOVING AVATARS ================= */}
+      {/* ================= DYNAMIC MOVING AVATARS (SÀN GỖ TỰ NHIÊN, KHÔNG CÒN VÒNG TRÒN) ================= */}
       {students.map((student) => (
-        <group key={student.id}>
-          {/* Cyber Floor Spawn Pad (Replaces old bulky desk) */}
-          <SpawnPod
-            position={student.deskPosition}
-            accentColor={student.shirtColor}
-          />
-
-          {/* Dynamic Moving & Emoting Chibi Avatar */}
-          <StudentAvatar data={student} />
-        </group>
+        <StudentAvatar key={student.id} data={student} />
       ))}
     </>
   );

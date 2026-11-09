@@ -105,24 +105,6 @@ export function ChibiBody({
         rightArmRef.current.rotation.z = 0.35;
       }
       bounceY = Math.sin(time * 2 + studentSeed) * 0.005;
-    } else if (state === 'PRESENTING') {
-      // 5. PRESENTING AT THE PODIUM
-      if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = 0;
-        rightLegRef.current.rotation.x = 0;
-      }
-      if (leftArmRef.current && rightArmRef.current) {
-        // Pointing with left hand
-        leftArmRef.current.rotation.x = -1.2;
-        leftArmRef.current.rotation.y = 0.5;
-        leftArmRef.current.rotation.z = -0.2;
-
-        // Gesturing to audience with right hand
-        rightArmRef.current.rotation.x = -0.7 + Math.sin(time * 2.5) * 0.12;
-        rightArmRef.current.rotation.y = -0.2;
-        rightArmRef.current.rotation.z = 0.3;
-      }
-      bounceY = Math.sin(time * 2 + studentSeed) * 0.005;
     } else {
       // 6. IDLE STANDING POSE (Gentle breathing and subtle arm sway)
       if (leftLegRef.current && rightLegRef.current) {

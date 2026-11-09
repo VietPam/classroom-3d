@@ -45,189 +45,200 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
     const w = canvas.width;
     const h = canvas.height;
 
-    // 1. Dark Cyber Smartboard Background (Full Canvas)
-    ctx.fillStyle = '#080d1a';
+    // 1. Light Pastel Smartboard Background (Full Canvas Coverage)
+    // Brand token SSOT: canvasBg = #FAF7F2, canvasDots = #E5D6BE
+    ctx.fillStyle = '#FAF7F2';
     ctx.fillRect(0, 0, w, h);
 
-    // Subtle Grid Pattern across whole board
-    ctx.strokeStyle = '#141d2e';
-    ctx.lineWidth = 1;
+    // Delicate Pastel Micro-Grid Dots across the entire board
+    ctx.fillStyle = '#E5D6BE';
+    for (let x = 32; x < w; x += 48) {
+      for (let y = 32; y < h; y += 48) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Outer Board Accent Border (Revealed: Vibrant Green, Normal: Soft Slate)
+    ctx.strokeStyle = status === 'REVEAL' ? BRAND_COLORS.semanticGreen : '#CBD5E1';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(16, 12, w - 32, h - 24);
+
+    // ================= FULL BOARD CONTENT BOUNDS (Bao quát tối đa diện tích hiển thị) =================
+    const margin = 110;
+    const boxX = margin;
+    const boxW = w - 2 * margin; // 1828px wide - Perfectly framed within 9:16 mobile portrait view
+
+    // 2. Question Card (Màn hình chỉ tập trung Câu hỏi & Đáp án, đã xóa header & badge góc phải)
+    const questionY = 24;
+    const questionH = 222;
+
+    ctx.fillStyle = '#FFFFFF';
     ctx.beginPath();
-    for (let x = 0; x < w; x += 64) {
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
-    }
-    for (let y = 0; y < h; y += 64) {
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-    }
+    ctx.roundRect(boxX, questionY, boxW, questionH, 18);
+    ctx.fill();
+    ctx.strokeStyle = '#E2E8F0';
+    ctx.lineWidth = 3;
     ctx.stroke();
 
-    // ================= MOBILE PORTRAIT SAFE CONTENT BOUNDS =================
-    // Camera in 9:16 portrait views the central ~65% of the 9m wide board
-    const safeX = 360;
-    const safeW = 1328;
+    // Category / Level Badge (Centered at top of Question Box)
+    const categoryText = `⚡ ${quiz.groupName ? quiz.groupName.toUpperCase() : (quiz.category ? quiz.category.toUpperCase() : 'VOCABULARY')} • CÂU ${quiz.quizNumber || 1}/${quiz.totalQuizzes || 12}`;
+    ctx.font = '700 24px "Be Vietnam Pro", sans-serif';
+    const catMetrics = ctx.measureText(categoryText);
+    const catPillW = Math.max(500, catMetrics.width + 48);
+    const catPillH = 38;
+    const catPillX = w / 2 - catPillW / 2;
+    const catPillY = questionY + 16;
 
-    // Content Outer Border (Glowing Green on Reveal, Royal Blue on Idle)
-    ctx.strokeStyle = status === 'REVEAL' ? BRAND_COLORS.semanticGreen : BRAND_COLORS.primary;
-    ctx.lineWidth = 6;
-    ctx.strokeRect(safeX, 15, safeW, h - 30);
-
-    // 2. Header Bar
-    ctx.fillStyle = BRAND_COLORS.primaryDark;
-    ctx.fillRect(safeX + 10, 25, safeW - 20, 85);
-
-    // Live Status Pulse Dot
-    ctx.fillStyle = status === 'REVEAL' ? BRAND_COLORS.semanticGreen : BRAND_COLORS.accentAmber;
+    ctx.fillStyle = BRAND_COLORS.primaryLight; // #EEF6FF
     ctx.beginPath();
-    ctx.arc(safeX + 45, 68, 12, 0, Math.PI * 2);
+    ctx.roundRect(catPillX, catPillY, catPillW, catPillH, 10);
     ctx.fill();
+    ctx.strokeStyle = '#BFDBFE';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
 
-    // Quiz Category / Title (Montserrat Bold)
-    ctx.font = '800 32px "Montserrat", "Be Vietnam Pro", sans-serif';
-    ctx.fillStyle = BRAND_COLORS.textInverse;
-    ctx.fillText('⚡ ' + quiz.title.toUpperCase(), safeX + 72, 78);
+    ctx.fillStyle = BRAND_COLORS.primary;
+    ctx.textAlign = 'center';
+    ctx.fillText(categoryText, w / 2, catPillY + 26);
 
-    // Status Pill on Right of Safe Header (Be Vietnam Pro SemiBold)
-    ctx.font = '600 24px "Be Vietnam Pro", monospace';
-    ctx.fillStyle = status === 'REVEAL' ? BRAND_COLORS.glowGreen : BRAND_COLORS.primaryLight;
-    const statusText =
-      status === 'RUNNING'
-        ? '🏃 ĐANG CHẠY ĐUA CHỌN Ô...'
-        : status === 'THINKING'
-        ? '🤔 ĐANG CÂN NHẮC ĐÁP ÁN...'
-        : status === 'REVEAL'
-        ? '🎉 CÔNG BỐ: Ô A ĐÚNG!'
-        : status === 'PRESENTING'
-        ? '🎤 HỌC SINH ĐANG LÊN BẢNG'
-        : '⚡ SẴN SÀNG - CHỜ BẮT ĐẦU';
-    ctx.fillText(statusText, safeX + safeW - 440, 77);
+    // Question Prompt (e.g. "CHOOSE THE CLOSEST SYNONYM FOR:")
+    ctx.font = '700 36px "Be Vietnam Pro", sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.fillText(quiz.question, w / 2, questionY + 98);
 
-    // 3. Question & Code Box
-    const boxX = safeX + 25;
-    const boxW = safeW - 50;
+    // Target Word (e.g. "METICULOUS" - Giant bold brand headline)
+    const target = quiz.targetWord || quiz.title || 'METICULOUS';
+    ctx.font = '900 64px "Montserrat", "Be Vietnam Pro", sans-serif';
+    ctx.fillStyle = BRAND_COLORS.primary;
+    ctx.fillText(target, w / 2, questionY + 165);
 
-    ctx.fillStyle = '#020617';
-    ctx.fillRect(boxX, 125, boxW, 250);
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 2.5;
-    ctx.strokeRect(boxX, 125, boxW, 250);
+    // Context Sentence (Optional subtle example sentence)
+    if (quiz.contextSentence) {
+      ctx.font = '500 26px "Be Vietnam Pro", sans-serif';
+      ctx.fillStyle = '#64748B';
+      ctx.fillText(quiz.contextSentence, w / 2, questionY + 204);
+    }
+    ctx.textAlign = 'start';
 
-    // Question Label (Be Vietnam Pro SemiBold)
-    ctx.font = '600 30px "Be Vietnam Pro", sans-serif';
-    ctx.fillStyle = '#cbd5e1';
-    ctx.fillText(quiz.question, boxX + 28, 172);
+    // 3. 4 Option Cards (A, B, C, D) - ĐÁP ÁN CĂN GIỮA TUYỆT ĐỐI (Chiều cao 595px)
+    const cardGap = 20;
+    const cardW = (boxW - 3 * cardGap) / 4; // ~442px each
+    const cardY = 262;
+    const cardH = 595;
 
-    // Code Snippet Box
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(boxX + 25, 200, boxW - 50, 145);
-    ctx.strokeStyle = '#1e293b';
-    ctx.strokeRect(boxX + 25, 200, boxW - 50, 145);
-
-    ctx.font = '700 50px "Courier New", monospace';
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('>', boxX + 50, 290);
-    ctx.fillStyle = '#60a5fa';
-    ctx.fillText('console', boxX + 90, 290);
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillText('.', boxX + 280, 290);
-    ctx.fillStyle = BRAND_COLORS.accentAmber;
-    ctx.fillText('log', boxX + 300, 290);
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillText('(', boxX + 380, 290);
-    ctx.fillStyle = '#c084fc';
-    ctx.fillText('typeof', boxX + 410, 290);
-    ctx.fillStyle = BRAND_COLORS.semanticGreen;
-    ctx.fillText(' NaN', boxX + 580, 290);
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillText(');', boxX + 705, 290);
-
-    // 4. 4 Option Cards (A, B, C, D) using Brand Palette
-    const cardGap = 16;
-    const cardW = (boxW - 3 * cardGap) / 4;
-    const cardY = 395;
-    const cardH = 265;
-
-    // Brand color mapping for options
-    const optionColorMap: Record<string, string> = {
-      A: BRAND_COLORS.accentAmber,   // #F08806
-      B: BRAND_COLORS.primary,       // #1F3EB7
-      C: BRAND_COLORS.semanticGreen, // #059669
-      D: BRAND_COLORS.semanticRed,   // #DC2626
+    // Pastel Theme tokens cho từng ô lựa chọn
+    const pastelOptionThemes: Record<
+      string,
+      {
+        bg: string;
+        border: string;
+        badgeBg: string;
+        codeText: string;
+      }
+    > = {
+      A: {
+        bg: '#FFFBEB',
+        border: '#FCD34D',
+        badgeBg: BRAND_COLORS.accentAmber,
+        codeText: '#92400E',
+      },
+      B: {
+        bg: '#EFF6FF',
+        border: '#93C5FD',
+        badgeBg: BRAND_COLORS.primary,
+        codeText: '#1E40AF',
+      },
+      C: {
+        bg: '#ECFDF5',
+        border: '#6EE7B7',
+        badgeBg: BRAND_COLORS.semanticGreen,
+        codeText: '#065F46',
+      },
+      D: {
+        bg: '#FEF2F2',
+        border: '#FCA5A5',
+        badgeBg: BRAND_COLORS.semanticRed,
+        codeText: '#991B1B',
+      },
     };
 
     quiz.options.forEach((opt, idx) => {
       const cardX = boxX + idx * (cardW + cardGap);
+      const centerX = cardX + cardW / 2;
       const isCorrect = status === 'REVEAL' && opt.id === quiz.correctOption;
       const isWrong = status === 'REVEAL' && opt.id !== quiz.correctOption;
-      const optBrandColor = optionColorMap[opt.id] || BRAND_COLORS.primary;
+      const theme = pastelOptionThemes[opt.id] || pastelOptionThemes.A;
 
-      // Card Background
-      ctx.fillStyle = isCorrect ? '#064e3b' : '#0f172a';
-      ctx.fillRect(cardX, cardY, cardW, cardH);
+      // Card Background (Light pastel tone, highlight bright mint on reveal correct)
+      ctx.fillStyle = isCorrect ? '#D1FAE5' : isWrong ? '#F8FAFC' : theme.bg;
+      ctx.beginPath();
+      ctx.roundRect(cardX, cardY, cardW, cardH, 20);
+      ctx.fill();
 
       // Card Border
       ctx.strokeStyle = isCorrect
-        ? BRAND_COLORS.glowGreen
+        ? BRAND_COLORS.semanticGreen
         : isWrong
-        ? '#1e293b'
-        : optBrandColor;
-      ctx.lineWidth = isCorrect ? 7 : 3.5;
-      ctx.strokeRect(cardX, cardY, cardW, cardH);
+        ? '#E2E8F0'
+        : theme.border;
+      ctx.lineWidth = isCorrect ? 8 : isWrong ? 2 : 4;
+      ctx.stroke();
 
-      // Option Letter Badge (Montserrat 800)
-      ctx.fillStyle = optBrandColor;
+      // 1. Option Letter Badge (Montserrat 900, Giant 54px font - CĂN GIỮA)
+      const badgeSize = 88;
+      const badgeX = centerX - badgeSize / 2;
+      const badgeY = cardY + 36;
+
+      ctx.fillStyle = isWrong ? '#94A3B8' : isCorrect ? BRAND_COLORS.semanticGreen : theme.badgeBg;
       ctx.beginPath();
-      ctx.roundRect(cardX + 20, cardY + 20, 60, 60, 14);
+      ctx.roundRect(badgeX, badgeY, badgeSize, badgeSize, 18);
       ctx.fill();
 
-      ctx.font = '800 38px "Montserrat", "Be Vietnam Pro", monospace';
-      ctx.fillStyle = BRAND_COLORS.textInverse;
-      ctx.fillText(opt.id, cardX + 37, cardY + 64);
+      ctx.font = '900 56px "Montserrat", "Be Vietnam Pro", monospace';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.fillText(opt.id, centerX, badgeY + 64);
 
-      // Option Value (Fira Code / Monospace)
-      ctx.font = '700 38px "Courier New", monospace';
-      ctx.fillStyle = isWrong ? BRAND_COLORS.textMuted : BRAND_COLORS.textInverse;
-      ctx.fillText(opt.code, cardX + 22, cardY + 155);
+      // 2. Main Vocab Word (Extra Large 52px - CĂN GIỮA)
+      const wordText = opt.word || opt.code || '';
+      ctx.font = '800 52px "Be Vietnam Pro", "Montserrat", sans-serif';
+      ctx.fillStyle = isCorrect ? '#065F46' : isWrong ? '#94A3B8' : theme.codeText;
+      ctx.fillText(wordText, centerX, cardY + 205);
 
-      // Correct Badge if Revealed (Be Vietnam Pro Bold)
+      // 3. Phonetics IPA (32px Monospace - CĂN GIỮA)
+      if (opt.ipa) {
+        ctx.font = '500 32px "Be Vietnam Pro", monospace';
+        ctx.fillStyle = isWrong ? '#CBD5E1' : '#64748B';
+        ctx.fillText(opt.ipa, centerX, cardY + 270);
+      }
+
+      // 4. Vietnamese Meaning (30px SemiBold - CĂN GIỮA)
+      if (opt.meaning) {
+        ctx.font = '600 30px "Be Vietnam Pro", sans-serif';
+        ctx.fillStyle = isWrong ? '#CBD5E1' : '#334155';
+        ctx.fillText(opt.meaning, centerX, cardY + 340);
+      }
+
+      // 5. Correct Celebration Banner if Revealed (CĂN GIỮA ĐÁY THẺ)
       if (isCorrect) {
+        const bannerW = cardW - 56;
+        const bannerH = 70;
+        const bannerX = centerX - bannerW / 2;
+        const bannerY = cardY + 480;
+
         ctx.fillStyle = BRAND_COLORS.semanticGreen;
         ctx.beginPath();
-        ctx.roundRect(cardX + 16, cardY + 195, cardW - 32, 48, 10);
+        ctx.roundRect(bannerX, bannerY, bannerW, bannerH, 16);
         ctx.fill();
 
-        ctx.font = '700 24px "Be Vietnam Pro", sans-serif';
-        ctx.fillStyle = BRAND_COLORS.textInverse;
-        ctx.fillText('✓ ĐÁP ÁN ĐÚNG!', cardX + cardW / 2 - 95, cardY + 228);
+        ctx.font = '800 30px "Be Vietnam Pro", sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('✓ ĐÁP ÁN ĐÚNG!', centerX, bannerY + 45);
       }
+      ctx.textAlign = 'start';
     });
-
-    // 5. Footer Explanation Banner with Brand Marker Highlighter
-    ctx.fillStyle = status === 'REVEAL' ? '#064e3b' : '#0f172a';
-    ctx.fillRect(boxX, 680, boxW, 150);
-    ctx.strokeStyle = status === 'REVEAL' ? BRAND_COLORS.semanticGreen : '#1e293b';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(boxX, 680, boxW, 150);
-
-    // Marker Badge Label
-    ctx.fillStyle = BRAND_COLORS.markerBg;
-    ctx.beginPath();
-    ctx.roundRect(boxX + 24, 702, 170, 36, 8);
-    ctx.fill();
-
-    ctx.font = '700 22px "Be Vietnam Pro", sans-serif';
-    ctx.fillStyle = BRAND_COLORS.markerText;
-    ctx.fillText('💡 GIẢI THÍCH', boxX + 40, 727);
-
-    // Explanation Body Text (Be Vietnam Pro Regular)
-    ctx.font = '500 25px "Be Vietnam Pro", sans-serif';
-    ctx.fillStyle = BRAND_COLORS.textInverse;
-    const explanationText =
-      status === 'REVEAL'
-        ? quiz.explanation
-        : 'Hãy quan sát 4 học sinh chạy về ô tương ứng và chọn đáp án trước khi hết giờ!';
-    ctx.fillText(explanationText, boxX + 24, 775);
 
     texture.needsUpdate = true;
   }, [quiz, status, canvas, texture]);

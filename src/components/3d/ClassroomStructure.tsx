@@ -159,7 +159,7 @@ export function ClassroomStructure() {
         {/* Vast Pristine Slate / Smartboard Writing Surface (Huge TikTok Content Space) */}
         <mesh position={[0, 0, 0.032]} receiveShadow>
           <planeGeometry args={[9.0, 3.84]} />
-          <meshStandardMaterial color="#0b1120" roughness={0.85} metalness={0.05} />
+          <meshStandardMaterial color="#FAF7F2" roughness={0.85} metalness={0.05} />
         </mesh>
 
         {/* Minimalist Slim Aluminum Accessory / Stylus Ledge at Bottom */}

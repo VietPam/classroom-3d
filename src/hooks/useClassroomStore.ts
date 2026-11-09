@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type {
   StudentData,
   QuizData,
@@ -6,31 +6,38 @@ import type {
   CharacterState,
 } from '../types/classroom';
 import { STUDENTS_DATA } from '../data/students';
-import { QUIZ_ZONES, PODIUM_POSITION } from '../data/floorZones';
+import { QUIZ_ZONES } from '../data/floorZones';
 import { audioEngine } from '../audio/audioEngine';
+import {
+  getQuizPlaylist,
+  getQuizByIndex,
+  getTotalQuizCount,
+} from '../config/quizConfig';
 
-export const DEFAULT_QUIZ: QuizData = {
-  title: 'JavaScript Quiz Race',
-  question: 'Trong JavaScript, kết quả của biểu thức sau là gì?',
-  codeSnippet: 'typeof NaN',
-  options: [
-    { id: 'A', label: 'Đáp án A', code: '"number"', isCorrect: true },
-    { id: 'B', label: 'Đáp án B', code: '"NaN"', isCorrect: false },
-    { id: 'C', label: 'Đáp án C', code: '"undefined"', isCorrect: false },
-    { id: 'D', label: 'Đáp án D', code: '"object"', isCorrect: false },
-  ],
-  correctOption: 'A',
-  explanation: 'NaN là viết tắt của "Not-a-Number", nhưng theo chuẩn IEEE 754 trong JS, kiểu dữ liệu của nó vẫn là "number".',
-};
+// Slot offsets bên trong mỗi ô đáp án phóng to (1.4m x 1.8m)
+// Giúp 2 đến 4 học sinh cùng đứng chung một ô mà không bị đè người
+const ZONE_SLOT_OFFSETS: [number, number, number][] = [
+  [-0.32, 0, 0.25],
+  [0.32, 0, 0.25],
+  [-0.32, 0, -0.10],
+  [0.32, 0, -0.10],
+];
 
 export interface ClassroomStore {
   students: StudentData[];
   quiz: QuizData;
   quizStatus: QuizStatus;
   cameraResetCount: number;
+  isAutoPlay: boolean;
+  activeGroupId: string;
+  quizIndex: number;
+  totalQuizzes: number;
+  toggleAutoPlay: () => void;
+  nextQuiz: () => void;
+  prevQuiz: () => void;
+  selectGroup: (groupId: string) => void;
   resetCamera: () => void;
   startQuizShowdown: () => void;
-  callStudentToBoard: (studentId?: string) => void;
   resetAllToSpawn: () => void;
   celebrateAll: () => void;
 }
@@ -43,11 +50,36 @@ export function useClassroomStore(): ClassroomStore {
       currentState: 'IDLE' as CharacterState,
     }))
   );
-  const [quiz] = useState<QuizData>(DEFAULT_QUIZ);
+
+  const [activeGroupId, setActiveGroupId] = useState<string>('all');
+  const [quizIndex, setQuizIndex] = useState<number>(0);
+  const [isAutoPlay, setIsAutoPlay] = useState<boolean>(true);
   const [quizStatus, setQuizStatus] = useState<QuizStatus>('IDLE');
   const [cameraResetCount, setCameraResetCount] = useState<number>(0);
 
+  // Sync refs to avoid stale closure issues in continuous loop timers
+  const activeGroupIdRef = useRef(activeGroupId);
+  const quizIndexRef = useRef(quizIndex);
+  const isAutoPlayRef = useRef(isAutoPlay);
+  const quizStatusRef = useRef(quizStatus);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const startQuizShowdownRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    activeGroupIdRef.current = activeGroupId;
+  }, [activeGroupId]);
+
+  useEffect(() => {
+    quizIndexRef.current = quizIndex;
+  }, [quizIndex]);
+
+  useEffect(() => {
+    isAutoPlayRef.current = isAutoPlay;
+  }, [isAutoPlay]);
+
+  useEffect(() => {
+    quizStatusRef.current = quizStatus;
+  }, [quizStatus]);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((t) => clearTimeout(t));
@@ -58,7 +90,18 @@ export function useClassroomStore(): ClassroomStore {
     setCameraResetCount((c) => c + 1);
   }, []);
 
-  // 1. Kịch bản: Bắt đầu Cuộc đua Quiz (Quiz Showdown)
+  // Get current active quiz item
+  const currentRawQuiz = getQuizByIndex(quizIndex, activeGroupId);
+  const totalQuizzes = getTotalQuizCount(activeGroupId);
+
+  const quiz: QuizData = {
+    ...currentRawQuiz,
+    quizNumber: quizIndex + 1,
+    totalQuizzes,
+  };
+
+  // Kịch bản: Bắt đầu Cuộc đua Quiz (Quiz Showdown)
+  // Phân bổ tự nhiên: 2 bạn chọn đúng (đứng chung ô), 2 bạn chọn 2 đáp án sai khác nhau
   const startQuizShowdown = useCallback(() => {
     clearTimers();
     setQuizStatus('RUNNING');
@@ -66,15 +109,40 @@ export function useClassroomStore(): ClassroomStore {
     // SFX: Tiếng vút gió xuất phát
     audioEngine.playSFX('whoosh_fast');
 
-    // Phân công 4 học sinh chạy về 4 ô A, B, C, D
+    const targetQuiz = getQuizByIndex(quizIndexRef.current, activeGroupIdRef.current);
+    const correct = targetQuiz.correctOption;
+    const allOptions: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
+    const wrongOptions = allOptions.filter((opt) => opt !== correct);
+
+    // Phân bổ 4 học sinh: 2 bạn chọn đúng, 2 bạn chia về 2 ô sai
+    const choices: ('A' | 'B' | 'C' | 'D')[] = [
+      correct,
+      correct,
+      wrongOptions[0] || 'B',
+      wrongOptions[1] || 'C',
+    ];
+
+    const zoneSlotCounts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+
     setStudents((prev) =>
       prev.map((student, idx) => {
-        const zone = QUIZ_ZONES[idx % QUIZ_ZONES.length];
+        const chosen = choices[idx % choices.length];
+        const slotIdx = zoneSlotCounts[chosen]++;
+        const offset = ZONE_SLOT_OFFSETS[slotIdx % ZONE_SLOT_OFFSETS.length];
+        const zone = QUIZ_ZONES.find((z) => z.id === chosen) || QUIZ_ZONES[0];
+
+        // Tọa độ mục tiêu kết hợp offset vị trí trong ô
+        const targetPos: [number, number, number] = [
+          zone.position[0] + offset[0],
+          zone.position[1] + offset[1],
+          zone.position[2] + offset[2],
+        ];
+
         return {
           ...student,
-          targetPosition: zone.position,
+          targetPosition: targetPos,
           currentState: 'WALKING',
-          chosenOption: zone.id,
+          chosenOption: chosen,
         };
       })
     );
@@ -85,8 +153,8 @@ export function useClassroomStore(): ClassroomStore {
     }, 400);
     timersRef.current.push(footstepTimer);
 
-    // Giai đoạn 2: Đến nơi, đứng suy nghĩ đắn đo
-    const timer1 = setTimeout(() => {
+    // Giai đoạn 2: Đến nơi, đứng suy nghĩ đắn đo (1.8s)
+    const thinkingTimer = setTimeout(() => {
       setQuizStatus('THINKING');
       audioEngine.playSFX('cat_huh');
       setStudents((prev) =>
@@ -96,10 +164,10 @@ export function useClassroomStore(): ClassroomStore {
         }))
       );
     }, 1800);
-    timersRef.current.push(timer1);
+    timersRef.current.push(thinkingTimer);
 
-    // Giai đoạn 3: Bảng công bố kết quả (Reveal)
-    const timer2 = setTimeout(() => {
+    // Giai đoạn 3: Bảng công bố kết quả (Reveal - 3.6s)
+    const revealTimer = setTimeout(() => {
       setQuizStatus('REVEAL');
 
       // Auto-duck BGM và phát chuông báo đúng
@@ -117,60 +185,66 @@ export function useClassroomStore(): ClassroomStore {
 
       setStudents((prev) =>
         prev.map((student) => {
-          const isWinner = student.chosenOption === DEFAULT_QUIZ.correctOption;
+          const isWinner = student.chosenOption === targetQuiz.correctOption;
           return {
             ...student,
             currentState: isWinner ? 'CELEBRATING' : 'SAD',
           };
         })
       );
-    }, 3800);
-    timersRef.current.push(timer2);
-  }, [clearTimers]);
 
-  // 2. Kịch bản: Gọi học sinh lên bục trước bảng thuyết trình (Call to Board)
-  const callStudentToBoard = useCallback((studentId = 's1') => {
-    clearTimers();
-    setQuizStatus('PRESENTING');
+      // Giai đoạn 4: Vòng lặp phát câu hỏi liên tục (Continuous Live Loop)
+      // Nếu isAutoPlay bật: sau 3.5s công bố kết quả -> chuyển sang câu tiếp theo
+      const autoNextTimer = setTimeout(() => {
+        if (!isAutoPlayRef.current) return;
 
-    // SFX: Tiếng vút gió bắt đầu chạy lên
-    audioEngine.playSFX('whoosh_fast');
-
-    setStudents((prev) =>
-      prev.map((student) => {
-        if (student.id === studentId) {
-          return {
+        // Đưa học sinh về vạch xuất phát
+        audioEngine.playSFX('card_slide');
+        setQuizStatus('IDLE');
+        setStudents((prev) =>
+          prev.map((student) => ({
             ...student,
-            targetPosition: PODIUM_POSITION,
+            targetPosition: student.deskPosition,
             currentState: 'WALKING',
-          };
-        }
-        return {
-          ...student,
-          currentState: 'IDLE',
-        };
-      })
-    );
+            chosenOption: undefined,
+          }))
+        );
 
-    // Đến bục giảng thì rung chuông lễ tân bắt đầu thuyết trình
-    const timer = setTimeout(() => {
-      audioEngine.playSFX('ding_bell');
-      setStudents((prev) =>
-        prev.map((student) => {
-          if (student.id === studentId) {
-            return {
+        // Chuyển chỉ mục câu hỏi tiếp theo
+        const playlist = getQuizPlaylist(activeGroupIdRef.current);
+        const nextIdx = (quizIndexRef.current + 1) % playlist.length;
+        quizIndexRef.current = nextIdx;
+        setQuizIndex(nextIdx);
+
+        // Sau 1.4s về chỗ, học sinh đứng nghiêm túc đọc đề mới
+        const readyTimer = setTimeout(() => {
+          setStudents((prev) =>
+            prev.map((student) => ({
               ...student,
-              currentState: 'PRESENTING',
-            };
+              currentState: 'IDLE',
+            }))
+          );
+        }, 1400);
+        timersRef.current.push(readyTimer);
+
+        // Sau 2.8s đọc đề mới, tự động chạy vòng showdown tiếp theo!
+        const nextShowdownTimer = setTimeout(() => {
+          if (isAutoPlayRef.current) {
+            startQuizShowdownRef.current();
           }
-          return student;
-        })
-      );
-    }, 1800);
-    timersRef.current.push(timer);
+        }, 2800);
+        timersRef.current.push(nextShowdownTimer);
+      }, 3600);
+      timersRef.current.push(autoNextTimer);
+    }, 3600);
+    timersRef.current.push(revealTimer);
   }, [clearTimers]);
 
-  // 3. Kịch bản: Quay về vị trí xuất phát ban đầu
+  useEffect(() => {
+    startQuizShowdownRef.current = startQuizShowdown;
+  }, [startQuizShowdown]);
+
+  // Kịch bản: Quay về vị trí xuất phát ban đầu
   const resetAllToSpawn = useCallback(() => {
     clearTimers();
     setQuizStatus('IDLE');
@@ -192,11 +266,11 @@ export function useClassroomStore(): ClassroomStore {
           currentState: 'IDLE',
         }))
       );
-    }, 1800);
+    }, 1400);
     timersRef.current.push(timer);
   }, [clearTimers]);
 
-  // 4. Cả lớp nhảy múa ăn mừng
+  // Cả lớp nhảy múa ăn mừng
   const celebrateAll = useCallback(() => {
     clearTimers();
     audioEngine.playSFX('coin_reward');
@@ -213,14 +287,113 @@ export function useClassroomStore(): ClassroomStore {
     );
   }, [clearTimers]);
 
+  // Chuyển sang câu hỏi tiếp theo
+  const nextQuiz = useCallback(() => {
+    clearTimers();
+    resetAllToSpawn();
+    const playlist = getQuizPlaylist(activeGroupIdRef.current);
+    const nextIdx = (quizIndexRef.current + 1) % playlist.length;
+    quizIndexRef.current = nextIdx;
+    setQuizIndex(nextIdx);
+
+    // Nếu đang bật Auto Play, lên lịch chạy sau khi đọc đề 2.8s
+    if (isAutoPlayRef.current) {
+      const autoTimer = setTimeout(() => {
+        startQuizShowdown();
+      }, 2800);
+      timersRef.current.push(autoTimer);
+    }
+  }, [clearTimers, resetAllToSpawn, startQuizShowdown]);
+
+  // Quay lại câu hỏi trước
+  const prevQuiz = useCallback(() => {
+    clearTimers();
+    resetAllToSpawn();
+    const playlist = getQuizPlaylist(activeGroupIdRef.current);
+    const prevIdx = (quizIndexRef.current - 1 + playlist.length) % playlist.length;
+    quizIndexRef.current = prevIdx;
+    setQuizIndex(prevIdx);
+
+    if (isAutoPlayRef.current) {
+      const autoTimer = setTimeout(() => {
+        startQuizShowdown();
+      }, 2800);
+      timersRef.current.push(autoTimer);
+    }
+  }, [clearTimers, resetAllToSpawn, startQuizShowdown]);
+
+  // Bật/Tắt chế độ tự động chạy liên tục (Continuous Auto-Play)
+  const toggleAutoPlay = useCallback(() => {
+    setIsAutoPlay((prev) => {
+      const nextState = !prev;
+      isAutoPlayRef.current = nextState;
+
+      if (nextState) {
+        // Nếu vừa bật lại, kích hoạt showdown câu hiện tại sau 1s
+        clearTimers();
+        resetAllToSpawn();
+        const autoTimer = setTimeout(() => {
+          startQuizShowdown();
+        }, 1500);
+        timersRef.current.push(autoTimer);
+      } else {
+        // Tắt auto play: giữ nguyên trạng thái hiện tại, dừng lịch trình tự động chuyển câu
+        clearTimers();
+      }
+
+      return nextState;
+    });
+  }, [clearTimers, resetAllToSpawn, startQuizShowdown]);
+
+  // Chọn nhóm câu hỏi (Tất cả / Đồng nghĩa / Trái nghĩa / Điền từ)
+  const selectGroup = useCallback(
+    (groupId: string) => {
+      clearTimers();
+      setActiveGroupId(groupId);
+      activeGroupIdRef.current = groupId;
+      setQuizIndex(0);
+      quizIndexRef.current = 0;
+      resetAllToSpawn();
+
+      if (isAutoPlayRef.current) {
+        const autoTimer = setTimeout(() => {
+          startQuizShowdown();
+        }, 2200);
+        timersRef.current.push(autoTimer);
+      }
+    },
+    [clearTimers, resetAllToSpawn, startQuizShowdown]
+  );
+
+  // Khởi động vòng lặp tự động lần đầu tiên khi ứng dụng mở
+  useEffect(() => {
+    const initialTimer = setTimeout(() => {
+      if (isAutoPlayRef.current) {
+        startQuizShowdown();
+      }
+    }, 2500);
+    timersRef.current.push(initialTimer);
+
+    return () => {
+      clearTimers();
+    };
+  }, [clearTimers, startQuizShowdown]);
+
   return {
     students,
     quiz,
     quizStatus,
     cameraResetCount,
+    isAutoPlay,
+    activeGroupId,
+    quizIndex,
+    totalQuizzes,
+    toggleAutoPlay,
+    nextQuiz,
+    prevQuiz,
+    selectGroup,
     resetCamera,
     startQuizShowdown,
-    callStudentToBoard,
     resetAllToSpawn,
     celebrateAll,
   };
