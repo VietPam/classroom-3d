@@ -14,24 +14,24 @@ export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
 
   const isPortrait = size.width < size.height;
   const initialCamPos = useRef(
-    isPortrait ? new THREE.Vector3(0, 2.4, -5.8) : new THREE.Vector3(0, 2.3, -5.5)
+    isPortrait ? new THREE.Vector3(0, 2.2, -6.8) : new THREE.Vector3(0, 2.2, -6.2)
   );
-  const initialTarget = useRef(new THREE.Vector3(0, 1.9, 2.5));
+  const initialTarget = useRef(new THREE.Vector3(0, 0.7, 1.8));
 
   // Responsive camera setup on mount & resize
   useEffect(() => {
     const isPortrait = size.width < size.height;
     if (isPortrait) {
-      initialCamPos.current.set(0, 2.4, -5.8);
-      initialTarget.current.set(0, 1.9, 2.5);
+      initialCamPos.current.set(0, 2.2, -6.8);
+      initialTarget.current.set(0, 0.7, 1.8);
     } else {
-      initialCamPos.current.set(0, 2.3, -5.5);
-      initialTarget.current.set(0, 1.9, 2.5);
+      initialCamPos.current.set(0, 2.2, -6.2);
+      initialTarget.current.set(0, 0.7, 1.8);
     }
 
     if ('isPerspectiveCamera' in camera && (camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
       const persCamera = camera as THREE.PerspectiveCamera;
-      const targetFov = isPortrait ? 64 : 52;
+      const targetFov = isPortrait ? 66 : 52;
       if (Math.abs(persCamera.fov - targetFov) > 0.5) {
         persCamera.fov = targetFov;
         persCamera.updateProjectionMatrix();
