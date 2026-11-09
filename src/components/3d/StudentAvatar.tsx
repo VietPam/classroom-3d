@@ -41,9 +41,9 @@ export function StudentAvatar({
 
   // Desk coordinates
   const [dx, , dz] = data.deskPosition;
-  const seatPos: [number, number, number] = [dx, 0, dz - 0.38];
-  const aislePos: [number, number, number] = [0, 0, dz - 0.38];
-  const teacherDeskPos: [number, number, number] = [0, 0, 3.15];
+  const seatPos: [number, number, number] = [dx, 0, dz - 0.26];
+  const aislePos: [number, number, number] = [0, 0, dz - 0.26];
+  const teacherDeskPos: [number, number, number] = data.submissionWaypoint || [0, 0, 2.4];
 
   // Warm Stylized Capybara Color Palette
   const furColor = data.capybaraTone || data.skinTone || '#9d633b';
@@ -234,19 +234,21 @@ export function StudentAvatar({
       const t = Math.min(1, progressRef.current);
 
       rootGroupRef.current.position.set(0, 0, teacherDeskPos[2]);
-      rootGroupRef.current.rotation.set(0, 0, 0);
+      // Smoothly rotate 180 degrees to face forward toward camera/classroom (matching IMG_3190)
+      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI, Math.min(1, t * 2.5));
 
-      // Cute polite bow and extend paper to teacher
+      // Proud chibi pose holding certificate/paper with both paws
       const reachProgress = Math.sin(t * Math.PI);
-      if (rightArmRef.current) {
-        rightArmRef.current.rotation.set(-0.85 * reachProgress, 0, 0.05);
+      if (leftArmRef.current && rightArmRef.current) {
+        leftArmRef.current.rotation.set(-0.62, 0, -0.22);
+        rightArmRef.current.rotation.set(-0.62, 0, 0.22);
       }
       if (torsoRef.current) {
-        torsoRef.current.rotation.x = reachProgress * 0.22;
+        torsoRef.current.rotation.x = reachProgress * 0.08;
         torsoRef.current.position.y = 0.46;
       }
       if (headRef.current) {
-        headRef.current.rotation.x = reachProgress * 0.28;
+        headRef.current.rotation.x = -0.05 + reachProgress * 0.06;
       }
 
       if (t >= 1) {
@@ -261,12 +263,15 @@ export function StudentAvatar({
       const t = Math.min(1, progressRef.current);
 
       rootGroupRef.current.position.set(0, 0, teacherDeskPos[2]);
-      // Smoothly rotate 180 degrees to face back toward desks (-Z)
-      rootGroupRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI, t);
+      // Student is already facing the classroom (-Z)
+      rootGroupRef.current.rotation.y = Math.PI;
 
       // Reset arm posture
       if (rightArmRef.current) {
         rightArmRef.current.rotation.set(0, 0, 0);
+      }
+      if (leftArmRef.current) {
+        leftArmRef.current.rotation.set(0, 0, 0);
       }
       if (torsoRef.current) {
         torsoRef.current.rotation.set(0, 0, 0);
@@ -396,6 +401,7 @@ export function StudentAvatar({
   return (
     <group
       ref={rootGroupRef}
+      scale={[0.62, 0.62, 0.62]}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();

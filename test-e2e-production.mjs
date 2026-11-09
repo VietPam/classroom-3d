@@ -84,18 +84,18 @@ async function runE2ETest() {
     // 3. Header & HUD inspection
     console.log('\n--- 3. Kiểm tra giao diện giáo viên (Teacher HUD) ---');
     const headerText = await page.$eval('header', (el) => el.innerText);
-    const hasHeaderTitle = headerText.includes('Math 301') || headerText.includes('Live Simulation');
+    const hasHeaderTitle = headerText.includes('IELTS 301') || headerText.includes('Math 301');
     record('Kiểm tra Header HUD & Thông tin bài thi', hasHeaderTitle);
 
     const hasTimer = headerText.includes('Time Left:');
     record('Kiểm tra Đồng hồ đếm ngược (Exam Timer)', hasTimer);
 
-    const hasCounter = headerText.includes('Handed In:') && headerText.includes('0 / 12');
-    record('Kiểm tra Bộ đếm bài nộp ban đầu (0 / 12)', hasCounter);
+    const hasCounter = headerText.includes('Handed In:') && headerText.includes('0 / 9');
+    record('Kiểm tra Bộ đếm bài nộp ban đầu (0 / 9)', hasCounter);
 
     // 4. Test Camera Switch
     console.log('\n--- 4. Kiểm tra chuyển đổi góc nhìn Camera ---');
-    // Find button containing Overview Orbit
+    // Find button containing Overview Orbit or Toàn Cảnh
     const buttons = await page.$$('button');
     let overviewBtn = null;
     let teacherPovBtn = null;
@@ -103,19 +103,19 @@ async function runE2ETest() {
 
     for (const b of buttons) {
       const text = await page.evaluate((el) => el.innerText, b);
-      if (text.includes('Overview Orbit')) overviewBtn = b;
-      if (text.includes('Teacher POV')) teacherPovBtn = b;
-      if (text.includes('Call Random Student')) randomBtn = b;
+      if (text.includes('Toàn Cảnh') || text.includes('Overview')) overviewBtn = b;
+      if (text.includes('Góc Lên Bảng') || text.includes('Teacher POV')) teacherPovBtn = b;
+      if (text.includes('Call Random')) randomBtn = b;
     }
 
     if (overviewBtn && teacherPovBtn) {
       await overviewBtn.click();
       await new Promise((r) => setTimeout(r, 1000));
-      record('Chuyển sang góc nhìn Overview Orbit', true);
+      record('Chuyển sang góc nhìn Toàn Cảnh Orbit', true);
 
       await teacherPovBtn.click();
       await new Promise((r) => setTimeout(r, 1000));
-      record('Chuyển lại góc nhìn Teacher POV (sau bàn giáo viên)', true);
+      record('Chuyển lại góc nhìn Góc Lên Bảng (Up-View)', true);
     } else {
       record('Kiểm tra nút chuyển Camera', false, 'Không tìm thấy đủ nút');
     }
@@ -194,10 +194,10 @@ async function runE2ETest() {
     console.log('Đang đợi học sinh bước về chỗ ngồi và hoàn tất chu trình...');
     await new Promise((r) => setTimeout(r, 6000));
 
-    // Check counter updated to 1 / 12
+    // Check counter updated to 1 / 9
     const updatedCounterText = await page.$eval('header', (el) => el.innerText);
-    const counterUpdated = updatedCounterText.includes('1 / 12');
-    record('Bộ đếm bài đã nộp cập nhật chính xác (1 / 12)', counterUpdated);
+    const counterUpdated = updatedCounterText.includes('1 / 9');
+    record('Bộ đếm bài đã nộp cập nhật chính xác (1 / 9)', counterUpdated);
 
     // Capture returned screenshot
     const returnedScreenshot = path.join(ARTIFACTS_DIR, 'e2e_prod_04_student_returned.png');
@@ -225,7 +225,7 @@ async function runE2ETest() {
       await new Promise((r) => setTimeout(r, 6000));
 
       const finalCounterText = await page.$eval('header', (el) => el.innerText);
-      record('Bộ đếm bài đã nộp cập nhật lên (2 / 12)', finalCounterText.includes('2 / 12'));
+      record('Bộ đếm bài đã nộp cập nhật lên (2 / 9)', finalCounterText.includes('2 / 9'));
     }
 
     // 9. Console Error Verification

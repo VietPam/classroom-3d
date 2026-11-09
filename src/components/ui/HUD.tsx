@@ -53,14 +53,14 @@ export function HUD({ store }: HUDProps) {
           </div>
           <div className="min-w-0">
             <h1 className="text-xs sm:text-sm font-bold text-white tracking-wide flex items-center gap-1.5 m-0 p-0 truncate">
-              <span>Math 301</span>
-              <span className="hidden sm:inline text-slate-300 font-normal">: Capybara Calculus Exam 🐾</span>
+              <span>IELTS 301</span>
+              <span className="hidden sm:inline text-slate-300 font-normal">: Chibi Capybara Classroom 🐾</span>
               <span className="text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
-                Capy Live
+                Chibi 9:16
               </span>
             </h1>
             <p className="hidden md:block text-xs text-slate-400 m-0 p-0 truncate">
-              Capybara 3D Low-Poly Classroom & Kinematics
+              Chibi Capybara Mascots & IELTS Honor Board
             </p>
           </div>
         </div>
@@ -134,7 +134,7 @@ export function HUD({ store }: HUDProps) {
                 }
               }}
               disabled={isBusy}
-              className="flex-1 sm:flex-none min-w-0 bg-slate-800 text-slate-100 text-[11px] sm:text-xs font-medium rounded-xl px-2.5 py-2 sm:px-3 sm:py-2 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-50 cursor-pointer truncate"
+              className="flex-1 sm:flex-none min-w-0 bg-slate-800 text-slate-100 text-[16px] sm:text-xs font-medium rounded-xl px-2.5 py-2 sm:px-3 sm:py-2 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-50 cursor-pointer truncate"
             >
               <option value="">Choose Student ({students.length})...</option>
               {students.map((st) => (
@@ -173,7 +173,7 @@ export function HUD({ store }: HUDProps) {
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Teacher POV</span>
+                <span>Góc Lên Bảng</span>
               </button>
               <button
                 onClick={() => setCameraMode('overview')}
@@ -184,7 +184,7 @@ export function HUD({ store }: HUDProps) {
                 }`}
               >
                 <Camera className="w-3.5 h-3.5" />
-                <span>Overview Orbit</span>
+                <span>Toàn Cảnh Orbit</span>
               </button>
             </div>
 

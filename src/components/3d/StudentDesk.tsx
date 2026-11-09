@@ -19,7 +19,7 @@ export function StudentDesk({
   const deskRef = useRef<THREE.Group>(null);
 
   return (
-    <group ref={deskRef} position={position}>
+    <group ref={deskRef} position={position} scale={[0.62, 0.62, 0.62]}>
       {/* ================= DESK TABLE ================= */}
       {/* Desk Top */}
       <mesh position={[0, 0.72, 0]} castShadow receiveShadow>

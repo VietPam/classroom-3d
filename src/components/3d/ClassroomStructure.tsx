@@ -142,37 +142,109 @@ export function ClassroomStructure() {
         </mesh>
       </group>
 
-      {/* ================= BLACKBOARD (Front Wall, Behind Teacher) ================= */}
-      <group position={[0, 2.2, 5.92]}>
-        {/* Wood frame */}
-        <mesh castShadow>
-          <boxGeometry args={[5.2, 2.0, 0.08]} />
-          <meshStandardMaterial color="#78350f" roughness={0.6} />
+      {/* ================= IELTS HONOR BOARD (Front Wall, Centerpiece behind teacher) ================= */}
+      <group position={[0, 2.25, 5.90]} rotation={[0, Math.PI, 0]}>
+        {/* Rich Walnut Wooden Frame */}
+        <mesh receiveShadow castShadow>
+          <boxGeometry args={[5.2, 2.6, 0.08]} />
+          <meshStandardMaterial color="#5c2d11" roughness={0.5} />
         </mesh>
-        {/* Slate dark green blackboard surface */}
-        <mesh position={[0, 0, -0.03]} receiveShadow>
-          <planeGeometry args={[5.0, 1.8]} />
-          <meshStandardMaterial color="#1a2e22" roughness={0.8} />
+        {/* Inner Gold Bevel Rim */}
+        <mesh position={[0, 0, 0.02]}>
+          <boxGeometry args={[5.06, 2.46, 0.06]} />
+          <meshStandardMaterial color="#d97706" metalness={0.6} roughness={0.3} />
+        </mesh>
+        {/* Dark Navy / Midnight Honor Backdrop */}
+        <mesh position={[0, 0, 0.045]} receiveShadow>
+          <planeGeometry args={[4.96, 2.36]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.6} />
         </mesh>
 
-        {/* Chalk tray */}
-        <mesh position={[0, -0.95, -0.08]}>
-          <boxGeometry args={[5.0, 0.06, 0.14]} />
-          <meshStandardMaterial color="#92400e" />
-        </mesh>
-        {/* Chalk pieces & Eraser on tray */}
-        <mesh position={[-0.6, -0.91, -0.08]}>
-          <boxGeometry args={[0.15, 0.04, 0.07]} />
-          <meshStandardMaterial color="#1e293b" />
-        </mesh>
-        <mesh position={[0.4, -0.91, -0.08]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.012, 0.012, 0.09]} />
-          <meshStandardMaterial color="#ffffff" />
-        </mesh>
-        <mesh position={[0.55, -0.91, -0.08]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.012, 0.012, 0.09]} />
-          <meshStandardMaterial color="#fef08a" />
-        </mesh>
+        {/* Top Header Banner - IELTS Official Score Board */}
+        <group position={[0, 0.98, 0.055]}>
+          <mesh>
+            <planeGeometry args={[4.6, 0.26]} />
+            <meshStandardMaterial color="#dc2626" roughness={0.3} />
+          </mesh>
+          {/* Gold Accent Ribbons */}
+          <mesh position={[0, 0.11, 0.002]}>
+            <planeGeometry args={[4.56, 0.018]} />
+            <meshBasicMaterial color="#facc15" />
+          </mesh>
+          <mesh position={[0, -0.11, 0.002]}>
+            <planeGeometry args={[4.56, 0.018]} />
+            <meshBasicMaterial color="#facc15" />
+          </mesh>
+          {/* Center Trophy / Laurel Emblem */}
+          <mesh position={[0, 0, 0.005]}>
+            <circleGeometry args={[0.075, 24]} />
+            <meshStandardMaterial color="#facc15" metalness={0.9} roughness={0.2} />
+          </mesh>
+        </group>
+
+        {/* 10 Official IELTS Test Report Forms in a 5x2 Grid (matching IMG_3190) */}
+        {[-1.8, -0.9, 0, 0.9, 1.8].map((colX, colIdx) =>
+          [0.36, -0.56].map((rowY, rowIdx) => {
+            const bands = ['8.5', '7.5', '8.0', '9.0', '8.5', '8.0', '7.5', '8.5', '8.0', '8.5'];
+            const band = bands[colIdx * 2 + rowIdx] || '8.5';
+            return (
+              <group key={`front-ielts-${colIdx}-${rowIdx}`} position={[colX, rowY, 0.055]}>
+                {/* Certificate Parchment */}
+                <mesh castShadow receiveShadow>
+                  <planeGeometry args={[0.74, 0.76]} />
+                  <meshStandardMaterial color="#fefefe" roughness={0.4} />
+                </mesh>
+                {/* Red IELTS Logo Header */}
+                <mesh position={[0, 0.30, 0.005]}>
+                  <planeGeometry args={[0.62, 0.08]} />
+                  <meshBasicMaterial color="#dc2626" />
+                </mesh>
+                {/* Candidate Photo placeholder */}
+                <mesh position={[-0.20, 0.12, 0.005]}>
+                  <planeGeometry args={[0.22, 0.22]} />
+                  <meshBasicMaterial color="#e2e8f0" />
+                </mesh>
+                {/* Score Band Badge Box */}
+                <mesh position={[0.15, 0.12, 0.005]}>
+                  <planeGeometry args={[0.32, 0.20]} />
+                  <meshBasicMaterial color="#f0f9ff" />
+                </mesh>
+                {/* Band Score Number Stamp */}
+                <mesh position={[0.15, 0.12, 0.008]}>
+                  <planeGeometry args={[0.24, 0.10]} />
+                  <meshBasicMaterial color={band === '9.0' ? '#16a34a' : '#2563eb'} />
+                </mesh>
+                {/* Form Detail Lines */}
+                <mesh position={[0, -0.06, 0.005]}>
+                  <planeGeometry args={[0.64, 0.02]} />
+                  <meshBasicMaterial color="#cbd5e1" />
+                </mesh>
+                <mesh position={[0, -0.13, 0.005]}>
+                  <planeGeometry args={[0.64, 0.02]} />
+                  <meshBasicMaterial color="#cbd5e1" />
+                </mesh>
+                <mesh position={[0, -0.20, 0.005]}>
+                  <planeGeometry args={[0.64, 0.02]} />
+                  <meshBasicMaterial color="#cbd5e1" />
+                </mesh>
+                <mesh position={[0, -0.27, 0.005]}>
+                  <planeGeometry args={[0.64, 0.02]} />
+                  <meshBasicMaterial color="#cbd5e1" />
+                </mesh>
+                {/* Official Red Stamp Seal */}
+                <mesh position={[0.22, -0.25, 0.008]}>
+                  <circleGeometry args={[0.045, 16]} />
+                  <meshBasicMaterial color="#ef4444" />
+                </mesh>
+                {/* Golden Push Pin */}
+                <mesh position={[0, 0.35, 0.012]} castShadow>
+                  <sphereGeometry args={[0.02, 14, 14]} />
+                  <meshStandardMaterial color="#facc15" metalness={0.9} roughness={0.2} />
+                </mesh>
+              </group>
+            );
+          })
+        )}
       </group>
 
       {/* ================= WALL CLOCK ================= */}
@@ -255,73 +327,35 @@ export function ClassroomStructure() {
         <meshStandardMaterial color="#475569" />
       </mesh>
 
-      {/* ================= IELTS HONOR BOARD (Back Wall, matching IMG_3190) ================= */}
+      {/* ================= ACADEMIC STUDY BULLETIN BOARD (Back Wall) ================= */}
       <group position={[0, 2.2, -8.92]}>
-        {/* Rich Walnut Wooden Frame */}
+        {/* Cork Bulletin Board Frame */}
         <mesh receiveShadow>
-          <boxGeometry args={[4.4, 2.4, 0.06]} />
+          <boxGeometry args={[4.4, 2.2, 0.06]} />
           <meshStandardMaterial color="#78350f" roughness={0.5} />
         </mesh>
-        {/* Warm cork / linen backing board */}
         <mesh position={[0, 0, 0.032]} receiveShadow>
-          <planeGeometry args={[4.2, 2.2]} />
-          <meshStandardMaterial color="#d97706" roughness={0.7} />
+          <planeGeometry args={[4.2, 2.0]} />
+          <meshStandardMaterial color="#c28e46" roughness={0.8} />
         </mesh>
 
-        {/* 10 IELTS Test Report Forms in a 5x2 Grid */}
-        {[-1.6, -0.8, 0, 0.8, 1.6].map((colX, colIdx) =>
-          [0.52, -0.52].map((rowY, rowIdx) => {
-            const bands = ['8.5', '7.5', '8.0', '9.0', '8.5', '8.0', '7.0', '8.5', '8.0', '8.5'];
-            const band = bands[colIdx * 2 + rowIdx] || '8.0';
-            return (
-              <group key={`ielts-${colIdx}-${rowIdx}`} position={[colX, rowY, 0.045]}>
-                {/* Certificate Paper */}
-                <mesh>
-                  <planeGeometry args={[0.62, 0.88]} />
-                  <meshStandardMaterial color="#fefefe" roughness={0.5} />
-                </mesh>
-                {/* Red IELTS Logo Header */}
-                <mesh position={[0, 0.34, 0.005]}>
-                  <planeGeometry args={[0.45, 0.08]} />
-                  <meshBasicMaterial color="#dc2626" />
-                </mesh>
-                {/* Candidate Photo placeholder */}
-                <mesh position={[-0.16, 0.16, 0.005]}>
-                  <planeGeometry args={[0.18, 0.22]} />
-                  <meshBasicMaterial color="#e2e8f0" />
-                </mesh>
-                {/* Score Band Circles */}
-                <mesh position={[0.12, 0.16, 0.005]}>
-                  <planeGeometry args={[0.26, 0.16]} />
-                  <meshBasicMaterial color="#eff6ff" />
-                </mesh>
-                {/* Band Score Number Stamp */}
-                <mesh position={[0.12, 0.16, 0.008]}>
-                  <planeGeometry args={[0.18, 0.08]} />
-                  <meshBasicMaterial color={band === '9.0' ? '#16a34a' : '#2563eb'} />
-                </mesh>
-                {/* Form Body Lines */}
-                <mesh position={[0, -0.12, 0.005]}>
-                  <planeGeometry args={[0.52, 0.02]} />
-                  <meshBasicMaterial color="#cbd5e1" />
-                </mesh>
-                <mesh position={[0, -0.20, 0.005]}>
-                  <planeGeometry args={[0.52, 0.02]} />
-                  <meshBasicMaterial color="#cbd5e1" />
-                </mesh>
-                <mesh position={[0, -0.28, 0.005]}>
-                  <planeGeometry args={[0.52, 0.02]} />
-                  <meshBasicMaterial color="#cbd5e1" />
-                </mesh>
-                {/* Golden Push Pin */}
-                <mesh position={[0, 0.41, 0.01]}>
-                  <sphereGeometry args={[0.018, 12, 12]} />
-                  <meshStandardMaterial color="#facc15" metalness={0.9} roughness={0.2} />
-                </mesh>
-              </group>
-            );
-          })
-        )}
+        {/* Academic notices and study charts */}
+        {[-1.4, -0.7, 0, 0.7, 1.4].map((px, i) => (
+          <group key={`back-notice-${i}`} position={[px, i % 2 === 0 ? 0.35 : -0.35, 0.045]}>
+            <mesh>
+              <planeGeometry args={[0.55, 0.75]} />
+              <meshStandardMaterial color="#f8fafc" roughness={0.5} />
+            </mesh>
+            <mesh position={[0, 0.28, 0.005]}>
+              <planeGeometry args={[0.42, 0.08]} />
+              <meshBasicMaterial color={i % 2 === 0 ? '#0284c7' : '#059669'} />
+            </mesh>
+            <mesh position={[0, 0.35, 0.01]}>
+              <sphereGeometry args={[0.016, 12, 12]} />
+              <meshStandardMaterial color="#f59e0b" metalness={0.8} />
+            </mesh>
+          </group>
+        ))}
       </group>
     </group>
   );

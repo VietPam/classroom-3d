@@ -35,8 +35,8 @@ export function ScorecardModal({ student, onDismiss }: ScorecardModalProps) {
   const isTopScore = scorecard.grade === 'A+' || scorecard.grade === 'A';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in pointer-events-auto">
-      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden text-slate-100 transform transition-all scale-100">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in pointer-events-auto">
+      <div className="relative w-full max-w-lg max-h-[82vh] sm:max-h-[90vh] flex flex-col bg-slate-900 border-t sm:border border-slate-700/80 rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden text-slate-100 transform transition-all scale-100">
         {/* Top Header Gradient Line */}
         <div
           className={`h-2 sm:h-2.5 w-full shrink-0 ${
