@@ -13,6 +13,7 @@ import {
   getQuizByIndex,
   getTotalQuizCount,
 } from '../config/quizConfig';
+import { STREAM_TIMING } from '../config/streamConfig';
 
 // Slot offsets bên trong mỗi ô đáp án phóng to (1.4m x 1.8m)
 // Giúp 2 đến 4 học sinh cùng đứng chung một ô mà không bị đè người
@@ -150,10 +151,10 @@ export function useClassroomStore(): ClassroomStore {
     // Tiếng bước chân lon ton khi chạy
     const footstepTimer = setTimeout(() => {
       audioEngine.playSFX('pop_soft');
-    }, 400);
+    }, STREAM_TIMING.FOOTSTEP_AUDIO_DELAY_MS);
     timersRef.current.push(footstepTimer);
 
-    // Giai đoạn 2: Đến nơi, đứng suy nghĩ đắn đo (1.8s)
+    // Giai đoạn 2: Đến nơi, đứng suy nghĩ đắn đo
     const thinkingTimer = setTimeout(() => {
       setQuizStatus('THINKING');
       audioEngine.playSFX('cat_huh');
@@ -163,10 +164,10 @@ export function useClassroomStore(): ClassroomStore {
           currentState: 'THINKING',
         }))
       );
-    }, 1800);
+    }, STREAM_TIMING.WALK_TO_THINKING_MS);
     timersRef.current.push(thinkingTimer);
 
-    // Giai đoạn 3: Bảng công bố kết quả (Reveal - 3.6s)
+    // Giai đoạn 3: Bảng công bố kết quả (Reveal)
     const revealTimer = setTimeout(() => {
       setQuizStatus('REVEAL');
 
@@ -177,10 +178,10 @@ export function useClassroomStore(): ClassroomStore {
       // Thưởng xu cho người thắng và buzzer cho người thua
       const winTimer = setTimeout(() => {
         audioEngine.playSFX('coin_reward');
-      }, 350);
+      }, STREAM_TIMING.REWARD_SFX_DELAY_MS);
       const loseTimer = setTimeout(() => {
         audioEngine.playSFX('wrong_buzzer');
-      }, 700);
+      }, STREAM_TIMING.BUZZER_SFX_DELAY_MS);
       timersRef.current.push(winTimer, loseTimer);
 
       setStudents((prev) =>
@@ -194,7 +195,7 @@ export function useClassroomStore(): ClassroomStore {
       );
 
       // Giai đoạn 4: Vòng lặp phát câu hỏi liên tục (Continuous Live Loop)
-      // Nếu isAutoPlay bật: sau 3.5s công bố kết quả -> chuyển sang câu tiếp theo
+      // Nếu isAutoPlay bật: sau thời gian hiển thị kết quả -> chuyển sang câu tiếp theo
       const autoNextTimer = setTimeout(() => {
         if (!isAutoPlayRef.current) return;
 
@@ -216,7 +217,7 @@ export function useClassroomStore(): ClassroomStore {
         quizIndexRef.current = nextIdx;
         setQuizIndex(nextIdx);
 
-        // Sau 1.4s về chỗ, học sinh đứng nghiêm túc đọc đề mới
+        // Sau khi về chỗ, học sinh đứng nghiêm túc đọc đề mới
         const readyTimer = setTimeout(() => {
           setStudents((prev) =>
             prev.map((student) => ({
@@ -224,19 +225,19 @@ export function useClassroomStore(): ClassroomStore {
               currentState: 'IDLE',
             }))
           );
-        }, 1400);
+        }, STREAM_TIMING.RETURN_TO_SPAWN_MS);
         timersRef.current.push(readyTimer);
 
-        // Sau 2.8s đọc đề mới, tự động chạy vòng showdown tiếp theo!
+        // Sau khi đọc đề mới, tự động chạy vòng showdown tiếp theo!
         const nextShowdownTimer = setTimeout(() => {
           if (isAutoPlayRef.current) {
             startQuizShowdownRef.current();
           }
-        }, 2800);
+        }, STREAM_TIMING.READ_PROMPT_MS);
         timersRef.current.push(nextShowdownTimer);
-      }, 3600);
+      }, STREAM_TIMING.REVEAL_DISPLAY_MS);
       timersRef.current.push(autoNextTimer);
-    }, 3600);
+    }, STREAM_TIMING.THINKING_TO_REVEAL_MS);
     timersRef.current.push(revealTimer);
   }, [clearTimers]);
 
@@ -266,7 +267,7 @@ export function useClassroomStore(): ClassroomStore {
           currentState: 'IDLE',
         }))
       );
-    }, 1400);
+    }, STREAM_TIMING.RETURN_TO_SPAWN_MS);
     timersRef.current.push(timer);
   }, [clearTimers]);
 
@@ -296,11 +297,11 @@ export function useClassroomStore(): ClassroomStore {
     quizIndexRef.current = nextIdx;
     setQuizIndex(nextIdx);
 
-    // Nếu đang bật Auto Play, lên lịch chạy sau khi đọc đề 2.8s
+    // Nếu đang bật Auto Play, lên lịch chạy sau khi đọc đề
     if (isAutoPlayRef.current) {
       const autoTimer = setTimeout(() => {
         startQuizShowdown();
-      }, 2800);
+      }, STREAM_TIMING.READ_PROMPT_MS);
       timersRef.current.push(autoTimer);
     }
   }, [clearTimers, resetAllToSpawn, startQuizShowdown]);
@@ -317,7 +318,7 @@ export function useClassroomStore(): ClassroomStore {
     if (isAutoPlayRef.current) {
       const autoTimer = setTimeout(() => {
         startQuizShowdown();
-      }, 2800);
+      }, STREAM_TIMING.READ_PROMPT_MS);
       timersRef.current.push(autoTimer);
     }
   }, [clearTimers, resetAllToSpawn, startQuizShowdown]);
@@ -329,12 +330,12 @@ export function useClassroomStore(): ClassroomStore {
       isAutoPlayRef.current = nextState;
 
       if (nextState) {
-        // Nếu vừa bật lại, kích hoạt showdown câu hiện tại sau 1s
+        // Nếu vừa bật lại, kích hoạt showdown câu hiện tại
         clearTimers();
         resetAllToSpawn();
         const autoTimer = setTimeout(() => {
           startQuizShowdown();
-        }, 1500);
+        }, STREAM_TIMING.AUTOPLAY_RESTART_DELAY_MS);
         timersRef.current.push(autoTimer);
       } else {
         // Tắt auto play: giữ nguyên trạng thái hiện tại, dừng lịch trình tự động chuyển câu
@@ -358,7 +359,7 @@ export function useClassroomStore(): ClassroomStore {
       if (isAutoPlayRef.current) {
         const autoTimer = setTimeout(() => {
           startQuizShowdown();
-        }, 2200);
+        }, STREAM_TIMING.GROUP_SWITCH_DELAY_MS);
         timersRef.current.push(autoTimer);
       }
     },
@@ -371,7 +372,7 @@ export function useClassroomStore(): ClassroomStore {
       if (isAutoPlayRef.current) {
         startQuizShowdown();
       }
-    }, 2500);
+    }, STREAM_TIMING.INITIAL_AUTOPLAY_DELAY_MS);
     timersRef.current.push(initialTimer);
 
     return () => {

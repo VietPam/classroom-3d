@@ -570,13 +570,27 @@ export const IELTS_QUIZ_DECK: IELTSQuizItem[] = [
 ];
 
 /**
+ * Quản lý bộ đề tùy chỉnh (hỗ trợ nạp từ API / CMS / JSON bên ngoài mà không cần sửa code giao diện)
+ */
+let dynamicQuizDeck: IELTSQuizItem[] | null = null;
+
+export function setDynamicQuizDeck(deck: IELTSQuizItem[] | null) {
+  dynamicQuizDeck = deck;
+}
+
+export function getCurrentQuizDeck(): IELTSQuizItem[] {
+  return dynamicQuizDeck && dynamicQuizDeck.length > 0 ? dynamicQuizDeck : IELTS_QUIZ_DECK;
+}
+
+/**
  * Trả về danh sách câu hỏi theo bộ lọc nhóm (Synonyms / Antonyms / Fill Blank / Tất cả)
  */
 export function getQuizPlaylist(groupId?: string): IELTSQuizItem[] {
+  const currentDeck = getCurrentQuizDeck();
   if (!groupId || groupId === 'all') {
-    return IELTS_QUIZ_DECK;
+    return currentDeck;
   }
-  return IELTS_QUIZ_DECK.filter((item) => item.groupId === groupId);
+  return currentDeck.filter((item) => item.groupId === groupId);
 }
 
 /**

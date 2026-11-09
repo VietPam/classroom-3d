@@ -22,8 +22,8 @@ export function StudentAvatar({ data }: StudentAvatarProps) {
   const currentYaw = useRef(0);
   const [isWalking, setIsWalking] = useState(false);
 
-  const studentSeed =
-    parseInt(data.id.replace('student-', '').replace('s', ''), 10) * 1.37;
+  const numericId = parseInt(data.id.replace(/\D/g, ''), 10);
+  const studentSeed = (Number.isNaN(numericId) ? 1 : numericId) * 1.37;
 
   // Target destination
   const targetX = data.targetPosition ? data.targetPosition[0] : data.deskPosition[0];

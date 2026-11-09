@@ -16,8 +16,6 @@ export interface QuizOption {
   word: string;
   ipa?: string;
   meaning?: string;
-  label?: string;
-  code?: string;
   isCorrect?: boolean;
 }
 
@@ -29,11 +27,9 @@ export interface QuizData {
   totalQuizzes?: number;
   category?: string;
   level?: string;
-  title?: string;
   question: string;
   targetWord?: string;
   contextSentence?: string;
-  codeSnippet?: string;
   options: QuizOption[];
   correctOption: 'A' | 'B' | 'C' | 'D';
   explanation?: string;
@@ -51,8 +47,7 @@ export interface StudentData {
   pantsColor: string;
   shoesColor: string;
   accessory?: 'orange' | 'lotus' | 'glasses' | 'scholar_hat' | 'red_bow' | 'none';
-  capybaraTone?: string;
-  // Spawn coordinate in world space
+  // Tọa độ vạch xuất phát / vị trí ban đầu của học sinh trong không gian 3D
   deskPosition: [number, number, number]; // [x, y, z]
   targetPosition?: [number, number, number];
   currentState?: CharacterState;

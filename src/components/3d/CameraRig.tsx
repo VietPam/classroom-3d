@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -13,24 +13,18 @@ export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
   const { camera, size } = useThree();
 
   const isPortrait = size.width < size.height;
-  const initialCamPos = useRef(
-    isPortrait ? new THREE.Vector3(0, 3.2, -6.6) : new THREE.Vector3(0, 2.2, -6.2)
+
+  const initialCamPos = useMemo(
+    () => (isPortrait ? new THREE.Vector3(0, 3.2, -6.6) : new THREE.Vector3(0, 2.2, -6.2)),
+    [isPortrait]
   );
-  const initialTarget = useRef(
-    isPortrait ? new THREE.Vector3(0, 1.9, 3.3) : new THREE.Vector3(0, 0.7, 1.8)
+  const initialTarget = useMemo(
+    () => (isPortrait ? new THREE.Vector3(0, 1.9, 3.3) : new THREE.Vector3(0, 0.7, 1.8)),
+    [isPortrait]
   );
 
   // Responsive camera setup on mount & resize
   useEffect(() => {
-    const isPortrait = size.width < size.height;
-    if (isPortrait) {
-      initialCamPos.current.set(0, 3.2, -6.6);
-      initialTarget.current.set(0, 1.9, 3.3);
-    } else {
-      initialCamPos.current.set(0, 2.2, -6.2);
-      initialTarget.current.set(0, 0.7, 1.8);
-    }
-
     if ('isPerspectiveCamera' in camera && (camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
       const persCamera = camera as THREE.PerspectiveCamera;
       const targetFov = isPortrait ? 73 : 52;
@@ -41,19 +35,19 @@ export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
     }
 
     if (controlsRef.current) {
-      controlsRef.current.target.copy(initialTarget.current);
+      controlsRef.current.target.copy(initialTarget);
       controlsRef.current.update();
     }
-  }, [size.width, size.height, camera]);
+  }, [isPortrait, camera, initialTarget]);
 
   // Handle reset button / trigger
   useEffect(() => {
     if (resetTrigger > 0 && controlsRef.current) {
-      camera.position.copy(initialCamPos.current);
-      controlsRef.current.target.copy(initialTarget.current);
+      camera.position.copy(initialCamPos);
+      controlsRef.current.target.copy(initialTarget);
       controlsRef.current.update();
     }
-  }, [resetTrigger, camera]);
+  }, [resetTrigger, camera, initialCamPos, initialTarget]);
 
   useFrame(() => {
     if (controlsRef.current) {
@@ -69,7 +63,7 @@ export function CameraRig({ resetTrigger = 0 }: CameraRigProps) {
   return (
     <OrbitControls
       ref={controlsRef}
-      target={[initialTarget.current.x, initialTarget.current.y, initialTarget.current.z]}
+      target={[initialTarget.x, initialTarget.y, initialTarget.z]}
       makeDefault
       enableDamping={false}
       enablePan={false}

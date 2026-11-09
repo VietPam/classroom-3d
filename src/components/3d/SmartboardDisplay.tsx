@@ -105,7 +105,7 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
 
     // Smart Prompting & Target Word (Tập trung thị giác, loại bỏ text thừa)
     let promptHeadline = '';
-    const rawTarget = quiz.targetWord || quiz.title || 'ACCURATE';
+    const rawTarget = quiz.targetWord || 'ACCURATE';
 
     if (quiz.groupId === 'antonyms') {
       promptHeadline = `${rawTarget.toUpperCase()}  ≠  ?`;
@@ -212,7 +212,7 @@ export function SmartboardDisplay({ quiz, status }: SmartboardDisplayProps) {
       ctx.fillText(opt.id, centerX, badgeY + 64);
 
       // 2. Main Vocab Word (Extra Large - CĂN GIỮA)
-      const wordText = opt.word || opt.code || '';
+      const wordText = opt.word || '';
 
       if (status === 'REVEAL') {
         if (isCorrect) {
