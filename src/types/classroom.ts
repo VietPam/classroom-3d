@@ -51,9 +51,6 @@ export interface StudentData {
   pantsColor: string;
   shoesColor: string;
   accessory?: 'orange' | 'lotus' | 'glasses' | 'scholar_hat' | 'red_bow' | 'none';
-  // Tọa độ vạch xuất phát / vị trí ban đầu của học sinh trong không gian 3D
-  deskPosition: [number, number, number]; // [x, y, z]
-  targetPosition?: [number, number, number];
   currentState?: CharacterState;
   chosenOption?: 'A' | 'B' | 'C' | 'D';
 }

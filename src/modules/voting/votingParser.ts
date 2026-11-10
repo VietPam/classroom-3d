@@ -53,7 +53,7 @@ export function parseVoteComment(rawComment: string): VoteOption | null {
 
   // 2. Kiểm tra cụm từ có tiền tố: "đáp án a", "chọn c", "câu b", "phương án d"
   const prefixMatch = lower.match(
-    /(?:^|[^\p{L}])(?:đáp án|dap an|chọn|chon|câu|cau|phương án|phuong an|là|la|chắc chắn là|chac chan la)\s*([abcd1234])(?![^\s\.,!?])/iu
+    /(?:^|[^\p{L}])(?:đáp án|dap an|chọn|chon|câu|cau|phương án|phuong an|là|la|chắc chắn là|chac chan la)\s*([abcd1234])(?![^\s.,!?])/iu
   );
   if (prefixMatch && prefixMatch[1]) {
     const val = prefixMatch[1].toUpperCase();

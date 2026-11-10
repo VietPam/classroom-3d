@@ -19,7 +19,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#334155',
     shoesColor: '#7c3aed',
     accessory: 'lotus',
-    deskPosition: [-2.4, 0, 1.4],
   },
   {
     id: 's2',
@@ -33,7 +32,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#334155',
     shoesColor: '#f43f5e',
     accessory: 'red_bow',
-    deskPosition: [-1.2, 0, 1.4],
   },
   {
     id: 's1',
@@ -47,7 +45,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#0f172a',
     accessory: 'orange',
-    deskPosition: [0.0, 0, 1.4],
   },
   {
     id: 's3',
@@ -61,7 +58,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#0f172a',
     shoesColor: '#0284c7',
     accessory: 'glasses',
-    deskPosition: [1.2, 0, 1.4],
   },
   {
     id: 's5',
@@ -75,7 +71,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#78350f',
     accessory: 'scholar_hat',
-    deskPosition: [2.4, 0, 1.4],
   },
 
   // ================= ROW 2 (Hàng 2 - Z = 0.5, 5 bạn) =================
@@ -91,7 +86,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#334155',
     shoesColor: '#ffffff',
     accessory: 'orange',
-    deskPosition: [-2.0, 0, 0.5],
   },
   {
     id: 's7',
@@ -105,7 +99,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#090d16',
     accessory: 'glasses',
-    deskPosition: [-0.8, 0, 0.5],
   },
   {
     id: 's8',
@@ -119,7 +112,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#0f172a',
     shoesColor: '#f43f5e',
     accessory: 'red_bow',
-    deskPosition: [0.4, 0, 0.5],
   },
   {
     id: 's9',
@@ -133,7 +125,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#1e1b4b',
     accessory: 'scholar_hat',
-    deskPosition: [1.6, 0, 0.5],
   },
   {
     id: 's10',
@@ -147,7 +138,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#334155',
     shoesColor: '#ec4899',
     accessory: 'lotus',
-    deskPosition: [2.8, 0, 0.5],
   },
 
   // ================= ROW 3 (Hàng 3 - Z = -0.4, 5 bạn) =================
@@ -163,7 +153,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#0f172a',
     accessory: 'orange',
-    deskPosition: [-2.6, 0, -0.4],
   },
   {
     id: 's12',
@@ -177,7 +166,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#0f172a',
     shoesColor: '#f8fafc',
     accessory: 'red_bow',
-    deskPosition: [-1.4, 0, -0.4],
   },
   {
     id: 's13',
@@ -191,7 +179,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#451a03',
     accessory: 'glasses',
-    deskPosition: [-0.2, 0, -0.4],
   },
   {
     id: 's14',
@@ -205,7 +192,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#334155',
     shoesColor: '#be123c',
     accessory: 'lotus',
-    deskPosition: [1.0, 0, -0.4],
   },
   {
     id: 's15',
@@ -219,7 +205,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#022c22',
     accessory: 'scholar_hat',
-    deskPosition: [2.2, 0, -0.4],
   },
 
   // ================= ROW 4 (Hàng 4 - Z = -1.3, 5 bạn) =================
@@ -235,7 +220,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#0f172a',
     shoesColor: '#ffffff',
     accessory: 'orange',
-    deskPosition: [-2.2, 0, -1.3],
   },
   {
     id: 's17',
@@ -249,7 +233,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#0f172a',
     accessory: 'glasses',
-    deskPosition: [-1.0, 0, -1.3],
   },
   {
     id: 's18',
@@ -263,7 +246,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#334155',
     shoesColor: '#dc2626',
     accessory: 'red_bow',
-    deskPosition: [0.2, 0, -1.3],
   },
   {
     id: 's19',
@@ -277,7 +259,6 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#1e293b',
     shoesColor: '#0c4a6e',
     accessory: 'scholar_hat',
-    deskPosition: [1.4, 0, -1.3],
   },
   {
     id: 's20',
@@ -291,6 +272,5 @@ export const STUDENTS_DATA: StudentData[] = [
     pantsColor: '#0f172a',
     shoesColor: '#6b21a8',
     accessory: 'lotus',
-    deskPosition: [2.6, 0, -1.3],
   },
 ];

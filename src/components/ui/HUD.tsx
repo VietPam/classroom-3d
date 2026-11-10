@@ -2,7 +2,6 @@ import {
   Play,
   SkipForward,
   Radio,
-  Camera,
   PartyPopper,
   Volume2,
   VolumeX,
@@ -21,7 +20,6 @@ interface HUDProps {
 
 export function HUD({ store }: HUDProps) {
   const {
-    resetCamera,
     startQuizShowdown,
     celebrateAll,
     triggerWaveAll,
@@ -227,18 +225,6 @@ export function HUD({ store }: HUDProps) {
             title={isMuted ? 'Bật âm thanh (BGM & SFX)' : 'Tắt âm thanh (Mute)'}
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
-
-          {/* F. Reset Camera View */}
-          <button
-            onClick={() => {
-              playSFX('click_ui');
-              resetCamera();
-            }}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all cursor-pointer active:scale-95 shrink-0"
-            title="Đặt lại góc nhìn camera mặc định"
-          >
-            <Camera className="w-4 h-4" />
           </button>
 
           {/* G. Toggle TikTok Live Simulator Dock */}

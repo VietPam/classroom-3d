@@ -6,7 +6,6 @@ import type {
   CharacterState,
 } from '../types/classroom';
 import { STUDENTS_DATA } from '../data/students';
-import { QUIZ_ZONES } from '../data/floorZones';
 import { audioEngine } from '../audio/audioEngine';
 import {
   getQuizPlaylist,
@@ -26,45 +25,10 @@ import {
   registerVote,
 } from '../modules/voting/votingEngine';
 
-// Slot offsets bên trong mỗi ô đáp án (1.4m x 1.8m)
-// Lưới 4 cột x 5 hàng hỗ trợ tối đa 20 học sinh đứng chung một ô mà không bị chồng lấn
-const ZONE_SLOT_OFFSETS: [number, number, number][] = [
-  // Hàng 1 (phía sau, Z = 0.55)
-  [-0.45, 0, 0.55],
-  [-0.15, 0, 0.55],
-  [0.15, 0, 0.55],
-  [0.45, 0, 0.55],
-
-  // Hàng 2 (Z = 0.25)
-  [-0.45, 0, 0.25],
-  [-0.15, 0, 0.25],
-  [0.15, 0, 0.25],
-  [0.45, 0, 0.25],
-
-  // Hàng 3 (Z = -0.05)
-  [-0.45, 0, -0.05],
-  [-0.15, 0, -0.05],
-  [0.15, 0, -0.05],
-  [0.45, 0, -0.05],
-
-  // Hàng 4 (hai bên mép decal chữ, Z = -0.35)
-  [-0.45, 0, -0.35],
-  [-0.15, 0, -0.35],
-  [0.15, 0, -0.35],
-  [0.45, 0, -0.35],
-
-  // Hàng 5 (phía trước mép sàn, Z = -0.65)
-  [-0.45, 0, -0.65],
-  [-0.15, 0, -0.65],
-  [0.15, 0, -0.65],
-  [0.45, 0, -0.65],
-];
-
 export interface ClassroomStore {
   students: StudentData[];
   quiz: QuizData;
   quizStatus: QuizStatus;
-  cameraResetCount: number;
   isAutoPlay: boolean;
   activeGroupId: string;
   quizIndex: number;
@@ -73,7 +37,6 @@ export interface ClassroomStore {
   nextQuiz: () => void;
   prevQuiz: () => void;
   selectGroup: (groupId: string) => void;
-  resetCamera: () => void;
   startQuizShowdown: () => void;
   resetAllToSpawn: () => void;
   celebrateAll: () => void;
@@ -94,7 +57,6 @@ export function useClassroomStore(): ClassroomStore {
   const [students, setStudents] = useState<StudentData[]>(() =>
     STUDENTS_DATA.map((s) => ({
       ...s,
-      targetPosition: s.deskPosition,
       currentState: 'IDLE' as CharacterState,
     }))
   );
@@ -103,7 +65,6 @@ export function useClassroomStore(): ClassroomStore {
   const [quizIndex, setQuizIndex] = useState<number>(0);
   const [isAutoPlay, setIsAutoPlay] = useState<boolean>(true);
   const [quizStatus, setQuizStatus] = useState<QuizStatus>('IDLE');
-  const [cameraResetCount, setCameraResetCount] = useState<number>(0);
 
   // Voting & Simulator State
   const [votingState, setVotingState] = useState<VotingState>(() =>
@@ -191,10 +152,6 @@ export function useClassroomStore(): ClassroomStore {
     timersRef.current = [];
   }, []);
 
-  const resetCamera = useCallback(() => {
-    setCameraResetCount((c) => c + 1);
-  }, []);
-
   // Get current active quiz item
   const currentRawQuiz = getQuizByIndex(quizIndex, activeGroupId);
   const totalQuizzes = getTotalQuizCount(activeGroupId);
@@ -225,25 +182,11 @@ export function useClassroomStore(): ClassroomStore {
     );
     const choices = distributionToChoiceList(distribution, 20);
 
-    const zoneSlotCounts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
-
     setStudents((prev) =>
       prev.map((student, idx) => {
         const chosen = choices[idx % choices.length];
-        const slotIdx = zoneSlotCounts[chosen]++;
-        const offset = ZONE_SLOT_OFFSETS[slotIdx % ZONE_SLOT_OFFSETS.length];
-        const zone = QUIZ_ZONES.find((z) => z.id === chosen) || QUIZ_ZONES[0];
-
-        // Tọa độ mục tiêu kết hợp offset vị trí trong ô
-        const targetPos: [number, number, number] = [
-          zone.position[0] + offset[0],
-          zone.position[1] + offset[1],
-          zone.position[2] + offset[2],
-        ];
-
         return {
           ...student,
-          targetPosition: targetPos,
           currentState: 'WALKING',
           chosenOption: chosen,
         };
@@ -308,7 +251,6 @@ export function useClassroomStore(): ClassroomStore {
         setStudents((prev) =>
           prev.map((student) => ({
             ...student,
-            targetPosition: student.deskPosition,
             currentState: 'WALKING',
             chosenOption: undefined,
           }))
@@ -358,7 +300,6 @@ export function useClassroomStore(): ClassroomStore {
     setStudents((prev) =>
       prev.map((student) => ({
         ...student,
-        targetPosition: student.deskPosition,
         currentState: 'WALKING',
         chosenOption: undefined,
       }))
@@ -580,7 +521,6 @@ export function useClassroomStore(): ClassroomStore {
     students,
     quiz,
     quizStatus,
-    cameraResetCount,
     isAutoPlay,
     activeGroupId,
     quizIndex,
@@ -589,7 +529,6 @@ export function useClassroomStore(): ClassroomStore {
     nextQuiz,
     prevQuiz,
     selectGroup,
-    resetCamera,
     startQuizShowdown,
     resetAllToSpawn,
     celebrateAll,

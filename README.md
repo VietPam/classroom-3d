@@ -1,4 +1,4 @@
-# 🏫 Classroom 3D & 2.5D Hybrid (TikTok Live Educational Showdown)
+# 🏫 Classroom 2.5D Hybrid (TikTok Live Educational Showdown)
 
 Dự án mô phỏng sân khấu phòng học tương tác trực tiếp (Interactive TikTok Live Classroom Showdown) dành cho việc học từ vựng tiếng Anh. Hệ thống hỗ trợ 20 nhân vật học sinh Chibi đại diện cho khán giả bình chọn thời gian thực, tích hợp bộ phân bổ ghế tỷ lệ Hamilton (Largest Remainder Method), bộ tổng hợp âm thanh Web Audio API không có độ trễ, và giao diện 2.5D Hybrid tối ưu cho OBS Studio / TikTok Live.
 
@@ -29,10 +29,9 @@ Dự án lấy cảm hứng từ cấu trúc hiệu năng cao của repo chùa t
 
 ---
 
-## 🔀 Điểm Khác Biệt Giữa Chế Độ 2.5D Mặc Định & 3D Fallback
+## 🔀 Định Dạng Hiển Thị & Chế Độ OBS Studio
 
-* **Mặc định (`URL: /`)**: Chế độ **2.5D Hybrid** siêu nhẹ, khởi động tức thì, nét căng ở mọi độ phân giải màn hình dọc 9:16.
-* **Chế độ 3D WebGL (`URL: /?3d=1`)**: Kích hoạt canvas Three.js / React Three Fiber với không gian 3D đầy đủ và camera tự do.
+* **Giao Diện Chuẩn 2.5D Hybrid**: Sân khấu 2.5D siêu nhẹ (~88 KB gzip), khởi động tức thì, nét căng ở mọi độ phân giải màn hình dọc 9:16.
 * **Chế độ OBS Studio (`URL: /?obs=1`)**: Ẩn toàn bộ thanh dock điều khiển và nút bấm HUD, tối ưu làm Browser Source trong OBS Studio.
 
 ---
@@ -43,21 +42,32 @@ Dự án lấy cảm hứng từ cấu trúc hiệu năng cao của repo chùa t
 classroom-3d/
 ├── src/
 │   ├── components/
-│   │   ├── stage2d/                # 🔥 MODULE 2.5D HYBRID MỚI
+│   │   ├── stage2d/                # 🔥 SÂN KHẤU 2.5D HYBRID VECTOR
 │   │   │   ├── ClassroomStage2D.tsx# Sân khấu chính 2.5D điều phối học sinh, ô đáp án, bảng thông minh
 │   │   │   ├── ChibiAvatar2D.tsx   # Nhân vật Chibi vector SVG & animation states
 │   │   │   ├── Smartboard2D.tsx    # Bảng thông minh DOM sắc nét, responsive font
 │   │   │   ├── FloorPads2D.tsx     # 4 Ô đáp án A/B/C/D nghiêng phối cảnh
 │   │   │   ├── ParticleEngine2D.tsx# Canvas 2D bắn pháo hoa giấy confetti
 │   │   │   └── types2d.ts          # Ma trận tọa độ 2.5D, slot đứng và vị trí bàn học
-│   │   ├── 3d/                     # MODULE 3D THREE.JS (Fallback mode ?3d=1)
-│   │   │   ├── ClassroomScene.tsx  # Không gian phòng học 3D WebGL
-│   │   │   ├── StudentAvatar.tsx   # Model học sinh 3D
-│   │   │   ├── Room.tsx            # Phòng học 3D
-│   │   │   └── CameraRig.tsx       # Điều khiển chuyển động camera 3D
 │   │   └── ui/                     # GIAO DIỆN ĐIỀU KHIỂN & GIẢ LẬP
 │   │       ├── HUD.tsx             # Thanh điều khiển kịch bản, emote nhanh (Chào, Giơ tay, Vũ đạo)
 │   │       └── SimulatorDock.tsx   # Bảng giả lập comment TikTok Live (A, B, C, D)
+│   ├── modules/
+│   │   ├── voting/                 # CÔNG CỤ TÍNH TOÁN BÌNH CHỌN KHÁN GIẢ
+│   │   │   ├── votingEngine.ts     # Thuật toán phân bổ ghế Hamilton (Largest Remainder)
+│   │   │   ├── votingParser.ts     # Trình bóc tách cú pháp comment tiếng Việt (A/B/C/D, 1/2/3/4)
+│   │   │   └── votingTypes.ts      # Định nghĩa kiểu dữ liệu phiếu bầu
+│   │   └── simulator/              # BỘ DỮ LIỆU GIẢ LẬP COMMENT TIKTOK LIVE
+│   ├── data/
+│   │   └── students.ts             # Danh sách 20 học sinh Chibi đa dạng
+│   ├── hooks/
+│   │   └── useClassroomStore.ts    # Store điều phối kịch bản bài thi, âm thanh và trạng thái học sinh
+│   └── audio/
+│       ├── audioEngine.ts          # Bộ tổng hợp âm thanh Web Audio API (zero delay)
+│       └── useAudio.ts             # Hook điều khiển âm thanh
+├── scripts/
+│   └── verify-stage2d.mjs          # Script kiểm thử tự động chụp ảnh 2.5D
+```
 │   ├── modules/
 │   │   └── voting/
 │   │       ├── votingEngine.ts     # Thuật toán Hamilton (Largest Remainder) chia 20 học sinh
@@ -181,24 +191,15 @@ gh run watch <run_id> --repo VietPam/repo-deploy-cloudflare
 
 ---
 
-## 🤝 Trạng Thái Hiện Tại & Bàn Giao Cho Agent Kế Tiếp
+## 🤝 Trạng Thái Hiện Tại & Bàn Giao
 
 ### Các công việc đã hoàn thành:
-1. Đã hoàn thiện toàn bộ mã nguồn 2.5D Hybrid tại `src/components/stage2d/`.
-2. Đã khắc phục triệt để các lỗi giao diện:
-   - Bàn học Hàng 4 không còn bị che bởi thanh nút HUD (`Chào`, `Phát Biểu`, `Vũ Đạo`).
-   - Học sinh khi chạy tới sàn đấu đứng chính xác trên bề mặt phát sáng của các ô A, B, C, D.
-   - Các từ vựng tiếng Anh dài (như `enormous`, `exhausted`) hiển thị responsive trọn vẹn, không bị cắt dấu ba chấm (`enor...`).
-3. Đã giữ nguyên vẹn chế độ 3D fallback qua URL `?3d=1`.
-4. Dự án biên dịch sạch 100% không cảnh báo lỗi type (`npm run build` thành công).
+1. Đã xóa bỏ 100% mã nguồn, module và thư viện 3D (`three`, `@react-three/fiber`, `@react-three/drei`, `@pixiv/three-vrm`, `@pixiv/three-vrm-animation`, `src/components/3d/`).
+2. Sân khấu 2.5D Hybrid Vector (`src/components/stage2d/`) hoạt động độc lập, siêu nhẹ (~88 KB gzip), khởi động tức thì.
+3. Bàn học Hàng 4, sàn đấu 4 ô A/B/C/D, 20 học sinh Chibi vector SVG và pháo hoa confetti hoạt động mượt mà.
+4. Dự án biên dịch sạch 100% không cảnh báo (`npm run lint` 0 warning, `npm run build` thành công trong 166ms).
+5. Script kiểm thử chuẩn hóa: `node scripts/verify-stage2d.mjs`.
 
-### Bước tiếp theo dành cho Agent tiếp quản:
-1. **Commit & Push mã nguồn**:
-   ```bash
-   git add .
-   git commit -m "feat: complete 2.5D hybrid classroom stage with chibi vector avatars and crisp smartboard"
-   git push origin main
-   ```
-2. **Kích hoạt deploy lên Cloudflare Pages** bằng lệnh `gh workflow run` nêu ở mục trên.
-3. **Kiểm tra production live** tại [https://classroom-3d.pages.dev](https://classroom-3d.pages.dev) và [https://classroom-3d.pages.dev/?3d=1](https://classroom-3d.pages.dev/?3d=1).
-4. *(Tùy chọn mở rộng)*: Tích hợp WebSocket kết nối trực tiếp với TikTok Live Connector (thay thế SimulatorDock bằng comment thật từ TikTok Live room ID).
+### Các bước mở rộng tiếp theo:
+1. Tích hợp WebSocket kết nối trực tiếp với TikTok Live Connector (thay thế SimulatorDock bằng comment thật từ TikTok Live qua roomId).
+2. Tinh chỉnh các câu hỏi và bộ từ vựng IELTS/TOEIC trong `src/config/quizConfig.ts`.
